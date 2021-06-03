@@ -47,16 +47,16 @@ class CsvHandler():
                 - default = ","
         """
         try:
-            file = open(path, mode, encoding="utf-8", newline='')
-            self.dbR = csv.reader(file, delimiter=Delimiter)
+            self.file = open(path, mode, encoding="utf-8", newline='\n')
+            self.dbR = csv.reader(self.file, delimiter=Delimiter)
             self.Data = [i for i in self.dbR]
-            self.dbW = csv.writer(file, delimiter=Delimiter)
+            self.dbW = csv.writer(self.file, delimiter=Delimiter)
         except FileNotFoundError:
             #print("Fichier non trouvé")
-            file = open(path, "x+", encoding="utf-8", newline='')
-            self.dbR = csv.reader(file, delimiter=Delimiter)
+            self.file = open(path, "x+", encoding="utf-8", newline='\n')
+            self.dbR = csv.reader(self.file, delimiter=Delimiter)
             self.Data = [i for i in self.dbR]
-            self.dbW = csv.writer(file, delimiter=Delimiter)
+            self.dbW = csv.writer(self.file, delimiter=Delimiter)
 
         #if self.Data != [] and self.Data[-1] == []:
         #    self.dbW.writerow([])
