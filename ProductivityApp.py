@@ -43,14 +43,12 @@ class MenuBar(Menu):
         self.FileMenu.add_separator() # séparateur dans le menu déroulant <File>
         self.FileMenu.add_command(
             label="Close database", command=self.CloseDatabase)
+        self.FileMenu.add_separator() # séparateur dans le menu déroulant <File>
+        self.FileMenu.add_command(
+            label="Exit", command=self.master.destroy)
         # Menu Edit
         self.EditMenu = Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=self.EditMenu)
-        self.EditMenu.add_command(
-            label="Save database as a new file", command=self.OpenDatabase)
-        self.EditMenu.add_separator()
-        self.EditMenu.add_command(
-            label="Close database", command=self.CloseDatabase)
 
     def OpenDatabase(self):
         """
@@ -106,6 +104,7 @@ class MenuBar(Menu):
             try:
                 self.master.Db.file.close()
                 self.master.Db = None
+                self.master.title(f"Productivity App v{__version__} : Pas de base de donnée ouverte")
                 print("DB fermée")
                 msgbox.showinfo("Fermeture database",
                                 "Fermeture du fichier réussie")
@@ -118,17 +117,21 @@ class MenuBar(Menu):
         """
         Sauvegarde base de donnée dans un nouveau fichier
         """
-        path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
-                title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
-        if path != None:
-            self.master.Db = DbM(path)
-            print(f"Sauvegarde DB réussie : {path}")
+        if self.master.Db == None:
             msgbox.showinfo("Sauvegarde database",
-                            "Ouverture du fichier réussie")
+                            "Il n'y a pas de base de donnée ouverte")
         else:
-            print("Sauvegarde DB annulée")
-            msgbox.showerror("Sauvegarde database",
-                             "Sauvegarde database échouée/annulée")
+            path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
+                    title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+            if path != None:
+                self.master.Db = DbM(path)
+                print(f"Sauvegarde DB réussie : {path}")
+                msgbox.showinfo("Sauvegarde database",
+                                "Ouverture du fichier réussie")
+            else:
+                print("Sauvegarde DB annulée")
+                msgbox.showerror("Sauvegarde database",
+                                    "Sauvegarde database échouée/annulée")
 
 
 class MainFrame(ttk.Frame):
@@ -174,7 +177,7 @@ class ActionFrame(ttk.Frame):
 
         Label(self, text="ActionFrame", font=("Arial",20), background="grey").pack(anchor=CENTER)
 
-        Button(self, text="Ajouter label", command=AddLabel).pack(ipadx=20,ipady=10)
+        Button(self, text="Ajouter label", command=AddLabel).pack(ipadx=20,ipady=10,anchor=CENTER)
     
 
 class TopLevel(Tk):

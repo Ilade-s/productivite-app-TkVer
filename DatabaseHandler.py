@@ -123,7 +123,7 @@ class CsvHandler():
 def main():
     Db = CsvHandler("Data/test.csv")
     print(Db.Data)
-    Db.Add(["name", "creation", "duedate"])
+    Db.Add(["name", "creation", "duedate","type"])
     Db.ReadAll()
     print(Db.Data)
 
