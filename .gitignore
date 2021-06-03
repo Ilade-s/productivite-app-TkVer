@@ -131,3 +131,4 @@ dmypy.json
 # custom ignore
 test.py
 Data/test.csv
+Data/new.csv
