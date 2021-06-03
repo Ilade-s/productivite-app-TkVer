@@ -46,6 +46,7 @@ class CsvHandler():
                 - comma entre les données du CSV
                 - default = ","
         """
+        self.Delimiter = Delimiter
         try:
             self.file = open(path, mode, encoding="utf-8", newline='\n')
             self.dbR = csv.reader(self.file, delimiter=Delimiter)
@@ -81,7 +82,10 @@ class CsvHandler():
                 - si dataheader = None, contient les lignes sous forme de listes
                 - si key correspond à plusieurs lignes, elles seront TOUTES renvoyées
         """
-        pass
+        # Mise à jour données
+        self.dbR = csv.reader(self.file, delimiter=self.Delimiter)
+        self.Data = [i for i in self.dbR]
+        print(self.Data)
 
     def Add(self, data):
         pass

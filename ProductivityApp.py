@@ -11,14 +11,15 @@ Consiste en une interface graphique tkinter :
 __version__ = "0.1"
 __author__ = "Merlet Raphaël"
 
-from DatabaseHandler import CsvHandler as DbM # Gestion base de donnée
-from PlotHandler import * # fonctions de création de graphique
-from tkinter import * # GUI
-from tkinter.ttk import *  # meilleurs widgets
+from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
+from PlotHandler import *  # fonctions de création de graphique
+from tkinter import *  # GUI
+from tkinter import ttk # meilleurs widgets
 import tkinter.filedialog as fldialog  # Choix de fichier etc...
 import os  # Pour trouver le répertoire courant (os.getcwd)
 import tkinter.messagebox as msgbox  # Messages d'information ou d'avertissement
-import shutil # Sauvegarde/copie de fichiers
+import shutil  # Sauvegarde/copie de fichiers
+
 
 class MenuBar(Menu):
     """
@@ -32,101 +33,173 @@ class MenuBar(Menu):
         self.master = master
         self.dbtype = dbtype
         self.FileMenu = Menu(self, tearoff=False)
-        self.add_cascade(label="File",underline=0, menu=self.FileMenu)
-        self.FileMenu.add_command(label="Open database", command=self.OpenDatabase)
-        self.EditMenu.add_command(label="Save database", command=self.SaveDatabase)
-        self.FileMenu.add_separator()
-        self.FileMenu.add_command(label="Close database", command=self.CloseDatabase)
+        self.add_cascade(label="File", underline=0, menu=self.FileMenu)
+        self.FileMenu.add_command(
+            label="Create new database", command=self.OpenDatabase)
+        self.FileMenu.add_command(
+            label="Open existant database", command=self.OpenDatabase)
+        self.FileMenu.add_command(
+            label="Save database", command=self.SaveDatabase)
+        self.FileMenu.add_separator() # séparateur dans le menu déroulant <File>
+        self.FileMenu.add_command(
+            label="Close database", command=self.CloseDatabase)
         # Menu Edit
         self.EditMenu = Menu(self, tearoff=False)
         self.add_cascade(label="Edit", menu=self.EditMenu)
-        self.EditMenu.add_command(label="Save database as a new file", command=self.OpenDatabase)
+        self.EditMenu.add_command(
+            label="Save database as a new file", command=self.OpenDatabase)
         self.EditMenu.add_separator()
-        self.EditMenu.add_command(label="Close database", command=self.CloseDatabase)
+        self.EditMenu.add_command(
+            label="Close database", command=self.CloseDatabase)
 
-    
     def OpenDatabase(self):
         """
         Dialogue pour ouverture de base de donnée
         """
+        a = f"Productivity App v{__version__} : Pas de base de donnée ouverte"
+        a.split()
         path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
-            title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
-        if path!=None:
+                title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+        if path != None:
             self.master.Db = DbM(path)
-            self.master.Db.dbW.writerow(["name","creation","duedate","type"])
+            # self.master.Db.dbW.writerow(["name","creation","duedate","type"])
+            self.master.title(f"Productivity App v{__version__} : {path}")
             print(f"Ouverture DB réussie : {path}")
-            msgbox.showinfo("Ouverture database","Ouverture du fichier réussie")
+            msgbox.showinfo("Ouverture database",
+                            "Ouverture du fichier réussie")
         else:
             print("Ouverture DB annulée")
-            msgbox.showerror("Ouverture database","Ouverture database échouée/annulée")
+            msgbox.showerror("Ouverture database",
+                             "Ouverture database échouée/annulée")
 
-    
+    def CreateDatabase(self):
+        """
+        Dialogue pour ouverture d'une nouvelle base de donnée
+        """
+        path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
+                title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+        if path != None:
+            # création d'un nouveau fichier CSV
+            self.master.Db = DbM(path, "x")
+            # Ajout des labels de colonne
+            self.master.Db.dbW.writerow(
+                ["name", "creation", "duedate", "type"])
+            print(f"Création DB réussie : {path}")
+            msgbox.showinfo("Création database",
+                            "Ouverture du fichier réussie")
+        else:
+            print("Création DB annulée")
+            msgbox.showerror("Création database",
+                             "Création database échouée/annulée")
+
     def CloseDatabase(self):
         """
-        Fermeture de la base de donnée
+        Fermeture de la base de donnée (si il y en a une d'ouverte)
         """
-        self.master.Db.file.close()
-        print("DB fermée")
-    
+        if self.master.Db == None:
+            msgbox.showinfo("Fermeture database",
+                            "Il n'y a pas de base de donnée ouverte")
+        else:
+            try:
+                self.master.Db.file.close()
+                self.master.Db = None
+                print("DB fermée")
+                msgbox.showinfo("Fermeture database",
+                                "Fermeture du fichier réussie")
+            except Exception:
+                print("Echec fermeture : pas de fichier ouvert ?")
+                msgbox.showerror("Fermeture database",
+                                    "Fermeture database échouée/annulée")
+
     def SaveDatabase(self):
         """
         Sauvegarde base de donnée dans un nouveau fichier
         """
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
-            title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
-        if path!=None:
+                title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+        if path != None:
             self.master.Db = DbM(path)
-            self.master.Db.dbW.writerow(["name","creation","duedate","type"])
+            self.master.Db.dbW.writerow(
+                ["name", "creation", "duedate", "type"])
             print(f"Sauvegarde DB réussie : {path}")
-            msgbox.showinfo("Sauvegarde database","Ouverture du fichier réussie")
+            msgbox.showinfo("Sauvegarde database",
+                            "Ouverture du fichier réussie")
         else:
             print("Sauvegarde DB annulée")
-            msgbox.showerror("Sauvegarde database","Sauvegarde database échouée/annulée")
+            msgbox.showerror("Sauvegarde database",
+                             "Sauvegarde database échouée/annulée")
 
-class MainFrame(Frame):
+
+class MainFrame(ttk.Frame):
     """
     Partie principale de l'application qui permet d'afficher les tâches et les demandes d'inputs
     """
 
-    def __init__(self, master=None) -> None:
-        super().__init__(master)
-        self.pack()
+    def __init__(self, master=None, style="TFrame") -> None:
+        self.master = master
+        # Style Frame
+        s = ttk.Style()
+        s.configure("MainFrame.TFrame", background="#292D3E", relief=SUNKEN)
+        super().__init__(master, style=style)
 
-class SubFrame(Frame):
+
+class ActionFrame(ttk.Frame):
     """
-    Bandeau en bas de l'application qui permet de quitter et de changer de pages dans la liste des tâches
+    Frame placé à gauche (prenant 1/4 de la longueur) permettant de choisir les actions à effectuer
     """
 
-    def __init__(self, master=None) -> None:
-        super().__init__(master)
-        self.pack()
+    def __init__(self, master=None, style="TFrame") -> None:
+        self.master = master
+        # Style Frame
+        s = ttk.Style()
+        s.configure("ActionFrame.TFrame", background="#5B648A", relief=RAISED)
+        super().__init__(master, style="ActionFrame.TFrame")
 
 class TopLevel(Tk):
     """
     Fenêtre tkinter en elle même, contient les Frames placées en grid
     """
 
-    def __init__(self, x=1000, y=600) -> None:
+    def __init__(self, x=1200, y=600) -> None:
+        """
+        Initialisation de la fenêtre
+        """
+        self.geo = (x,y)
         super().__init__()
+        self.title(f"Productivity App v{__version__} : Pas de base de donnée ouverte")
         self.Db = None
-        self.geometry("{}x{}".format(x,y))
+        self.geometry("{}x{}".format(x, y))
         # Placement des Frames
         self.SetupFrames()
-    
+
     def SetupFrames(self):
         """
         Place les Frames dans la grille
         """
+        print("Placement Frames...")
+        # Création Style
+        self.s = ttk.Style()
+        self.s.configure("ActionFrame.TFrame", background="#5B648A", relief=RAISED) # Style ActionFrame
+        self.s.configure("MainFrame.TFrame", background="#292D3E", relief=SUNKEN) # Style MainFrame
         # Configuration lignes et colonnes
-        for r in range(2):
+        for r in range(1):
             self.rowconfigure(r)
         for c in range(4):
             self.columnconfigure(c)
         # Placement Frames dans les colonnes
+        print("Création Menu...")
         self.Menu = MenuBar(self)
         self.config(menu=self.Menu)
+        # placement Menu d'actions
+        print("Création ActionFrame...")
+        self.ActionFrame = ActionFrame(self, style="ActionFrame.TFrame")
+        self.ActionFrame.grid(row=0,column=0,columnspan=1,ipadx=self.geo[0]/4,ipady=self.geo[1])
+        # Placement MainFrame
+        print("Création MainFrame...")
+        self.MainFrame = MainFrame(self, style="MainFrame.TFrame")
+        self.MainFrame.grid(row=0,column=1,columnspan=3,ipadx=self.geo[0]/4*3,ipady=self.geo[1])
 
-        
+
 
 def main():
     print("===============================================================")
@@ -134,9 +207,10 @@ def main():
     print(f"Made by {__author__}")
     print("Source : https://github.com/Ilade-s/productivite-app-TkVer")
     print("===============================================================")
-
+    # Création fenêtre
     app = TopLevel()
     app.mainloop()
 
-if __name__=='__main__': # test
+
+if __name__ == '__main__':  # test
     main()
