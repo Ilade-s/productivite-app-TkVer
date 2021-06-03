@@ -4,7 +4,7 @@ Consiste en une interface graphique tkinter :
     - Avec un stockage géré par DatabaseHandler :
         - format csv (dossier data)
         (- format sql)
-    - Permet de gérer plusieurs utilisateurs
+    - on peut ouvrir des bases de données avec nos tâches, en créer et les exporter
     - Affiche et permet de modifier des tâches, ainsi que de les trier par type
 """
 
@@ -141,6 +141,13 @@ class MainFrame(ttk.Frame):
         s = ttk.Style()
         s.configure("MainFrame.TFrame", background="#292D3E", relief=SUNKEN)
         super().__init__(master, style=style)
+        self.CreateWidgets()
+    
+    def CreateWidgets(self):
+        """
+        Placement des widgets
+        """
+        Label(self, text="MainFrame", font=("Arial",20), background="grey").pack(anchor=CENTER)
 
 
 class ActionFrame(ttk.Frame):
@@ -154,6 +161,14 @@ class ActionFrame(ttk.Frame):
         s = ttk.Style()
         s.configure("ActionFrame.TFrame", background="#5B648A", relief=RAISED)
         super().__init__(master, style="ActionFrame.TFrame")
+        self.CreateWidgets()
+    
+    def CreateWidgets(self):
+        """
+        Placement des widgets
+        """
+        Label(self, text="ActionFrame", font=("Arial",20), background="grey").pack(anchor=CENTER)
+    
 
 class TopLevel(Tk):
     """
@@ -184,8 +199,8 @@ class TopLevel(Tk):
         # Configuration lignes et colonnes
         for r in range(1):
             self.rowconfigure(r)
-        for c in range(4):
-            self.columnconfigure(c)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=3)
         # Placement Frames dans les colonnes
         print("Création Menu...")
         self.Menu = MenuBar(self)
@@ -193,11 +208,11 @@ class TopLevel(Tk):
         # placement Menu d'actions
         print("Création ActionFrame...")
         self.ActionFrame = ActionFrame(self, style="ActionFrame.TFrame")
-        self.ActionFrame.grid(row=0,column=0,columnspan=1,ipadx=self.geo[0]/4,ipady=self.geo[1])
+        self.ActionFrame.grid(row=0,column=0,ipadx=self.geo[0]/4,ipady=self.geo[1])
         # Placement MainFrame
         print("Création MainFrame...")
         self.MainFrame = MainFrame(self, style="MainFrame.TFrame")
-        self.MainFrame.grid(row=0,column=1,columnspan=3,ipadx=self.geo[0]/4*3,ipady=self.geo[1])
+        self.MainFrame.grid(row=0,column=1,ipadx=self.geo[0]/4*3,ipady=self.geo[1])
 
 
 
