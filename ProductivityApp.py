@@ -35,7 +35,7 @@ class MenuBar(Menu):
         self.FileMenu = Menu(self, tearoff=False)
         self.add_cascade(label="File", underline=0, menu=self.FileMenu)
         self.FileMenu.add_command(
-            label="Create new database", command=self.OpenDatabase)
+            label="Create new database", command=self.CreateDatabase)
         self.FileMenu.add_command(
             label="Open existant database", command=self.OpenDatabase)
         self.FileMenu.add_command(
@@ -62,7 +62,6 @@ class MenuBar(Menu):
                 title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None:
             self.master.Db = DbM(path)
-            # self.master.Db.dbW.writerow(["name","creation","duedate","type"])
             self.master.title(f"Productivity App v{__version__} : {path}")
             print(f"Ouverture DB réussie : {path}")
             msgbox.showinfo("Ouverture database",
@@ -79,11 +78,15 @@ class MenuBar(Menu):
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
                 title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None:
+            if path[-4:]!=".csv":
+                path += ".csv"
             # création d'un nouveau fichier CSV
-            self.master.Db = DbM(path, "x")
+            self.master.Db = DbM(path, "x+")
+            # Ouverture fichier
+            self.master.Db = DbM(path)
             # Ajout des labels de colonne
-            self.master.Db.dbW.writerow(
-                ["name", "creation", "duedate", "type"])
+            self.master.Db.Add(self.master.DefaultLabel)
+            self.master.title(f"Productivity App v{__version__} : {path}")
             print(f"Création DB réussie : {path}")
             msgbox.showinfo("Création database",
                             "Ouverture du fichier réussie")
@@ -119,8 +122,6 @@ class MenuBar(Menu):
                 title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None:
             self.master.Db = DbM(path)
-            self.master.Db.dbW.writerow(
-                ["name", "creation", "duedate", "type"])
             print(f"Sauvegarde DB réussie : {path}")
             msgbox.showinfo("Sauvegarde database",
                             "Ouverture du fichier réussie")
@@ -135,12 +136,12 @@ class MainFrame(ttk.Frame):
     Partie principale de l'application qui permet d'afficher les tâches et les demandes d'inputs
     """
 
-    def __init__(self, master=None, style="TFrame") -> None:
+    def __init__(self, master=None) -> None:
         self.master = master
         # Style Frame
         s = ttk.Style()
-        s.configure("MainFrame.TFrame", background="#292D3E", relief=SUNKEN)
-        super().__init__(master, style=style)
+        s.configure("MainFrame.TFrame", background="#292D3E", relief=SOLID)
+        super().__init__(master, style="MainFrame.TFrame")
         self.CreateWidgets()
     
     def CreateWidgets(self):
@@ -155,7 +156,7 @@ class ActionFrame(ttk.Frame):
     Frame placé à gauche (prenant 1/4 de la longueur) permettant de choisir les actions à effectuer
     """
 
-    def __init__(self, master=None, style="TFrame") -> None:
+    def __init__(self, master=None) -> None:
         self.master = master
         # Style Frame
         s = ttk.Style()
@@ -167,7 +168,13 @@ class ActionFrame(ttk.Frame):
         """
         Placement des widgets
         """
+        def AddLabel():
+            if self.master.Db != None:
+                self.master.Db.Add(["name", "creation", "duedate", "type"])
+
         Label(self, text="ActionFrame", font=("Arial",20), background="grey").pack(anchor=CENTER)
+
+        Button(self, text="Ajouter label", command=AddLabel).pack(ipadx=20,ipady=10)
     
 
 class TopLevel(Tk):
@@ -179,6 +186,7 @@ class TopLevel(Tk):
         """
         Initialisation de la fenêtre
         """
+        self.DefaultLabel = ["name", "creation", "duedate", "type"]
         self.geo = (x,y)
         super().__init__()
         self.title(f"Productivity App v{__version__} : Pas de base de donnée ouverte")
@@ -207,11 +215,11 @@ class TopLevel(Tk):
         self.config(menu=self.Menu)
         # placement Menu d'actions
         print("Création ActionFrame...")
-        self.ActionFrame = ActionFrame(self, style="ActionFrame.TFrame")
+        self.ActionFrame = ActionFrame(self)
         self.ActionFrame.grid(row=0,column=0,ipadx=self.geo[0]/4,ipady=self.geo[1])
         # Placement MainFrame
         print("Création MainFrame...")
-        self.MainFrame = MainFrame(self, style="MainFrame.TFrame")
+        self.MainFrame = MainFrame(self)
         self.MainFrame.grid(row=0,column=1,ipadx=self.geo[0]/4*3,ipady=self.geo[1])
 
 

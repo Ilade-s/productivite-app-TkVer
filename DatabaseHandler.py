@@ -38,30 +38,44 @@ class CsvHandler():
                 - Chemin du fichier CSV de la base de donnée
             - mode : str
                 - mode d'ouverture du fichier
-                - "x" : création d'un nouveau fichier CSV
-                - "+" : lecture/écriture d'un fichier existant
-                - si l'ouverture en mode "+" échoue, "x" sera utilisé (va créer un nouveau fichier)
-                - default = "x"
+                - "x+" : création d'un nouveau fichier CSV
+                - "r+" : lecture/écriture d'un fichier existant
+                - si l'ouverture en mode "+" échoue, "x+" sera utilisé (va créer un nouveau fichier)
+                - default = "r+"
             - Delimiter : str
                 - comma entre les données du CSV
                 - default = ","
         """
         self.Delimiter = Delimiter
-        try:
-            self.file = open(path, mode, encoding="utf-8", newline='\n')
-            self.dbR = csv.reader(self.file, delimiter=Delimiter)
-            self.Data = [i for i in self.dbR]
-            self.dbW = csv.writer(self.file, delimiter=Delimiter)
-        except FileNotFoundError:
-            #print("Fichier non trouvé")
-            self.file = open(path, "x+", encoding="utf-8", newline='\n')
-            self.dbR = csv.reader(self.file, delimiter=Delimiter)
-            self.Data = [i for i in self.dbR]
-            self.dbW = csv.writer(self.file, delimiter=Delimiter)
+        self.path = path
+        if mode=="x+":
+            with open(path, "x+", encoding="utf-8", newline='\n') as file:
+                self.dbR = csv.reader(file, delimiter=Delimiter)
+        else:
+            try:
+                self.file = open(path, mode, encoding="utf-8", newline='\n')
+                self.dbR = csv.reader(self.file, delimiter=Delimiter)
+                self.Data = [i for i in self.dbR]
+                self.dbW = csv.writer(self.file, delimiter=Delimiter)
+            except FileNotFoundError:
+                #print("Fichier non trouvé")
+                with open(path, "x+", encoding="utf-8", newline='\n') as file:
+                    self.dbR = csv.reader(file, delimiter=Delimiter)
 
         #if self.Data != [] and self.Data[-1] == []:
         #    self.dbW.writerow([])
         #self.dbW.writerow([1,2,3])
+
+    def ReadAll(self):
+        """
+        Permet de mettre à jour la base de donnée
+        """
+        self.file.close()
+        self.file = open(self.path, "r+", encoding="utf-8", newline='\n')
+        self.dbR = csv.reader(self.file, delimiter=self.Delimiter)
+        self.Data = [i for i in self.dbR]
+        self.dbW = csv.writer(self.file, delimiter=self.Delimiter)
+        #print(self.Data)
 
     def Search(self, key, dataheader=None):
         """
@@ -82,13 +96,23 @@ class CsvHandler():
                 - si dataheader = None, contient les lignes sous forme de listes
                 - si key correspond à plusieurs lignes, elles seront TOUTES renvoyées
         """
-        # Mise à jour données
-        self.dbR = csv.reader(self.file, delimiter=self.Delimiter)
-        self.Data = [i for i in self.dbR]
-        print(self.Data)
+        self.ReadAll()
 
     def Add(self, data):
-        pass
+        """
+        Permet d'ajouter la ligne data
+
+        PARAMETRES :
+        ------------
+            - data : list
+                - ligne à ajouter au fichier csv
+        
+        SORTIE :
+        ------------
+            - Aucune
+        """
+        self.dbW.writerow(data)
+        self.ReadAll()
 
     def Remove(self, key):
         pass
@@ -98,6 +122,9 @@ class CsvHandler():
 
 def main():
     Db = CsvHandler("Data/test.csv")
+    print(Db.Data)
+    Db.Add(["name", "creation", "duedate"])
+    Db.ReadAll()
     print(Db.Data)
 
 if __name__=='__main__': # test
