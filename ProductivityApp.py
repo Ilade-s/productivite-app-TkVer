@@ -22,7 +22,6 @@ from tkinter import filedialog as fldialog  # Choix de fichier etc...
 from tkinter import messagebox as msgbox
 from tkinter import simpledialog as smpldial  # Demande d'informations simples
 import os  # Pour trouver le répertoire courant (os.getcwd)
-# import shutil  # Sauvegarde/copie de fichiers
 
 
 class MenuBar(Menu):
@@ -88,11 +87,12 @@ class MenuBar(Menu):
             msgbox.showerror("Ouverture database",
                              "Ouverture database échouée/annulée")
 
-    def CreateDatabase(self):
+    def CreateDatabase(self,msg=True):
         """
         Dialogue pour ouverture d'une nouvelle base de donnée
+        msg : bool (indique si la création doit être discrète ou non et si on doit déconnecter le serveur)
         """
-        if self.master.Server != None:
+        if self.master.Server != None and msg:
             self.ServerDisconnect()
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
                                           title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
@@ -107,12 +107,16 @@ class MenuBar(Menu):
             self.master.Db.Add(self.master.DefaultLabel)
             self.master.title(f"Productivity App v{__version__} : {path}")
             print(f"Création DB réussie : {path}")
-            msgbox.showinfo("Création database",
-                            "Création et ouverture du fichier réussie")
+            if msg:
+                msgbox.showinfo("Création database",
+                                "Création et ouverture du fichier réussie")
         else:
             print("Création DB annulée")
-            msgbox.showerror("Création database",
-                             "Création database échouée/annulée")
+            if msg:
+                msgbox.showerror("Création database",
+                                "Création database échouée/annulée")
+            else:
+                return 0
 
     def CloseDatabase(self,msg=True):
         """
@@ -243,24 +247,38 @@ class MenuBar(Menu):
         Permet de se synchroniser à la base de donnée (après être connecté à un compte)
         """
         if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Sync Serveur","Vous n'êtes pas connectés à un serveur")
+            msgbox.showinfo("Sync Database","Vous n'êtes pas connectés à un serveur")
         elif self.master.Server.Account == None: # Pas de compte connecté
-            msgbox.showinfo("Sync Serveur","Vous n'êtes pas connectés à un compte") 
+            msgbox.showinfo("Sync Database","Vous n'êtes pas connectés à un compte") 
         else:
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
-                print(f"Tasks : {self.master.MainFrame.Tasks}")
+                #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 msgbox.showinfo("Sync Database","Synchronisation réussie")
             except Exception as e:
                 print("Echec de la synchronisation")
                 msgbox.showerror("Sync Database",f"La base de donnée n'a pas pu être synchronisée : {e}")
     
-    def ServerExtract(self):
+    def ServerExtract(self): # A faire
         """
         Permet d'extraire la base de donnée dans un fichier CSV
         """
-        pass
+        if self.master.Server == None: # Pas de serveur ouvert
+            msgbox.showinfo("Extract Database","Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account == None: # Pas de compte connecté
+            msgbox.showinfo("Extract Database","Vous n'êtes pas connectés à un compte") 
+        else:
+            try:
+                self.CreateDatabase(False)
+                TaskList = self.master.Server.GetData()
+                #print(f"Tasks : {TaskList}")
+                for task in TaskList:
+                    self.master.Db.Add(task[1:])
+                msgbox.showinfo("Extract Database","Extraction réussie")
+            except Exception as e:
+                print("Echec de la synchronisation")
+                msgbox.showerror("Extract Database",f"La base de donnée n'a pas pu être extraite : {e}")
 
 class MainFrame(ttk.Frame):
     """
@@ -295,8 +313,8 @@ class MainFrame(ttk.Frame):
                 task.destroy()
 
         self.ShownTasks = [Checkbutton(self, text=f"{task[1]} // {task[2]}", 
-            background="#5B648A", font=(20), width=20, anchor="w") 
-                for task in self.Tasks[self.Ci:self.Ci+7]]
+            background="#5B648A", font=(20), width=15, anchor="w") 
+                for task in self.Tasks[self.Ci:self.Ci+10]]
         for task in self.ShownTasks:
             task.pack(pady=5,padx=20,anchor="w")
 
