@@ -11,6 +11,7 @@ Consiste en une interface graphique tkinter :
 __version__ = "0.1"
 __author__ = "Merlet Raphaël"
 
+from requests.models import encode_multipart_formdata
 from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
 from PlotHandler import *  # fonctions de création de graphique
 from WebHandler import WebInterface  # Classe d'interfacage avec un serveur web
@@ -185,7 +186,7 @@ class MenuBar(Menu):
             msgbox.showerror(
                 "Connexion serveur", f"Connexion au serveur à l'adresse {adresse} échouée")
 
-    def ServerLogin(self): # A faire
+    def ServerLogin(self):
         """
         Dialogue pour identification d'un compte dans le serveur
         """
@@ -206,7 +207,7 @@ class MenuBar(Menu):
                 print(f"Echec login au compte {iD}")
                 msgbox.showerror("Login Serveur","Echec de la connexion, veuillez rééssayer")
 
-    def ServerLogout(self,msg=True): # A faire
+    def ServerLogout(self,msg=True):
         """
         Permet de se déconnecter de son compte
         msg : bool (indique si la déconnexion doit être discrète ou non)
@@ -246,9 +247,14 @@ class MenuBar(Menu):
         elif self.master.Server.Account == None: # Pas de compte connecté
             msgbox.showinfo("Sync Serveur","Vous n'êtes pas connectés à un compte") 
         else:
-            self.master.Server.Data = []
-            self.master.Server.GetData(self.master.Server.Data)
-            print(f"Tasks : {self.master.Server.Data}")
+            try:
+                self.master.MainFrame.Tasks = self.master.Server.GetData()
+                print(f"Tasks : {self.master.MainFrame.Tasks}")
+                self.master.MainFrame.ShowTasks()
+                msgbox.showinfo("Sync Database","Synchronisation réussie")
+            except Exception as e:
+                print("Echec de la synchronisation")
+                msgbox.showerror("Sync Database",f"La base de donnée n'a pas pu être synchronisée : {e}")
     
     def ServerExtract(self):
         """
@@ -261,8 +267,11 @@ class MainFrame(ttk.Frame):
     Partie principale de l'application qui permet d'afficher les tâches et les demandes d'inputs
     """
 
-    def __init__(self, master=None) -> None:
+    def __init__(self, master) -> None:
         self.master = master
+        self.Tasks = []
+        self.ShownTasks = []
+        self.Ci = 0
         # Style Frame
         s = ttk.Style()
         s.configure("MainFrame.TFrame", background="#292D3E", relief=SOLID)
@@ -275,6 +284,22 @@ class MainFrame(ttk.Frame):
         """
         Label(self, text="MainFrame", font=("Arial", 20),
               background="grey").pack(anchor=CENTER)
+    
+    def ShowTasks(self):
+        """
+        Affiche les tâches
+        """
+        # Unpack tâches précedemment affichées
+        if self.ShownTasks != []:
+            for task in self.ShownTasks:
+                task.destroy()
+
+        self.ShownTasks = [Checkbutton(self, text=f"{task[1]} // {task[2]}", 
+            background="#5B648A", font=(20), width=20, anchor="w") 
+                for task in self.Tasks[self.Ci:self.Ci+7]]
+        for task in self.ShownTasks:
+            task.pack(pady=5,padx=20,anchor="w")
+
 
 
 class ActionFrame(ttk.Frame):
@@ -282,7 +307,7 @@ class ActionFrame(ttk.Frame):
     Frame placé à gauche (prenant 1/4 de la longueur) permettant de choisir les actions à effectuer
     """
 
-    def __init__(self, master=None) -> None:
+    def __init__(self, master) -> None:
         self.master = master
         # Style Frame
         s = ttk.Style()
@@ -294,14 +319,29 @@ class ActionFrame(ttk.Frame):
         """
         Placement des widgets
         """
-        def AddLabel():
-            if self.master.Db != None:
-                self.master.Db.Add(["name", "creation", "duedate", "type"])
-
         Label(self, text="ActionFrame", font=("Arial", 20),
               background="grey").pack(anchor=CENTER)
 
-        #Button(self, text="Ajouter label", command=AddLabel).pack(ipadx=20,ipady=10,anchor=CENTER)
+
+class SubFrame(ttk.Frame):
+    """
+
+    """
+
+    def __init__(self, master) -> None:
+        self.master = master
+        # Style Frame
+        s = ttk.Style()
+        s.configure("SubFrame.TFrame", background="#A8B8FF", relief=RAISED)
+        super().__init__(master, style="SubFrame.TFrame")
+        self.CreateWidgets()
+
+    def CreateWidgets(self):
+        """
+        Placement des widgets
+        """
+        Label(self, text="SubFrame", font=("Arial", 20),
+              background="grey").pack(anchor=CENTER)
 
 
 class TopLevel(Tk):
@@ -336,8 +376,8 @@ class TopLevel(Tk):
         self.s.configure("MainFrame.TFrame", background="#292D3E",
                          relief=SUNKEN)  # Style MainFrame
         # Configuration lignes et colonnes
-        for r in range(1):
-            self.rowconfigure(r)
+        self.rowconfigure(0, weight=4)
+        self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=3)
         # Placement Frames dans les colonnes
@@ -348,12 +388,17 @@ class TopLevel(Tk):
         print("Création ActionFrame...")
         self.ActionFrame = ActionFrame(self)
         self.ActionFrame.grid(
-            row=0, column=0, ipadx=self.geo[0]/4, ipady=self.geo[1])
+            row=0, column=0, rowspan=2, columnspan=1, sticky='nesw')
         # Placement MainFrame
         print("Création MainFrame...")
         self.MainFrame = MainFrame(self)
         self.MainFrame.grid(
-            row=0, column=1, ipadx=self.geo[0]/4*3, ipady=self.geo[1])
+            row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
+        # Placement SubFrame
+        print("Création SubFrame...")
+        self.SubFrame = SubFrame(self)
+        self.SubFrame.grid(
+            row=1, column=1, rowspan=1, columnspan=1, sticky='nesw')
 
 
 def main():

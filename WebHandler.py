@@ -73,15 +73,18 @@ class WebInterface():
         print("Login réussi")
 
 
-    def GetData(self, targetlist, subpage="/getdata"):
+    def GetData(self, subpage="/getdata"):
         """
         Permet de récupérer la base de données de toutes les tâches liées à l'utilisateur
         t
         subpage : str (extension indiquant le sous page permettant des récupérer les données)
         """
-        db = self.session.post(self.adress+subpage, data=targetlist)
+        r = self.session.post(self.adress+subpage)
 
-        return db.text
+        if r.status_code != requests.codes.ok:
+            raise(Exception)
+
+        return r.json()
 
     def AddTask(self):
         """
