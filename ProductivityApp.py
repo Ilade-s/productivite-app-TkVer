@@ -11,7 +11,6 @@ Consiste en une interface graphique tkinter :
 __version__ = "0.1"
 __author__ = "Merlet Raphaël"
 
-from requests.models import encode_multipart_formdata
 from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
 from PlotHandler import *  # fonctions de création de graphique
 from WebHandler import WebInterface  # Classe d'interfacage avec un serveur web
@@ -260,7 +259,7 @@ class MenuBar(Menu):
                 print("Echec de la synchronisation")
                 msgbox.showerror("Sync Database",f"La base de donnée n'a pas pu être synchronisée : {e}")
     
-    def ServerExtract(self): # A faire
+    def ServerExtract(self):
         """
         Permet d'extraire la base de donnée dans un fichier CSV
         """
@@ -279,6 +278,7 @@ class MenuBar(Menu):
             except Exception as e:
                 print("Echec de la synchronisation")
                 msgbox.showerror("Extract Database",f"La base de donnée n'a pas pu être extraite : {e}")
+
 
 class MainFrame(ttk.Frame):
     """
@@ -317,7 +317,6 @@ class MainFrame(ttk.Frame):
                 for task in self.Tasks[self.Ci:self.Ci+10]]
         for task in self.ShownTasks:
             task.pack(pady=5,padx=20,anchor="w")
-
 
 
 class ActionFrame(ttk.Frame):
