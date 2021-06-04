@@ -58,6 +58,11 @@ class MenuBar(Menu):
             label="Disconnect", command=self.ServerDisconnect)
         self.WebMenu.add_separator()  # séparateur
         self.WebMenu.add_command(
+            label="Sync to database", command=self.ServerSync)
+        self.WebMenu.add_command(
+            label="Extract database to csv", command=self.ServerExtract)
+        self.WebMenu.add_separator()  # séparateur
+        self.WebMenu.add_command(
             label="Login", command=self.ServerLogin)
         self.WebMenu.add_command(
             label="Logout", command=self.ServerLogout)
@@ -188,16 +193,17 @@ class MenuBar(Menu):
             msgbox.showinfo("Login Serveur","Vous n'êtes pas connectés à un serveur")
         else:
             # Récupération identitifant et mot de passe
+            adresse = smpldial.askstring("Connexion compte","Adresse page de connexion :")
             iD = smpldial.askstring("Connexion compte","Identifant/Adresse mail :")
-            passwd = smpldial.askstring("Connexion compte","Mot de passe :")
+            passwd = smpldial.askstring("Connexion compte","Mot de passe :", show="*")
             # Essai de login
             try:
-                self.master.Server.Login(iD, passwd)
+                self.master.Server.Login(iD, passwd, adresse)
                 self.master.title(
                     f"Productivity App v{__version__} : {self.master.Server.adress} : {iD}")
                 msgbox.showinfo("Login Serveur",f"Connexion au compte {iD} réussie")
             except Exception as e: # Echec login
-                print(e)
+                print(f"Echec login au compte {iD}")
                 msgbox.showerror("Login Serveur","Echec de la connexion, veuillez rééssayer")
 
     def ServerLogout(self,msg=True): # A faire
@@ -231,6 +237,24 @@ class MenuBar(Menu):
                 f"Productivity App v{__version__} : Pas de base de donnée ouverte")
             print("Déconnecté du serveur")
 
+    def ServerSync(self):
+        """
+        Permet de se synchroniser à la base de donnée (après être connecté à un compte)
+        """
+        if self.master.Server == None: # Pas de serveur ouvert
+            msgbox.showinfo("Sync Serveur","Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account == None: # Pas de compte connecté
+            msgbox.showinfo("Sync Serveur","Vous n'êtes pas connectés à un compte") 
+        else:
+            self.master.Server.Data = []
+            self.master.Server.GetData(self.master.Server.Data)
+            print(f"Tasks : {self.master.Server.Data}")
+    
+    def ServerExtract(self):
+        """
+        Permet d'extraire la base de donnée dans un fichier CSV
+        """
+        pass
 
 class MainFrame(ttk.Frame):
     """
@@ -289,7 +313,7 @@ class TopLevel(Tk):
         """
         Initialisation de la fenêtre
         """
-        self.DefaultLabel = ["name", "creation", "duedate", "priority"]
+        self.DefaultLabel = ["name", "date", "priority"]
         self.geo = (x, y)
         super().__init__()
         self.title(

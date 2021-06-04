@@ -28,7 +28,7 @@ class WebInterface():
         self.adress = adress
         testrequest = requests.get(self.adress) # test GET
     
-    def Login(self, username, password):
+    def Login(self, username, password, adress):
         """
         Permet de s'identifier au serveur avec un compte (préexistant uniquement)
 
@@ -38,16 +38,52 @@ class WebInterface():
                 - identifiant/adresse email
             - password : str
                 - mot de passe du compte
-        
+            - adress : str
+                - adresse pour se login au serveur
         SORTIE :
         ------------
-            - Aucune
+            - Etat : bool
         """
         self.Account = username
-        print(f"Credentials : \n\t- username : {username} \n\t- password : {password}")
+        #print(f"Credentials : \n\t- username : {username} \n\t- password : {password}")
+        # création payload credentials
+        payload = {
+            'email': username,
+            'password': password
+        }
 
-    def GetDatabase(self):
+        # Use 'with' to ensure the session context is closed after use.
+        self.session = requests.Session()
+        p = self.session.post(adress, data=payload)
+        print("login :",p.status_code)
+
+        if p.status_code != requests.codes.ok:
+            raise(Exception)
+
+        # An authorised request.
+        r = self.session.get(self.adress+"/profile")
+        print("profile :",r.status_code)
+
+        if r.status_code != requests.codes.ok:
+            raise(Exception)
+        
+        if not "Welcome" in r.text:
+            raise(Exception)
+        
+        print("Login réussi")
+
+
+    def GetData(self, targetlist, subpage="/getdata"):
         """
         Permet de récupérer la base de données de toutes les tâches liées à l'utilisateur
+        t
+        subpage : str (extension indiquant le sous page permettant des récupérer les données)
         """
-        pass
+        db = self.session.post(self.adress+subpage, data=targetlist)
+
+        return db.text
+
+    def AddTask(self):
+        """
+        Ajoute un tâche
+        """
