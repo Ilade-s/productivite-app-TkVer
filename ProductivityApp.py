@@ -265,7 +265,7 @@ class MenuBar(Menu):
         else:
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
-                #print(f"Tasks : {self.master.MainFrame.Tasks}")
+                print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database","Synchronisation réussie")
@@ -348,7 +348,7 @@ class MainFrame(LabelFrame):
             for task in self.ShownTasks:
                 task.destroy()
 
-        self.ShownTasks = [Checkbutton(self, text=f"{task[1]} // {task[2]}", 
+        self.ShownTasks = [Checkbutton(self, text=f"{task[2]} // {task[3]}",
             background="#5B648A", font=(17), anchor="w") 
                 for task in self.Tasks[self.Ci:self.Ci+10]]
         for task in self.ShownTasks:
