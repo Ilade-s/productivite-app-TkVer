@@ -209,7 +209,7 @@ class MenuBar(Menu):
             msgbox.showinfo("Login Serveur",
                 f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous reconnecter")
         else:
-            self.master.LoginPage = AccountFrame(self.master.MainFrame, "login")
+            AccountFrame(self.master.MainFrame, "login")
             
 
     def ServerLogout(self,msg=True):
@@ -254,7 +254,7 @@ class MenuBar(Menu):
             msgbox.showinfo("Sync Database","Vous n'êtes pas connectés à un compte") 
         else:
             try:
-                #self.master.MainFrame.Tasks = self.master.Server.GetData()
+                self.master.MainFrame.Tasks = self.master.Server.GetData()
                 print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
@@ -401,12 +401,11 @@ class AccountFrame(LabelFrame):
         idEntry.grid(row=0, column=1, padx=10, pady=10)
         passwdEntry.grid(row=1, column=1, padx=10, pady=10)
 
-    
     def SignupFrame(self):
         """
         Widgets de frame permettant de créer un nouveau compte
         """
-        self["text"] = "Login"
+        self["text"] = "Création d'un compte"
 
 
 class ActionFrame(LabelFrame):
