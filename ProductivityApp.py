@@ -21,6 +21,7 @@ from tkinter import filedialog as fldialog  # Choix de fichier etc...
 from tkinter import messagebox as msgbox
 from tkinter import simpledialog as smpldial  # Demande d'informations simples
 import os  # Pour trouver le répertoire courant (os.getcwd)
+from functools import partial # permet d'exécuter des fonctions avec arguments avec des widgets tk
 
 
 class MenuBar(Menu):
@@ -206,21 +207,10 @@ class MenuBar(Menu):
             msgbox.showinfo("Login Serveur","Vous n'êtes pas connectés à un serveur")
         elif self.master.Server.Account != None:
             msgbox.showinfo("Login Serveur",
-                f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous réconnecter")
+                f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous reconnecter")
         else:
-            self.master.LoginPage = AccountFrame(self.master)
-            # Récupération identitifant et mot de passe
-            iD = smpldial.askstring("Connexion compte","Identifant/Adresse mail :")
-            passwd = smpldial.askstring("Connexion compte","Mot de passe :", show="*")
-            try:
-                self.master.Server.Login(iD, passwd, self.master.Server.adress+"/login")
-                self.master.title(
-                    f"Productivity App v{__version__} : {self.master.Server.adress} : {iD}")
-                msgbox.showinfo("Login Serveur",f"Connexion au compte {iD} réussie")
-            except Exception as e:
-                self.master.Server.Account = None
-                print(f"Echec login au compte {iD}")
-                msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
+            self.master.LoginPage = AccountFrame(self.master.MainFrame, "login")
+            
 
     def ServerLogout(self,msg=True):
         """
@@ -264,7 +254,7 @@ class MenuBar(Menu):
             msgbox.showinfo("Sync Database","Vous n'êtes pas connectés à un compte") 
         else:
             try:
-                self.master.MainFrame.Tasks = self.master.Server.GetData()
+                #self.master.MainFrame.Tasks = self.master.Server.GetData()
                 print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
@@ -386,28 +376,28 @@ class AccountFrame(LabelFrame):
         # Création variables des entrées
         iD = StringVar()
         passwd = StringVar()
-
-        def LoginAttempt():
+        def LoginAttempt(iD, passwd):
             try:
-                self.master.Server.Login(iD.get(), passwd.get(), self.master.Server.adress+"/login")
-                self.master.title(
-                    f"Productivity App v{__version__} : {self.master.Server.adress} : {iD}")
-                msgbox.showinfo("Login Serveur",f"Connexion au compte {iD} réussie")
+                self.master.master.Server.Login(iD.get(), passwd.get(), self.master.master.Server.adress+"/login")
+                self.master.master.title(
+                    f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
+                msgbox.showinfo("Login Serveur",f"Connexion au compte {iD.get()} réussie")
+                self.destroy()
             except Exception as e:
-                self.master.Server.Account = None
-                print(f"Echec login au compte {iD}")
+                self.master.master.Server.Account = None
+                print(f"Echec login au compte {iD.get()}")
                 msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
 
         self["text"] = "Connexion à un compte"
         # Création widgets
-        Label(self, text="adresse mail :", font=(17), background=self["background"]
-            ).grid(row=0, column=0, padx=10, pady=10)
-        Label(self, text="mot de passe :", font=(17), background=self["background"]
-            ).grid(row=1, column=0, padx=10, pady=10)
-        ttk.Button(self, text="Login", command=LoginAttempt, width=20, background=self["background"]
+        Label(self, text="email :", font=(17), background=self["background"], foreground="white"
+            ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        Label(self, text="password :", font=(17), background=self["background"], foreground="white"
+            ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        ttk.Button(self, text="Login", command=partial(LoginAttempt, iD, passwd), width=20
             ).grid(row=2, column=1, padx=10, pady=10)
         idEntry = ttk.Entry(self, textvariable=iD, width=30, background=self["background"])
-        passwdEntry = ttk.Entry(self, textvariable=passwd, width=30, background=self["background"])
+        passwdEntry = ttk.Entry(self, textvariable=passwd, width=30, background=self["background"], show="*")
         idEntry.grid(row=0, column=1, padx=10, pady=10)
         passwdEntry.grid(row=1, column=1, padx=10, pady=10)
 
