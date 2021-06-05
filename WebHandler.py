@@ -4,6 +4,7 @@ La classe est initialisée avec l'adresse du serveur en argument
 """
 
 import requests
+from requests.models import Response
 
 class WebInterface():
     """
@@ -56,7 +57,7 @@ class WebInterface():
         if p.status_code != requests.codes.ok:
             raise(Exception)
         # An authorised request.
-        r = self.session.get(self.adress+"/profile")
+        r = self.session.get(self.adress+"profile")
         #print("profile :",r.status_code)
 
         if r.status_code != requests.codes.ok:
@@ -92,24 +93,16 @@ class WebInterface():
 
         # Use 'with' to ensure the session context is closed after use.
         self.session = requests.Session()
-        p = self.session.post(adress, data=payload)
+        p = self.session.post(adress, data=payload, allow_redirects=True)
         #print("login :",p.status_code)
-
         if p.status_code != requests.codes.ok:
             raise(Exception)
-        # An authorised request.
-        r = self.session.get(self.adress+"/profile")
-        #print("profile :",r.status_code)
+        if not p.url == self.adress+"login":
+            raise(Exception)
 
-        if r.status_code != requests.codes.ok:
-            raise(Exception)
-        
-        if not "Welcome" in r.text:
-            raise(Exception)
-        
         print(f"Création du compte réussie : {self.Account}")
 
-        self.Login(username, password, )
+        self.Login(username, password, self.adress+"login")
 
 
     def GetData(self, subpage="/getdata"):
@@ -124,7 +117,7 @@ class WebInterface():
 
         return r.json()
 
-    def AddTask(self):
+    def AddTask(self): # à faire
         """
         Ajoute un tâche
         """

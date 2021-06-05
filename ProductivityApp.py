@@ -209,9 +209,11 @@ class MenuBar(Menu):
             msgbox.showinfo("Login Serveur",
                 f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous reconnecter")
         else:
-            AccountFrame(self.master.MainFrame, "login")
+            if self.master.AccountFrame != None:
+                self.master.AccountFrame.destroy()
+                self.master.AccountFrame = None
+            self.master.AccountFrame = AccountFrame(self.master.MainFrame, "login")
             
-
     def ServerLogout(self,msg=True):
         """
         Permet de se déconnecter de son compte
@@ -222,6 +224,7 @@ class MenuBar(Menu):
         elif self.master.Server.Account == None: # Pas de compte connecté
             msgbox.showinfo("Logout Serveur","Vous n'êtes pas connectés à un compte") 
         else:
+            self.master.MainFrame.UnpackTasks() # Supprime les tâches
             self.master.Server.Account = None
             self.master.Server.session.close() # fermeture session
             self.master.title(
@@ -239,10 +242,12 @@ class MenuBar(Menu):
         else:
             if self.master.Server.Account != None:
                 self.ServerLogout(False)
+            oldserver = self.master.Server
             self.master.Server = None
             self.master.title(
                 f"Productivity App v{__version__} : Pas de base de donnée ouverte")
             print("Déconnecté du serveur")
+            msgbox.showinfo("Login Serveur",f"Déconnecté du serveur {oldserver}")
 
     def ServerSync(self):
         """
@@ -255,7 +260,7 @@ class MenuBar(Menu):
         else:
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
-                print(f"Tasks : {self.master.MainFrame.Tasks}")
+                #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database","Synchronisation réussie")
@@ -287,7 +292,7 @@ class MenuBar(Menu):
                 print("Echec de l'extraction")
                 msgbox.showerror("Extract Database",f"La base de donnée n'a pas pu être extraite : {e}")
 
-    def ServerSignup(self): # à faire
+    def ServerSignup(self):
         """
         dialogue (AccountFrame) permettant de créer un compte
         """
@@ -297,13 +302,10 @@ class MenuBar(Menu):
             msgbox.showinfo("Signup Serveur",
                 f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant d'en créer un nouveau")
         else:
-            try:
-                # à remplir...
-                pass
-            except Exception as e:
-                self.master.Server.Account = None
-                print("Echec création du compte")
-                msgbox.showerror("Signup Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
+            if self.master.AccountFrame != None:
+                self.master.AccountFrame.destroy()
+                self.master.AccountFrame = None
+            self.master.AccountFrame = AccountFrame(self.master.MainFrame, "signup")
     
 
 
@@ -343,6 +345,13 @@ class MainFrame(LabelFrame):
                 for task in self.Tasks[self.Ci:self.Ci+10]]
         for task in self.ShownTasks:
             task.pack(anchor="w", padx=20, pady=5)
+    
+    def UnpackTasks(self):
+        """
+        Retire toutes les tâches
+        """
+        for task in self.ShownTasks:
+            task.destroy()
 
 
 class AccountFrame(LabelFrame):
@@ -359,15 +368,19 @@ class AccountFrame(LabelFrame):
             - "signup" : fenêtre de création de compte avec id, nom et mdp
         """
         assert purpose == "login" or purpose == "signup", "purpose invalide, affichage AccountFrame annulé"
+        if purpose=="login":
+            height = 300
+        else:
+            height = 400
         super().__init__(master, background="#424864", 
             relief=SOLID, text="AccountFrame", foreground="white",
-                width=450, height=300)
+                width=450, height=height)
         self.master = master
         if purpose=="login": 
             self.LoginFrame()
         elif purpose=="signup": 
             self.SignupFrame()
-        self.pack(anchor="w", pady=5, padx=5)
+        self.pack(anchor="nw", pady=5, padx=5)
     
     def LoginFrame(self):
         """
@@ -405,7 +418,38 @@ class AccountFrame(LabelFrame):
         """
         Widgets de frame permettant de créer un nouveau compte
         """
+        # Création variables des entrées
+        iD = StringVar()
+        passwd = StringVar()
+        name = StringVar()
+        def LoginAttempt(iD, name, passwd):
+            try:
+                self.master.master.Server.Signup(iD.get(), passwd.get(), name.get(), self.master.master.Server.adress+"/signup")
+                self.master.master.title(
+                    f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
+                msgbox.showinfo("Signup Serveur",f"Création du compte {iD.get()} réussie")
+                self.destroy()
+            except Exception as e:
+                self.master.master.Server.Account = None
+                print(f"Echec signup compte {iD.get()}")
+                msgbox.showerror("Signup Serveur",f"Echec de la création, veuillez réessayer : {e}")
+
         self["text"] = "Création d'un compte"
+        # Création widgets
+        Label(self, text="email :", font=(17), background=self["background"], foreground="white"
+            ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        Label(self, text="name :", font=(17), background=self["background"], foreground="white"
+            ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        Label(self, text="password :", font=(17), background=self["background"], foreground="white"
+            ).grid(row=2, column=0, padx=10, pady=10, sticky="w")
+        ttk.Button(self, text="Signup", command=partial(LoginAttempt, iD, name, passwd), width=20
+            ).grid(row=3, column=1, padx=10, pady=10)
+        idEntry = ttk.Entry(self, textvariable=iD, width=30, background=self["background"])
+        nameEntry = ttk.Entry(self, textvariable=name, width=30, background=self["background"])
+        passwdEntry = ttk.Entry(self, textvariable=passwd, width=30, background=self["background"], show="*")
+        idEntry.grid(row=0, column=1, padx=10, pady=10)
+        nameEntry.grid(row=1, column=1, padx=10, pady=10)
+        passwdEntry.grid(row=2, column=1, padx=10, pady=10)
 
 
 class ActionFrame(LabelFrame):
@@ -465,7 +509,7 @@ class TopLevel(Tk):
             f"Productivity App v{__version__} : Pas de base de donnée ouverte")
         self.Db = None
         self.Server = None
-        self.LoginPage = None
+        self.AccountFrame = None
         self.geometry("{}x{}".format(x, y))
         # Placement des Frames
         self.SetupFrames()
