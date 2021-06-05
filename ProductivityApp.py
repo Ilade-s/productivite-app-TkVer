@@ -308,7 +308,8 @@ class MainFrame(LabelFrame):
         self.ShownTasks = []
         self.Ci = 0
         super().__init__(master, background="#292D3E", 
-            relief=SOLID, text="MainFrame", foreground="white")
+            relief=SOLID, text="MainFrame", foreground="white",
+                height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
         self.CreateWidgets()
 
     def CreateWidgets(self):
@@ -331,7 +332,22 @@ class MainFrame(LabelFrame):
             background="#5B648A", font=(17), anchor="w") 
                 for task in self.Tasks[self.Ci:self.Ci+10]]
         for task in self.ShownTasks:
-            task.pack(anchor="w",ipady=5,ipadx=5, pady=5, padx=10)
+            task.pack(anchor="w", padx=20, pady=5)
+
+
+class AccountFrame(LabelFrame):
+    """
+    Frame utilisé pour la connexion à un compte ou à sa création
+    située (packée) dans MainFrame
+    """
+    def __init__(self, master):
+        super().__init__(master)
+        self.master = master
+    
+    def LoginWidgets(self):
+        """
+        Widgets de frame permettant de se connecter à un compte existant
+        """
 
 
 class ActionFrame(LabelFrame):
@@ -342,7 +358,8 @@ class ActionFrame(LabelFrame):
     def __init__(self, master) -> None:
         self.master = master
         super().__init__(master, background="#5B648A", 
-            relief=RAISED, text="ActionFrame", foreground="white")
+            relief=RAISED, text="ActionFrame", foreground="white",
+            height=self.master.geo[1], width=self.master.geo[0]/4)
         self.CreateWidgets()
 
     def CreateWidgets(self):
@@ -361,7 +378,8 @@ class SubFrame(LabelFrame):
     def __init__(self, master) -> None:
         self.master = master
         super().__init__(master, background="#A8B8FF", 
-            relief=RAISED, text="SubFrame", foreground="white")
+            relief=RAISED, text="SubFrame", foreground="white",
+                height=self.master.geo[1]*.25, width=self.master.geo[0]*.75)
         self.CreateWidgets()
 
     def CreateWidgets(self):
@@ -384,7 +402,7 @@ class TopLevel(Tk):
         super().__init__()
         self.DefaultLabel = ["name", "date", "priority"]
         self.geo = (x, y)
-        self.iconphoto(False, PhotoImage(file="Assets/favicon.png"))
+        self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(
             f"Productivity App v{__version__} : Pas de base de donnée ouverte")
         self.Db = None
@@ -399,10 +417,10 @@ class TopLevel(Tk):
         """
         print("Placement Frames...")
         # Configuration lignes et colonnes
-        self.rowconfigure(0, weight=4)
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=3)
+        self.grid_rowconfigure(0, weight=3)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=3)
         # Placement Frames dans les colonnes
         print("Création Menu...")
         self.Menu = MenuBar(self)
