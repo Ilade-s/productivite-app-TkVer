@@ -1,4 +1,3 @@
 # productivite-app-TkVer
 Tkinter (python) version of the webapp for the project
-Je vais utiliser des fichiers CSV pour le stockage des données pour la 1ere version car ce sera plus facile à implémenter en 1er lieu
-Je compte utiliser sqlite dans un second temps
+Permet de se connecter au serveur, d'afficher la liste des tâches ainsi que de l'exporter au format qui pourra (à faire) être lu en local
