@@ -1,11 +1,7 @@
 """
 Application/Programme de productivité et d'emploi du temps
-Consiste en une interface graphique tkinter : 
-    - Avec un stockage géré par DatabaseHandler :
-        - format csv (dossier data)
-        (- format sql)
-    - on peut ouvrir des bases de données avec nos tâches, en créer et les exporter
-    - Affiche et permet de modifier des tâches, ainsi que de les trier par type
+supporte la connexion au serveur correspondant et l'exportation en CSV
+on peut afficher les tâches en se synchronisant au serveur
 """
 
 __version__ = "0.1"
