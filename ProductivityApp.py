@@ -30,10 +30,9 @@ class MenuBar(Menu):
     Affiche les actions possibles en fonction de MainFrame
     """
 
-    def __init__(self, master, dbtype="csv") -> None:
+    def __init__(self, master) -> None:
         super().__init__(master)
         self.master = master
-        self.dbtype = dbtype
         self.FileMenu = Menu(self, tearoff=False)
         self.add_cascade(label="File", underline=0, menu=self.FileMenu)
         self.FileMenu.add_command(
@@ -54,7 +53,7 @@ class MenuBar(Menu):
         self.WebMenu.add_command(
             label="Connect to server", command=self.ServerConnect)
         self.WebMenu.add_command(
-            label="Disconnect", command=self.ServerDisconnect)
+            label="Login", command=self.ServerLogin)
         self.WebMenu.add_separator()  # séparateur
         self.WebMenu.add_command(
             label="Sync to database", command=self.ServerSync)
@@ -62,7 +61,7 @@ class MenuBar(Menu):
             label="Extract database to csv", command=self.ServerExtract)
         self.WebMenu.add_separator()  # séparateur
         self.WebMenu.add_command(
-            label="Login", command=self.ServerLogin)
+            label="Disconnect", command=self.ServerDisconnect)
         self.WebMenu.add_command(
             label="Logout", command=self.ServerLogout)
 
