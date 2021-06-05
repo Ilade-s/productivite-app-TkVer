@@ -4,7 +4,6 @@ La classe est initialisée avec l'adresse du serveur en argument
 """
 
 import requests
-from requests.models import Response
 
 class WebInterface():
     """
@@ -27,7 +26,10 @@ class WebInterface():
         """
         self.Account = None
         self.adress = adress
-        testrequest = requests.get(self.adress) # test GET
+        r = requests.get(self.adress) # test GET
+        if r.status_code != requests.codes.ok:
+            raise(Exception)
+
     
     def Login(self, username, password, adress):
         """
@@ -43,20 +45,19 @@ class WebInterface():
                 - adresse pour se login au serveur
         """
         self.Account = username
-        # création payload credentials
+
         payload = {
             'email': username,
             'password': password
         }
 
-        # Use 'with' to ensure the session context is closed after use.
         self.session = requests.Session()
         p = self.session.post(adress, data=payload)
         #print("login :",p.status_code)
 
         if p.status_code != requests.codes.ok:
             raise(Exception)
-        # An authorised request.
+
         r = self.session.get(self.adress+"profile")
         #print("profile :",r.status_code)
 
@@ -91,7 +92,6 @@ class WebInterface():
             'password': password
         }
 
-        # Use 'with' to ensure the session context is closed after use.
         self.session = requests.Session()
         p = self.session.post(adress, data=payload, allow_redirects=True)
         #print("login :",p.status_code)
