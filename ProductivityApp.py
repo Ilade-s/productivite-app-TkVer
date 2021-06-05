@@ -208,18 +208,16 @@ class MenuBar(Menu):
             msgbox.showinfo("Login Serveur",
                 f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous réconnecter")
         else:
-            self.master.LoginPage = AccountFrame(self.master.MainFrame)
+            self.master.LoginPage = AccountFrame(self.master)
             # Récupération identitifant et mot de passe
-            #adresse = smpldial.askstring("Connexion compte","Adresse page de connexion :")
             iD = smpldial.askstring("Connexion compte","Identifant/Adresse mail :")
             passwd = smpldial.askstring("Connexion compte","Mot de passe :", show="*")
-            # Essai de login
             try:
                 self.master.Server.Login(iD, passwd, self.master.Server.adress+"/login")
                 self.master.title(
                     f"Productivity App v{__version__} : {self.master.Server.adress} : {iD}")
                 msgbox.showinfo("Login Serveur",f"Connexion au compte {iD} réussie")
-            except Exception as e: # Echec login
+            except Exception as e:
                 self.master.Server.Account = None
                 print(f"Echec login au compte {iD}")
                 msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
@@ -362,20 +360,59 @@ class AccountFrame(LabelFrame):
     Frame utilisé pour la connexion à un compte ou à sa création
     située (packée) dans MainFrame
     """
-    def __init__(self, master):
+    def __init__(self, master, purpose="login"):
+        """
+        Création et affichage de la Frame souhaitée
+        master : fenêtre maîtresse (sera MainFrame)
+        purpose : str : indique le but de la Frame à afficher (et donc les widgets à ajouter):
+            - "login" : fenêtre de connexion avec id et mdp
+            - "signup" : fenêtre de création de compte avec id, nom et mdp
+        """
+        assert purpose == "login" or purpose == "signup", "purpose invalide, affichage AccountFrame annulé"
         super().__init__(master, background="#424864", 
             relief=SOLID, text="AccountFrame", foreground="white",
                 width=450, height=300)
         self.master = master
+        if purpose=="login": 
+            self.LoginFrame()
+        elif purpose=="signup": 
+            self.SignupFrame()
         self.pack(anchor="w", pady=5, padx=5)
     
-    def LoginWidgets(self):
+    def LoginFrame(self):
         """
         Widgets de frame permettant de se connecter à un compte existant
         """
-        self["text"] = "Login"
+        # Création variables des entrées
+        iD = StringVar()
+        passwd = StringVar()
+
+        def LoginAttempt():
+            try:
+                self.master.Server.Login(iD.get(), passwd.get(), self.master.Server.adress+"/login")
+                self.master.title(
+                    f"Productivity App v{__version__} : {self.master.Server.adress} : {iD}")
+                msgbox.showinfo("Login Serveur",f"Connexion au compte {iD} réussie")
+            except Exception as e:
+                self.master.Server.Account = None
+                print(f"Echec login au compte {iD}")
+                msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
+
+        self["text"] = "Connexion à un compte"
+        # Création widgets
+        Label(self, text="adresse mail :", font=(17), background=self["background"]
+            ).grid(row=0, column=0, padx=10, pady=10)
+        Label(self, text="mot de passe :", font=(17), background=self["background"]
+            ).grid(row=1, column=0, padx=10, pady=10)
+        ttk.Button(self, text="Login", command=LoginAttempt, width=20, background=self["background"]
+            ).grid(row=2, column=1, padx=10, pady=10)
+        idEntry = ttk.Entry(self, textvariable=iD, width=30, background=self["background"])
+        passwdEntry = ttk.Entry(self, textvariable=passwd, width=30, background=self["background"])
+        idEntry.grid(row=0, column=1, padx=10, pady=10)
+        passwdEntry.grid(row=1, column=1, padx=10, pady=10)
+
     
-    def SignupWidgets(self):
+    def SignupFrame(self):
         """
         Widgets de frame permettant de créer un nouveau compte
         """
