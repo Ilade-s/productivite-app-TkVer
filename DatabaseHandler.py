@@ -11,9 +11,6 @@ CLASSES :
             - Add : ajouter une donnée/ligne
             - Remove : retirer une ligne
             - Edit : éditer une ligne ou un élément de ligne
-    - SqlHandler :
-        - permet de gérer et lire une base de données avec une interface SQL
-        - pour l'instant vide, sera faite et utilisée dans un second temps
 """
 
 import csv  # Module mère gestion CSV
@@ -62,10 +59,6 @@ class CsvHandler():
                 with open(path, "x+", encoding="utf-8", newline='\n') as file:
                     self.dbR = csv.reader(file, delimiter=Delimiter)
 
-        #if self.Data != [] and self.Data[-1] == []:
-        #    self.dbW.writerow([])
-        #self.dbW.writerow([1,2,3])
-
     def ReadAll(self):
         """
         Permet de mettre à jour la base de donnée
@@ -76,27 +69,6 @@ class CsvHandler():
         self.Data = [i for i in self.dbR]
         self.dbW = csv.writer(self.file, delimiter=self.Delimiter)
         #print(self.Data)
-
-    def Search(self, key, dataheader=None):
-        """
-        Permet de chercher une donnée ou une ligne de donnée dans la base de donnée
-
-        PARAMETRES :
-        ------------
-            - key : str
-                - clé de la donnée/des données à chercher
-            - dataheader : None | str
-                - None : signifie que toute la/les lignes correspondantes doivent être récupérées
-                - str : header de la ligne de donnée à récupérer
-                - default = None
-        
-        SORTIE :
-        -----------
-            - données : list
-                - si dataheader = None, contient les lignes sous forme de listes
-                - si key correspond à plusieurs lignes, elles seront TOUTES renvoyées
-        """
-        self.ReadAll()
 
     def Add(self, data):
         """
