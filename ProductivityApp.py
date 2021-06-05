@@ -289,13 +289,14 @@ class MenuBar(Menu):
                 #print(f"Tasks : {TaskList}")
                 for task in TaskList:
                     self.master.Db.Add(task[1:])
+                print("Exrtraction réussie")
                 msgbox.showinfo("Extract Database","Extraction réussie")
             except Exception as e:
                 print("Echec de l'extraction")
                 msgbox.showerror("Extract Database",f"La base de donnée n'a pas pu être extraite : {e}")
 
 
-class MainFrame(ttk.Frame):
+class MainFrame(LabelFrame):
     """
     Partie principale de l'application qui permet d'afficher les tâches et les demandes d'inputs
     """
@@ -305,18 +306,16 @@ class MainFrame(ttk.Frame):
         self.Tasks = []
         self.ShownTasks = []
         self.Ci = 0
-        # Style Frame
-        s = ttk.Style()
-        s.configure("MainFrame.TFrame", background="#292D3E", relief=SOLID)
-        super().__init__(master, style="MainFrame.TFrame")
+        super().__init__(master, background="#292D3E", 
+            relief=SOLID, text="MainFrame", foreground="white")
         self.CreateWidgets()
 
     def CreateWidgets(self):
         """
         Placement des widgets
         """
-        Label(self, text="MainFrame", font=("Arial", 20),
-              background="grey").pack(anchor=CENTER)
+        #Label(self, text="MainFrame", font=("Arial", 20),
+        #      background="grey").pack(anchor=CENTER)
     
     def ShowTasks(self):
         """
@@ -328,52 +327,48 @@ class MainFrame(ttk.Frame):
                 task.destroy()
 
         self.ShownTasks = [Checkbutton(self, text=f"{task[1]} // {task[2]}", 
-            background="#5B648A", font=(20), width=15, anchor="w") 
+            background="#5B648A", font=(17), anchor="w") 
                 for task in self.Tasks[self.Ci:self.Ci+10]]
         for task in self.ShownTasks:
-            task.pack(pady=5,padx=20,anchor="w")
+            task.pack(anchor="w",ipady=5,ipadx=5, pady=5, padx=10)
 
 
-class ActionFrame(ttk.Frame):
+class ActionFrame(LabelFrame):
     """
     Frame placé à gauche (prenant 1/4 de la longueur) permettant de choisir les actions à effectuer
     """
 
     def __init__(self, master) -> None:
         self.master = master
-        # Style Frame
-        s = ttk.Style()
-        s.configure("ActionFrame.TFrame", background="#5B648A", relief=RAISED)
-        super().__init__(master, style="ActionFrame.TFrame")
+        super().__init__(master, background="#5B648A", 
+            relief=RAISED, text="ActionFrame", foreground="white")
         self.CreateWidgets()
 
     def CreateWidgets(self):
         """
         Placement des widgets
         """
-        Label(self, text="ActionFrame", font=("Arial", 20),
-              background="grey").pack(anchor=CENTER)
+        #Label(self, text="ActionFrame", font=("Arial", 20),
+        #      background="grey").pack(anchor=CENTER)
 
 
-class SubFrame(ttk.Frame):
+class SubFrame(LabelFrame):
     """
-
+    Frame située en dessous de MainFrame servant à changer de page et indiquer la page affichée
     """
 
     def __init__(self, master) -> None:
         self.master = master
-        # Style Frame
-        s = ttk.Style()
-        s.configure("SubFrame.TFrame", background="#A8B8FF", relief=RAISED)
-        super().__init__(master, style="SubFrame.TFrame")
+        super().__init__(master, background="#A8B8FF", 
+            relief=RAISED, text="SubFrame", foreground="white")
         self.CreateWidgets()
 
     def CreateWidgets(self):
         """
         Placement des widgets
         """
-        Label(self, text="SubFrame", font=("Arial", 20),
-              background="grey").pack(anchor=CENTER)
+        #Label(self, text="SubFrame", font=("Arial", 20),
+        #      background="grey").pack(anchor=CENTER)
 
 
 class TopLevel(Tk):
@@ -401,12 +396,6 @@ class TopLevel(Tk):
         Place les Frames dans la grille
         """
         print("Placement Frames...")
-        # Création Style
-        self.s = ttk.Style()
-        self.s.configure("ActionFrame.TFrame", background="#5B648A",
-                         relief=RAISED)  # Style ActionFrame
-        self.s.configure("MainFrame.TFrame", background="#292D3E",
-                         relief=SUNKEN)  # Style MainFrame
         # Configuration lignes et colonnes
         self.rowconfigure(0, weight=4)
         self.rowconfigure(1, weight=1)
