@@ -40,12 +40,8 @@ class WebInterface():
                 - mot de passe du compte
             - adress : str
                 - adresse pour se login au serveur
-        SORTIE :
-        ------------
-            - Etat : bool
         """
         self.Account = username
-        #print(f"Credentials : \n\t- username : {username} \n\t- password : {password}")
         # création payload credentials
         payload = {
             'email': username,
@@ -69,7 +65,51 @@ class WebInterface():
         if not "Welcome" in r.text:
             raise(Exception)
         
-        print("Login réussi")
+        print(f"Login réussi : {self.Account}")
+
+    def Signup(self, username, password, name, adress):
+        """
+        Permet de s'identifier au serveur avec un compte (préexistant uniquement)
+
+        PARAMETRE :
+        ------------
+            - username : str
+                - identifiant/adresse email
+            - password : str
+                - mot de passe du compte
+            - name : str
+                - nom du compte
+            - adress : str
+                - adresse pour se créer un compte
+        """
+        self.Account = username
+        # création payload credentials
+        payload = {
+            'email': username,
+            'name': name,
+            'password': password
+        }
+
+        # Use 'with' to ensure the session context is closed after use.
+        self.session = requests.Session()
+        p = self.session.post(adress, data=payload)
+        #print("login :",p.status_code)
+
+        if p.status_code != requests.codes.ok:
+            raise(Exception)
+        # An authorised request.
+        r = self.session.get(self.adress+"/profile")
+        #print("profile :",r.status_code)
+
+        if r.status_code != requests.codes.ok:
+            raise(Exception)
+        
+        if not "Welcome" in r.text:
+            raise(Exception)
+        
+        print(f"Création du compte réussie : {self.Account}")
+
+        self.Login(username, password, )
 
 
     def GetData(self, subpage="/getdata"):

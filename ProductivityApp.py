@@ -54,6 +54,8 @@ class MenuBar(Menu):
             label="Connect to server", command=self.ServerConnect)
         self.WebMenu.add_command(
             label="Login", command=self.ServerLogin)
+        self.WebMenu.add_command(
+            label="Signup", command=self.ServerSignup)
         self.WebMenu.add_separator()  # séparateur
         self.WebMenu.add_command(
             label="Sync to database", command=self.ServerSync)
@@ -203,8 +205,10 @@ class MenuBar(Menu):
         if self.master.Server == None: # Pas de serveur ouvert
             msgbox.showinfo("Login Serveur","Vous n'êtes pas connectés à un serveur")
         elif self.master.Server.Account != None:
-            msgbox.showinfo("Login Serveur",f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant")
+            msgbox.showinfo("Login Serveur",
+                f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous réconnecter")
         else:
+            self.master.LoginPage = AccountFrame(self.master.MainFrame)
             # Récupération identitifant et mot de passe
             #adresse = smpldial.askstring("Connexion compte","Adresse page de connexion :")
             iD = smpldial.askstring("Connexion compte","Identifant/Adresse mail :")
@@ -218,7 +222,7 @@ class MenuBar(Menu):
             except Exception as e: # Echec login
                 self.master.Server.Account = None
                 print(f"Echec login au compte {iD}")
-                msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez rééssayer : {e}")
+                msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
 
     def ServerLogout(self,msg=True):
         """
@@ -295,6 +299,25 @@ class MenuBar(Menu):
                 print("Echec de l'extraction")
                 msgbox.showerror("Extract Database",f"La base de donnée n'a pas pu être extraite : {e}")
 
+    def ServerSignup(self): # à faire
+        """
+        dialogue (AccountFrame) permettant de créer un compte
+        """
+        if self.master.Server == None: # Pas de serveur ouvert
+            msgbox.showinfo("Signup Serveur","Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account != None:
+            msgbox.showinfo("Signup Serveur",
+                f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant d'en créer un nouveau")
+        else:
+            try:
+                # à remplir...
+                pass
+            except Exception as e:
+                self.master.Server.Account = None
+                print("Echec création du compte")
+                msgbox.showerror("Signup Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
+    
+
 
 class MainFrame(LabelFrame):
     """
@@ -340,13 +363,23 @@ class AccountFrame(LabelFrame):
     située (packée) dans MainFrame
     """
     def __init__(self, master):
-        super().__init__(master)
+        super().__init__(master, background="#424864", 
+            relief=SOLID, text="AccountFrame", foreground="white",
+                width=450, height=300)
         self.master = master
+        self.pack(anchor="w", pady=5, padx=5)
     
     def LoginWidgets(self):
         """
         Widgets de frame permettant de se connecter à un compte existant
         """
+        self["text"] = "Login"
+    
+    def SignupWidgets(self):
+        """
+        Widgets de frame permettant de créer un nouveau compte
+        """
+        self["text"] = "Login"
 
 
 class ActionFrame(LabelFrame):
@@ -406,6 +439,7 @@ class TopLevel(Tk):
             f"Productivity App v{__version__} : Pas de base de donnée ouverte")
         self.Db = None
         self.Server = None
+        self.LoginPage = None
         self.geometry("{}x{}".format(x, y))
         # Placement des Frames
         self.SetupFrames()
