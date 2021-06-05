@@ -225,12 +225,13 @@ class MenuBar(Menu):
             msgbox.showinfo("Logout Serveur","Vous n'êtes pas connectés à un compte") 
         else:
             self.master.MainFrame.UnpackTasks() # Supprime les tâches
+            oldaccount = self.master.Server.Account
             self.master.Server.Account = None
             self.master.Server.session.close() # fermeture session
             self.master.title(
                     f"Productivity App v{__version__} : {self.master.Server.adress} : non identifié")
             if msg:
-                msgbox.showinfo("Login Serveur",f"Déconnecté du compte")
+                msgbox.showinfo("Login Serveur",f"Déconnecté du compte {oldaccount}")
             print("Déconnecté du compte")
 
     def ServerDisconnect(self):
@@ -242,7 +243,7 @@ class MenuBar(Menu):
         else:
             if self.master.Server.Account != None:
                 self.ServerLogout(False)
-            oldserver = self.master.Server
+            oldserver = self.master.Server.adress
             self.master.Server = None
             self.master.title(
                 f"Productivity App v{__version__} : Pas de base de donnée ouverte")
@@ -307,7 +308,6 @@ class MenuBar(Menu):
                 self.master.AccountFrame = None
             self.master.AccountFrame = AccountFrame(self.master.MainFrame, "signup")
     
-
 
 class MainFrame(LabelFrame):
     """
