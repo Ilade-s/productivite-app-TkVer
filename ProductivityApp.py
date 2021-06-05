@@ -67,36 +67,44 @@ class MenuBar(Menu):
             label="Logout", command=self.ServerLogout)
 
     # fonctions du menu déroulant File
-    def OpenDatabase(self):
+    def OpenDatabase(self, msg=True, path=""):
         """
         Dialogue pour ouverture de base de donnée
+        msg : bool (indique si l'ouverture doit être discrète ou non et si on doit déconnecter le serveur)
+        path : str (optionnel, si fourni, la fonction ne demandera pas le chemin à nouveau)
         """
-        if self.master.Server != None:
+        if self.master.Server != None and msg:
             self.ServerDisconnect()
-        path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
-                title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+        if path == "":
+            path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
+                    title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None:
             self.master.Db = DbM(path)
             self.master.title(f"Productivity App v{__version__} : {path}")
             print(f"Ouverture DB réussie : {path}")
-            msgbox.showinfo("Ouverture database",
-                            f"Ouverture du fichier {path} réussie")
+            if msg:
+                msgbox.showinfo("Ouverture database",
+                                f"Ouverture du fichier {path} réussie")
         else:
             print("Ouverture DB annulée")
-            msgbox.showerror("Ouverture database",
-                             "Ouverture database échouée/annulée")
+            if msg:
+                msgbox.showerror("Ouverture database",
+                                "Ouverture database échouée/annulée")
 
-    def CreateDatabase(self,msg=True):
+    def CreateDatabase(self, msg=True):
         """
         Dialogue pour ouverture d'une nouvelle base de donnée
         msg : bool (indique si la création doit être discrète ou non et si on doit déconnecter le serveur)
+        SORTIE : (exitcode: int, path: str)
         """
         if self.master.Server != None and msg:
             self.ServerDisconnect()
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
                                           title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+        if os.path.exists(path): # file already exists
+            return (0, path)
         if path != None:
-            if path[-4:] != ".csv":
+            if path[:-4] != ".csv":
                 path += ".csv"
             # création d'un nouveau fichier CSV
             self.master.Db = DbM(path, "x+")
@@ -109,13 +117,13 @@ class MenuBar(Menu):
             if msg:
                 msgbox.showinfo("Création database",
                                 "Création et ouverture du fichier réussie")
+            return (1, path)
         else:
             print("Création DB annulée")
             if msg:
                 msgbox.showerror("Création database",
                                 "Création database échouée/annulée")
-            else:
-                return 0
+            return (0, path)
 
     def CloseDatabase(self,msg=True):
         """
@@ -195,20 +203,23 @@ class MenuBar(Menu):
         """
         if self.master.Server == None: # Pas de serveur ouvert
             msgbox.showinfo("Login Serveur","Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account != None:
+            msgbox.showinfo("Login Serveur",f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant")
         else:
             # Récupération identitifant et mot de passe
-            adresse = smpldial.askstring("Connexion compte","Adresse page de connexion :")
+            #adresse = smpldial.askstring("Connexion compte","Adresse page de connexion :")
             iD = smpldial.askstring("Connexion compte","Identifant/Adresse mail :")
             passwd = smpldial.askstring("Connexion compte","Mot de passe :", show="*")
             # Essai de login
             try:
-                self.master.Server.Login(iD, passwd, adresse)
+                self.master.Server.Login(iD, passwd, self.master.Server.adress+"/login")
                 self.master.title(
                     f"Productivity App v{__version__} : {self.master.Server.adress} : {iD}")
                 msgbox.showinfo("Login Serveur",f"Connexion au compte {iD} réussie")
             except Exception as e: # Echec login
+                self.master.Server.Account = None
                 print(f"Echec login au compte {iD}")
-                msgbox.showerror("Login Serveur","Echec de la connexion, veuillez rééssayer")
+                msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez rééssayer : {e}")
 
     def ServerLogout(self,msg=True):
         """
@@ -254,6 +265,7 @@ class MenuBar(Menu):
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
                 #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
+                print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database","Synchronisation réussie")
             except Exception as e:
                 print("Echec de la synchronisation")
@@ -269,14 +281,17 @@ class MenuBar(Menu):
             msgbox.showinfo("Extract Database","Vous n'êtes pas connectés à un compte") 
         else:
             try:
-                self.CreateDatabase(False)
+                (exitcode, path) = self.CreateDatabase(False)
+                if not exitcode: # création impossile (le fichier existe déjà)
+                    print("Le fichier existe déjà... switching to func OpenDatabase")
+                    self.OpenDatabase(False, path)
                 TaskList = self.master.Server.GetData()
                 #print(f"Tasks : {TaskList}")
                 for task in TaskList:
                     self.master.Db.Add(task[1:])
                 msgbox.showinfo("Extract Database","Extraction réussie")
             except Exception as e:
-                print("Echec de la synchronisation")
+                print("Echec de l'extraction")
                 msgbox.showerror("Extract Database",f"La base de donnée n'a pas pu être extraite : {e}")
 
 

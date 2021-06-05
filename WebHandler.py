@@ -55,14 +55,14 @@ class WebInterface():
         # Use 'with' to ensure the session context is closed after use.
         self.session = requests.Session()
         p = self.session.post(adress, data=payload)
-        print("login :",p.status_code)
+        #print("login :",p.status_code)
 
         if p.status_code != requests.codes.ok:
             raise(Exception)
 
         # An authorised request.
         r = self.session.get(self.adress+"/profile")
-        print("profile :",r.status_code)
+        #print("profile :",r.status_code)
 
         if r.status_code != requests.codes.ok:
             raise(Exception)
@@ -76,7 +76,6 @@ class WebInterface():
     def GetData(self, subpage="/getdata"):
         """
         Permet de récupérer la base de données de toutes les tâches liées à l'utilisateur
-        t
         subpage : str (extension indiquant le sous page permettant des récupérer les données)
         """
         r = self.session.post(self.adress+subpage)

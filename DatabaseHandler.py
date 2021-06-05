@@ -40,7 +40,7 @@ class CsvHandler():
                 - mode d'ouverture du fichier
                 - "x+" : création d'un nouveau fichier CSV
                 - "r+" : lecture/écriture d'un fichier existant
-                - si l'ouverture en mode "+" échoue, "x+" sera utilisé (va créer un nouveau fichier)
+                - si l'ouverture en mode "r+" échoue, "x+" sera utilisé (va créer un nouveau fichier)
                 - default = "r+"
             - Delimiter : str
                 - comma entre les données du CSV
