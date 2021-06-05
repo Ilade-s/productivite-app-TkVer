@@ -59,7 +59,6 @@ class WebInterface():
 
         if p.status_code != requests.codes.ok:
             raise(Exception)
-
         # An authorised request.
         r = self.session.get(self.adress+"/profile")
         #print("profile :",r.status_code)

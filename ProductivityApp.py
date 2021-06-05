@@ -73,7 +73,7 @@ class MenuBar(Menu):
         msg : bool (indique si l'ouverture doit être discrète ou non et si on doit déconnecter le serveur)
         path : str (optionnel, si fourni, la fonction ne demandera pas le chemin à nouveau)
         """
-        if self.master.Server != None and msg:
+        if self.master.Server != None:
             self.ServerDisconnect()
         if path == "":
             path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
@@ -97,7 +97,7 @@ class MenuBar(Menu):
         msg : bool (indique si la création doit être discrète ou non et si on doit déconnecter le serveur)
         SORTIE : (exitcode: int, path: str)
         """
-        if self.master.Server != None and msg:
+        if self.master.Server != None:
             self.ServerDisconnect()
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
                                           title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
@@ -232,6 +232,7 @@ class MenuBar(Menu):
             msgbox.showinfo("Logout Serveur","Vous n'êtes pas connectés à un compte") 
         else:
             self.master.Server.Account = None
+            self.master.Server.session.close() # fermeture session
             self.master.title(
                     f"Productivity App v{__version__} : {self.master.Server.adress} : non identifié")
             if msg:
@@ -281,15 +282,15 @@ class MenuBar(Menu):
             msgbox.showinfo("Extract Database","Vous n'êtes pas connectés à un compte") 
         else:
             try:
-                (exitcode, path) = self.CreateDatabase(False)
-                if not exitcode: # création impossile (le fichier existe déjà)
-                    print("Le fichier existe déjà... switching to func OpenDatabase")
-                    self.OpenDatabase(False, path)
                 TaskList = self.master.Server.GetData()
                 #print(f"Tasks : {TaskList}")
+                (exitcode, path) = self.CreateDatabase(False)
+                if not exitcode: # création impossile (le fichier existe déjà)
+                    print("File already exists... switching to func OpenDatabase")
+                    self.OpenDatabase(False, path)
                 for task in TaskList:
                     self.master.Db.Add(task[1:])
-                print("Exrtraction réussie")
+                print("Extraction réussie")
                 msgbox.showinfo("Extract Database","Extraction réussie")
             except Exception as e:
                 print("Echec de l'extraction")
@@ -380,9 +381,10 @@ class TopLevel(Tk):
         """
         Initialisation de la fenêtre
         """
+        super().__init__()
         self.DefaultLabel = ["name", "date", "priority"]
         self.geo = (x, y)
-        super().__init__()
+        self.iconphoto(False, PhotoImage(file="Assets/favicon.png"))
         self.title(
             f"Productivity App v{__version__} : Pas de base de donnée ouverte")
         self.Db = None
