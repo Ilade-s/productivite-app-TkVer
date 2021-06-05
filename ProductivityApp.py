@@ -364,13 +364,9 @@ class AccountFrame(LabelFrame):
             - "signup" : fenêtre de création de compte avec id, nom et mdp
         """
         assert purpose == "login" or purpose == "signup", "purpose invalide, affichage AccountFrame annulé"
-        if purpose=="login":
-            height = 300
-        else:
-            height = 400
         super().__init__(master, background="#424864", 
             relief=SOLID, text="AccountFrame", foreground="white",
-                width=450, height=height)
+                width=450, height=300)
         self.master = master
         if purpose=="login": 
             self.LoginFrame()
