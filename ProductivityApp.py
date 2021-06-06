@@ -239,6 +239,8 @@ class MenuBar(Menu):
         else:
             if self.master.Server.Account != None:
                 self.ServerLogout(False)
+            if self.master.AccountFrame != None:
+                self.master.AccountFrame.destroy()
             oldserver = self.master.Server.adress
             self.master.Server = None
             self.master.title(
@@ -257,7 +259,7 @@ class MenuBar(Menu):
         else:
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
-                print(f"Tasks : {self.master.MainFrame.Tasks}")
+                #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database","Synchronisation réussie")
