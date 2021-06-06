@@ -244,7 +244,7 @@ class MenuBar(Menu):
             self.master.title(
                 f"Productivity App v{__version__} : Pas de base de donnée ouverte")
             print("Déconnecté du serveur")
-            msgbox.showinfo("Login Serveur",f"Déconnecté du serveur {oldserver}")
+            msgbox.showinfo("Déconnexion Serveur",f"Déconnecté du serveur {oldserver}")
 
     def ServerSync(self):
         """
@@ -257,7 +257,7 @@ class MenuBar(Menu):
         else:
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
-                #print(f"Tasks : {self.master.MainFrame.Tasks}")
+                print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database","Synchronisation réussie")
@@ -336,11 +336,16 @@ class MainFrame(LabelFrame):
             for task in self.ShownTasks:
                 task.destroy()
 
-        self.ShownTasks = [Checkbutton(self, text=f"{task[2]} // {task[3]}",
-            background="#5B648A", font=(17), anchor="w") 
+        self.StateTasks = [IntVar() for i in range(len(self.Tasks[self.Ci:self.Ci+10]))]
+        
+        self.ShownTasks = [Checkbutton(self, text=f"{task[2]} // {task[3]} // {task[4]}",
+            background="#5B648A", font=(17), anchor="w", 
+                onvalue=1, offvalue=0) 
                 for task in self.Tasks[self.Ci:self.Ci+10]]
-        for task in self.ShownTasks:
-            task.pack(anchor="w", padx=20, pady=5)
+        
+        for task in range(len(self.ShownTasks)):
+            self.ShownTasks[task]["variable"] = self.StateTasks[task]
+            self.ShownTasks[task].pack(anchor="w", padx=20, pady=5)
     
     def UnpackTasks(self):
         """
@@ -365,8 +370,7 @@ class AccountFrame(LabelFrame):
         """
         assert purpose == "login" or purpose == "signup", "purpose invalide, affichage AccountFrame annulé"
         super().__init__(master, background="#424864", 
-            relief=SOLID, text="AccountFrame", foreground="white",
-                width=450, height=300)
+            relief=SOLID, text="AccountFrame", foreground="white",)
         self.master = master
         if purpose=="login": 
             self.LoginFrame()
