@@ -324,7 +324,7 @@ class MainFrame(LabelFrame):
 
     def CreateWidgets(self):
         """
-        Placement des widgets
+        Placement des widgets de base (aucun pour l'instant)
         """
         #Label(self, text="MainFrame", font=("Arial", 20),
         #      background="grey").pack(anchor=CENTER)
@@ -500,7 +500,7 @@ class TopLevel(Tk):
         Initialisation de la fenêtre
         """
         super().__init__()
-        self.DefaultLabel = ["name", "date", "priority"]
+        self.DefaultLabel = ["userID", "name", "date", "priority", "status"]
         self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(
