@@ -498,9 +498,13 @@ class SubFrame(LabelFrame):
         self.rowconfigure(0, weight=1)
         for i in range(5):
             self.columnconfigure(i, weight=1)
-        # ajout des boutons
+        # ajout des widgets
         self.BackButton = ttk.Button(self, text="Previous page", state="disabled")
+        self.NextButton = ttk.Button(self, text="Next page", state="disabled")
+        self.ReaderInfo = Label(self, text="../..", font=(30))
         self.BackButton.grid(row=0, column=1, ipadx=50, ipady=20)
+        self.NextButton.grid(row=0, column=3, ipadx=50, ipady=20)
+        self.ReaderInfo.grid(row=0, column=2, ipadx=50, ipady=20)
         
 
 class TopLevel(Tk):
