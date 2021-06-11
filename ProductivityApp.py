@@ -318,9 +318,11 @@ class MainFrame(LabelFrame):
         self.ShownTasks = []
         self.Ci = 0
         super().__init__(master, background="#292D3E", 
-            relief=SOLID, text="MainFrame", foreground="white",
-                height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
+            relief=SOLID, text="MainFrame", foreground="white")
+        #        height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
         self.CreateWidgets()
+        #self.grid(row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
+        self.place(relx=.25, rely=0, relheight=.75, relwidth=.75)
 
     def CreateWidgets(self):
         """
@@ -380,7 +382,7 @@ class AccountFrame(LabelFrame):
             self.LoginFrame()
         elif purpose=="signup": 
             self.SignupFrame()
-        self.pack(anchor="nw", pady=5, padx=5)
+        self.pack(anchor="nw", pady=5, padx=5, expand=True)
     
     def LoginFrame(self):
         """
@@ -460,9 +462,11 @@ class ActionFrame(LabelFrame):
     def __init__(self, master) -> None:
         self.master = master
         super().__init__(master, background="#5B648A", 
-            relief=RAISED, text="ActionFrame", foreground="white",
-            height=self.master.geo[1], width=self.master.geo[0]/4)
+            relief=RAISED, text="ActionFrame", foreground="white")
+        #    height=self.master.geo[1], width=self.master.geo[0]/4)
         self.CreateWidgets()
+        #self.grid(row=0, column=0, rowspan=2, columnspan=1, sticky='nesw')
+        self.place(relx=0, rely=0, relheight=1, relwidth=.25)
 
     def CreateWidgets(self):
         """
@@ -480,17 +484,24 @@ class SubFrame(LabelFrame):
     def __init__(self, master) -> None:
         self.master = master
         super().__init__(master, background="#A8B8FF", 
-            relief=RAISED, text="SubFrame", foreground="white",
-                height=self.master.geo[1]*.25, width=self.master.geo[0]*.75)
+            relief=RAISED, text="SubFrame", foreground="white")
+        #        height=self.master.geo[1]*.25, width=self.master.geo[0]*.75)
         self.CreateWidgets()
+        #self.grid(row=1, column=1, rowspan=1, columnspan=1, sticky='nesw')
+        self.place(relx=.25, rely=.75, relheight=.25, relwidth=.75)
 
     def CreateWidgets(self):
         """
         Placement des widgets
         """
-        #Label(self, text="SubFrame", font=("Arial", 20),
-        #      background="grey").pack(anchor=CENTER)
-
+        # config lignes et colonnes
+        self.rowconfigure(0, weight=1)
+        for i in range(5):
+            self.columnconfigure(i, weight=1)
+        # ajout des boutons
+        self.BackButton = ttk.Button(self, text="Previous page", state="disabled")
+        self.BackButton.grid(row=0, column=1, ipadx=50, ipady=20)
+        
 
 class TopLevel(Tk):
     """
@@ -511,6 +522,7 @@ class TopLevel(Tk):
         self.Server = None
         self.AccountFrame = None
         self.geometry("{}x{}".format(x, y))
+        #self.resizable(False, False)
         # Placement des Frames
         self.SetupFrames()
 
@@ -519,11 +531,6 @@ class TopLevel(Tk):
         Place les Frames dans la grille
         """
         print("Placement Frames...")
-        # Configuration lignes et colonnes
-        self.grid_rowconfigure(0, weight=3)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=3)
         # Placement Frames dans les colonnes
         print("Création Menu...")
         self.Menu = MenuBar(self)
@@ -531,18 +538,12 @@ class TopLevel(Tk):
         # placement Menu d'actions
         print("Création ActionFrame...")
         self.ActionFrame = ActionFrame(self)
-        self.ActionFrame.grid(
-            row=0, column=0, rowspan=2, columnspan=1, sticky='nesw')
         # Placement MainFrame
         print("Création MainFrame...")
         self.MainFrame = MainFrame(self)
-        self.MainFrame.grid(
-            row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
         # Placement SubFrame
         print("Création SubFrame...")
         self.SubFrame = SubFrame(self)
-        self.SubFrame.grid(
-            row=1, column=1, rowspan=1, columnspan=1, sticky='nesw')
 
 
 def main():
