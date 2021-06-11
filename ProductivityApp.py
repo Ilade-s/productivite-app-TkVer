@@ -76,7 +76,7 @@ class MenuBar(Menu):
         if path == "":
             path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
                     title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
-        if path != None:
+        if path != None and path != "":
             self.master.Db = DbM(path)
             self.master.title(f"Productivity App v{__version__} : {path}")
             print(f"Ouverture DB réussie : {path}")
@@ -101,7 +101,7 @@ class MenuBar(Menu):
                                           title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if os.path.exists(path): # file already exists
             return (0, path)
-        if path != None:
+        if path != None and path != "":
             if path[:-4] != ".csv":
                 path += ".csv"
             # création d'un nouveau fichier CSV
@@ -340,8 +340,10 @@ class MainFrame(LabelFrame):
 
         self.StateTasks = [IntVar() for i in range(len(self.Tasks[self.Ci:self.Ci+10]))]
         
-        self.ShownTasks = [Checkbutton(self, text=f"{task[2]} // {task[3]} // {task[4]}",
-            background="#5B648A", font=(17), anchor="w", 
+        self.ShownTasks = [Checkbutton(self, 
+            text=f"{task[2][:60]}... // {task[3]} // {task[4]}" if len(task[2])>60 
+            else f"{task[2]} // {task[3]} // {task[4]}",
+                background="#5B648A", font=(17), anchor="w", 
                 onvalue=1, offvalue=0) 
                 for task in self.Tasks[self.Ci:self.Ci+10]]
         
@@ -500,7 +502,7 @@ class TopLevel(Tk):
         Initialisation de la fenêtre
         """
         super().__init__()
-        self.DefaultLabel = ["userID", "name", "date", "priority", "status"]
+        self.DefaultLabel = ["userID", "name", "date", "priority", "status", "label"]
         self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(

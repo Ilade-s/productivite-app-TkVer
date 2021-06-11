@@ -58,7 +58,8 @@ class WebInterface():
         if p.status_code != requests.codes.ok:
             raise(Exception)
 
-        r = self.session.get(self.adress+"profile")
+        r = self.session.get(self.adress+"profile" if self.adress[-1]=="/" 
+                                else self.adress+"/profile")
         #print("profile :",r.status_code)
 
         if r.status_code != requests.codes.ok:
