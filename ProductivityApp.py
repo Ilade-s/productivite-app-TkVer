@@ -200,7 +200,7 @@ class MenuBar(Menu):
         Dialogue pour identification d'un compte dans le serveur
         """
         if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Login Serveur","Vous n'êtes pas connectés à un serveur")
+            msgbox.showinfo("Login Serveur","Vous n'êtes pas connecté à un serveur")
         elif self.master.Server.Account != None:
             msgbox.showinfo("Login Serveur",
                 f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous reconnecter")
@@ -317,19 +317,12 @@ class MainFrame(LabelFrame):
         self.Tasks = []
         self.ShownTasks = []
         self.Ci = 0
+        self.maxAff = 7 # nombre de tâches affichables sans clippage (dynamique)
         super().__init__(master, background="#292D3E", 
             relief=SOLID, text="MainFrame", foreground="white")
         #        height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
-        self.CreateWidgets()
         #self.grid(row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
         self.place(relx=.25, rely=0, relheight=.75, relwidth=.75)
-
-    def CreateWidgets(self):
-        """
-        Placement des widgets de base (aucun pour l'instant)
-        """
-        #Label(self, text="MainFrame", font=("Arial", 20),
-        #      background="grey").pack(anchor=CENTER)
     
     def ShowTasks(self):
         """
@@ -340,18 +333,30 @@ class MainFrame(LabelFrame):
             for task in self.ShownTasks:
                 task.destroy()
 
-        self.StateTasks = [IntVar() for i in range(len(self.Tasks[self.Ci:self.Ci+10]))]
+        # création et affichage des widgets
+        self.StateTasks = [IntVar() for i in range(len(self.Tasks[self.Ci:self.Ci+self.maxAff]))]
         
         self.ShownTasks = [Checkbutton(self, 
             text=f"{task[2][:60]}... // {task[3]} // {task[4]}" if len(task[2])>60 
             else f"{task[2]} // {task[3]} // {task[4]}",
                 background="#5B648A", font=(17), anchor="w", 
                 onvalue=1, offvalue=0) 
-                for task in self.Tasks[self.Ci:self.Ci+10]]
+                for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
         
         for task in range(len(self.ShownTasks)):
             self.ShownTasks[task]["variable"] = self.StateTasks[task]
             self.ShownTasks[task].pack(anchor="w", padx=20, pady=5)
+        # Maj état des boutons de SubFrame
+        if self.Ci == 0: # début de la liste des tâches
+            self.master.SubFrame.BackButton["state"] = "disabled"
+            self.master.SubFrame.NextButton["state"] = "normal"
+        elif self.Ci+self.maxAff >= len(self.Tasks): # fin de la liste des tâches
+            self.master.SubFrame.BackButton["state"] = "normal"
+            self.master.SubFrame.NextButton["state"] = "disabled"
+        else: # autre intervalle
+            self.master.SubFrame.BackButton["state"] = "normal"
+            self.master.SubFrame.NextButton["state"] = "normal"
+        self.master.SubFrame.ReaderInfo['text'] = f"{self.Ci+1}-{self.Ci+len(self.ShownTasks)}/{len(self.Tasks)}"
     
     def UnpackTasks(self):
         """
@@ -359,6 +364,20 @@ class MainFrame(LabelFrame):
         """
         for task in self.ShownTasks:
             task.destroy()
+    
+    def UpdateMaxAff(self):
+        """
+        Permet de mettre à jour le nombre de tâches affichables sans clippage 
+        (et avec un espace pour la Frame d'ajout de tâches)
+        """
+        # on sait que taille de base = 600*.75 = 450 or on peut y afficher 9 tâches - 2 pour l'espace restant
+        # donc yTask = 50 et à la fin on doit retirer 2 au résultat
+        CurrentHeight = self.winfo_height()
+        #print(f"taille MainFrame : {CurrentHeight}")
+        self.maxAff = CurrentHeight//50 - 2
+        #print(f"nombre de tâches max : {self.maxAff}")
+        # on renvoie ensuite self.maxaff pour SubFrame
+        return self.maxAff
 
 
 class AccountFrame(LabelFrame):
@@ -499,12 +518,38 @@ class SubFrame(LabelFrame):
         for i in range(5):
             self.columnconfigure(i, weight=1)
         # ajout des widgets
-        self.BackButton = ttk.Button(self, text="Previous page", state="disabled")
-        self.NextButton = ttk.Button(self, text="Next page", state="disabled")
-        self.ReaderInfo = Label(self, text="../..", font=(30))
+        self.BackButton = ttk.Button(self, text="Previous page", state="disabled"
+                                    , style="SubFrame.TButton", command=self.PreviousPage)
+        self.NextButton = ttk.Button(self, text="Next page", state="disabled"
+                                    , style="SubFrame.TButton", command=self.NextPage)
+        self.ReaderInfo = Label(self, text="..-../..", font=("Arial", 20))
         self.BackButton.grid(row=0, column=1, ipadx=50, ipady=20)
         self.NextButton.grid(row=0, column=3, ipadx=50, ipady=20)
         self.ReaderInfo.grid(row=0, column=2, ipadx=50, ipady=20)
+        # config style boutons
+        s = ttk.Style(self)
+        s.configure("SubFrame.TButton", font=("Arial", 20))
+    
+    def PreviousPage(self):
+        """
+        Commande appelée par le bouton self.BackButton permettant de revenir à la page précédente 
+        (dans l'affichage des tâches)
+        """
+        affmax = self.master.MainFrame.UpdateMaxAff() # récupération affmax
+        self.master.MainFrame.Ci -= affmax # maj intervalle des tâches à afficher
+        if self.master.MainFrame.Ci < 0: # afin d'éviter les index négatifs
+            self.master.MainFrame.Ci = 0
+        self.master.MainFrame.ShowTasks() # maj affichage
+    
+    def NextPage(self):
+        """
+        Commande appelée par le bouton self.BackButton permettant d'afficher la page suivante
+        (dans l'affichage des tâches)
+        """
+        affmax = self.master.MainFrame.UpdateMaxAff()
+        self.master.MainFrame.Ci += affmax # maj intervalle des tâches à afficher
+        self.master.MainFrame.ShowTasks() # maj affichage
+
         
 
 class TopLevel(Tk):
