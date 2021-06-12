@@ -17,7 +17,8 @@ from tkinter import filedialog as fldialog  # Choix de fichier etc...
 from tkinter import messagebox as msgbox
 from tkinter import simpledialog as smpldial  # Demande d'informations simples
 import os  # Pour trouver le répertoire courant (os.getcwd)
-from functools import partial # permet d'exécuter des fonctions avec arguments avec des widgets tk
+# permet d'exécuter des fonctions avec arguments avec des widgets tk
+from functools import partial
 
 
 class MenuBar(Menu):
@@ -75,7 +76,7 @@ class MenuBar(Menu):
             self.ServerDisconnect()
         if path == "":
             path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
-                    title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+                                            title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None and path != "":
             self.master.Db = DbM(path)
             self.master.title(f"Productivity App v{__version__} : {path}")
@@ -87,7 +88,7 @@ class MenuBar(Menu):
             print("Ouverture DB annulée")
             if msg:
                 msgbox.showerror("Ouverture database",
-                                "Ouverture database échouée/annulée")
+                                 "Ouverture database échouée/annulée")
 
     def CreateDatabase(self, msg=True):
         """
@@ -99,7 +100,7 @@ class MenuBar(Menu):
             self.ServerDisconnect()
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
                                           title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
-        if os.path.exists(path): # file already exists
+        if os.path.exists(path):  # file already exists
             return (0, path)
         if path != None and path != "":
             if path[:-4] != ".csv":
@@ -120,10 +121,10 @@ class MenuBar(Menu):
             print("Création DB annulée")
             if msg:
                 msgbox.showerror("Création database",
-                                "Création database échouée/annulée")
+                                 "Création database échouée/annulée")
             return (0, path)
 
-    def CloseDatabase(self,msg=True):
+    def CloseDatabase(self, msg=True):
         """
         Fermeture de la base de donnée (si il y en a une d'ouverte)
         msg : bool (indique si la fermeture doit être discrète ou non)
@@ -145,7 +146,7 @@ class MenuBar(Menu):
                 print("Echec fermeture : pas de fichier ouvert ?")
                 if msg:
                     msgbox.showerror("Fermeture database",
-                                        "Fermeture database échouée/annulée")
+                                     "Fermeture database échouée/annulée")
 
     def SaveDatabase(self):
         """
@@ -199,43 +200,50 @@ class MenuBar(Menu):
         """
         Dialogue pour identification d'un compte dans le serveur
         """
-        if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Login Serveur","Vous n'êtes pas connecté à un serveur")
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Login Serveur",
+                            "Vous n'êtes pas connecté à un serveur")
         elif self.master.Server.Account != None:
             msgbox.showinfo("Login Serveur",
-                f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous reconnecter")
+                            f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous reconnecter")
         else:
             if self.master.AccountFrame != None:
                 self.master.AccountFrame.destroy()
                 self.master.AccountFrame = None
-            self.master.AccountFrame = AccountFrame(self.master.MainFrame, "login")
-            
-    def ServerLogout(self,msg=True):
+            self.master.AccountFrame = AccountFrame(
+                self.master.MainFrame, "login")
+
+    def ServerLogout(self, msg=True):
         """
         Permet de se déconnecter de son compte
         msg : bool (indique si la déconnexion doit être discrète ou non)
         """
-        if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Logout Serveur","Vous n'êtes pas connectés à un serveur")
-        elif self.master.Server.Account == None: # Pas de compte connecté
-            msgbox.showinfo("Logout Serveur","Vous n'êtes pas connectés à un compte") 
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Logout Serveur",
+                            "Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account == None:  # Pas de compte connecté
+            msgbox.showinfo("Logout Serveur",
+                            "Vous n'êtes pas connectés à un compte")
         else:
-            self.master.MainFrame.UnpackTasks() # Supprime les tâches
+            self.master.MainFrame.UnpackTasks()  # Supprime les tâches
+            self.master.SubFrame.CreateWidgets() # Réinitialise les widgets de SubFrame
             oldaccount = self.master.Server.Account
             self.master.Server.Account = None
-            self.master.Server.session.close() # fermeture session
+            self.master.Server.session.close()  # fermeture session
             self.master.title(
-                    f"Productivity App v{__version__} : {self.master.Server.adress} : non identifié")
+                f"Productivity App v{__version__} : {self.master.Server.adress} : non identifié")
             if msg:
-                msgbox.showinfo("Login Serveur",f"Déconnecté du compte {oldaccount}")
+                msgbox.showinfo("Login Serveur",
+                                f"Déconnecté du compte {oldaccount}")
             print("Déconnecté du compte")
 
     def ServerDisconnect(self):
         """
         Déconnexion d'un serveur web
         """
-        if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Déconnexion Serveur","Vous n'êtes pas connectés à un serveur")
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Déconnexion Serveur",
+                            "Vous n'êtes pas connectés à un serveur")
         else:
             if self.master.Server.Account != None:
                 self.ServerLogout(False)
@@ -246,66 +254,75 @@ class MenuBar(Menu):
             self.master.title(
                 f"Productivity App v{__version__} : Pas de base de donnée ouverte")
             print("Déconnecté du serveur")
-            msgbox.showinfo("Déconnexion Serveur",f"Déconnecté du serveur {oldserver}")
+            msgbox.showinfo("Déconnexion Serveur",
+                            f"Déconnecté du serveur {oldserver}")
 
     def ServerSync(self):
         """
         Permet de se synchroniser à la base de donnée (après être connecté à un compte)
         """
-        if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Sync Database","Vous n'êtes pas connectés à un serveur")
-        elif self.master.Server.Account == None: # Pas de compte connecté
-            msgbox.showinfo("Sync Database","Vous n'êtes pas connectés à un compte") 
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Sync Database",
+                            "Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account == None:  # Pas de compte connecté
+            msgbox.showinfo("Sync Database",
+                            "Vous n'êtes pas connectés à un compte")
         else:
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
                 #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
-                msgbox.showinfo("Sync Database","Synchronisation réussie")
+                msgbox.showinfo("Sync Database", "Synchronisation réussie")
             except Exception as e:
                 print("Echec de la synchronisation")
-                msgbox.showerror("Sync Database",f"La base de donnée n'a pas pu être synchronisée : {e}")
-    
+                msgbox.showerror(
+                    "Sync Database", f"La base de donnée n'a pas pu être synchronisée : {e}")
+
     def ServerExtract(self):
         """
         Permet d'extraire la base de donnée dans un fichier CSV
         """
-        if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Extract Database","Vous n'êtes pas connectés à un serveur")
-        elif self.master.Server.Account == None: # Pas de compte connecté
-            msgbox.showinfo("Extract Database","Vous n'êtes pas connectés à un compte") 
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Extract Database",
+                            "Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account == None:  # Pas de compte connecté
+            msgbox.showinfo("Extract Database",
+                            "Vous n'êtes pas connectés à un compte")
         else:
             try:
                 TaskList = self.master.Server.GetData()
                 #print(f"Tasks : {TaskList}")
                 (exitcode, path) = self.CreateDatabase(False)
-                if not exitcode: # création impossile (le fichier existe déjà)
+                if not exitcode:  # création impossile (le fichier existe déjà)
                     print("File already exists... switching to func OpenDatabase")
                     self.OpenDatabase(False, path)
                 for task in TaskList:
                     self.master.Db.Add(task[1:])
                 print("Extraction réussie")
-                msgbox.showinfo("Extract Database","Extraction réussie")
+                msgbox.showinfo("Extract Database", "Extraction réussie")
             except Exception as e:
                 print("Echec de l'extraction")
-                msgbox.showerror("Extract Database",f"La base de donnée n'a pas pu être extraite : {e}")
+                msgbox.showerror(
+                    "Extract Database", f"La base de donnée n'a pas pu être extraite : {e}")
 
     def ServerSignup(self):
         """
         dialogue (AccountFrame) permettant de créer un compte
         """
-        if self.master.Server == None: # Pas de serveur ouvert
-            msgbox.showinfo("Signup Serveur","Vous n'êtes pas connectés à un serveur")
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Signup Serveur",
+                            "Vous n'êtes pas connectés à un serveur")
         elif self.master.Server.Account != None:
             msgbox.showinfo("Signup Serveur",
-                f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant d'en créer un nouveau")
+                            f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant d'en créer un nouveau")
         else:
             if self.master.AccountFrame != None:
                 self.master.AccountFrame.destroy()
                 self.master.AccountFrame = None
-            self.master.AccountFrame = AccountFrame(self.master.MainFrame, "signup")
-    
+            self.master.AccountFrame = AccountFrame(
+                self.master.MainFrame, "signup")
+
 
 class MainFrame(LabelFrame):
     """
@@ -317,13 +334,14 @@ class MainFrame(LabelFrame):
         self.Tasks = []
         self.ShownTasks = []
         self.Ci = 0
-        self.maxAff = 7 # nombre de tâches affichables sans clippage (dynamique)
-        super().__init__(master, background="#292D3E", 
-            relief=SOLID, text="MainFrame", foreground="white")
+        # nombre de tâches affichables sans clippage (dynamique)
+        self.maxAff = 7
+        super().__init__(master, background="#292D3E",
+                         relief=SOLID, text="MainFrame", foreground="white")
         #        height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
         #self.grid(row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
         self.place(relx=.25, rely=0, relheight=.75, relwidth=.75)
-    
+
     def ShowTasks(self):
         """
         Affiche les tâches
@@ -334,37 +352,42 @@ class MainFrame(LabelFrame):
                 task.destroy()
 
         # création et affichage des widgets
-        self.StateTasks = [IntVar() for i in range(len(self.Tasks[self.Ci:self.Ci+self.maxAff]))]
-        
-        self.ShownTasks = [Checkbutton(self, 
-            text=f"{task[2][:60]}... // {task[3]} // {task[4]}" if len(task[2])>60 
-            else f"{task[2]} // {task[3]} // {task[4]}",
-                background="#5B648A", font=(17), anchor="w", 
-                onvalue=1, offvalue=0) 
-                for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
-        
+        self.StateTasks = [IntVar() for i in range(
+            len(self.Tasks[self.Ci:self.Ci+self.maxAff]))]
+
+        self.ShownTasks = [Checkbutton(self,
+                                       text=f"{task[2][:60]}... // {task[3]} // {task[4]}" if len(task[2]) > 60
+                                       else f"{task[2]} // {task[3]} // {task[4]}",
+                                       background="#5B648A", font=(17), anchor="w",
+                                       onvalue=1, offvalue=0)
+                           for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
+
         for task in range(len(self.ShownTasks)):
             self.ShownTasks[task]["variable"] = self.StateTasks[task]
             self.ShownTasks[task].pack(anchor="w", padx=20, pady=5)
         # Maj état des boutons de SubFrame
-        if self.Ci == 0: # début de la liste des tâches
+        if self.Ci == 0:  # début de la liste des tâches
             self.master.SubFrame.BackButton["state"] = "disabled"
             self.master.SubFrame.NextButton["state"] = "normal"
-        elif self.Ci+self.maxAff >= len(self.Tasks): # fin de la liste des tâches
+        # fin de la liste des tâches
+        elif self.Ci+self.maxAff >= len(self.Tasks):
             self.master.SubFrame.BackButton["state"] = "normal"
             self.master.SubFrame.NextButton["state"] = "disabled"
-        else: # autre intervalle
+        else:  # autre intervalle
             self.master.SubFrame.BackButton["state"] = "normal"
             self.master.SubFrame.NextButton["state"] = "normal"
-        self.master.SubFrame.ReaderInfo['text'] = f"{self.Ci+1}-{self.Ci+len(self.ShownTasks)}/{len(self.Tasks)}"
-    
+        self.master.SubFrame.ReaderInfo[
+            'text'] = f"{self.Ci+1}-{self.Ci+len(self.ShownTasks)}/{len(self.Tasks)}"
+
     def UnpackTasks(self):
         """
         Retire toutes les tâches
         """
         for task in self.ShownTasks:
             task.destroy()
-    
+        for w in self.master.SubFrame.winfo_children():
+            w.destroy()
+
     def UpdateMaxAff(self):
         """
         Permet de mettre à jour le nombre de tâches affichables sans clippage 
@@ -385,6 +408,7 @@ class AccountFrame(LabelFrame):
     Frame utilisé pour la connexion à un compte ou à sa création
     située (packée) dans MainFrame
     """
+
     def __init__(self, master, purpose="login"):
         """
         Création et affichage de la Frame souhaitée
@@ -394,15 +418,15 @@ class AccountFrame(LabelFrame):
             - "signup" : fenêtre de création de compte avec id, nom et mdp
         """
         assert purpose == "login" or purpose == "signup", "purpose invalide, affichage AccountFrame annulé"
-        super().__init__(master, background="#424864", 
-            relief=SOLID, text="AccountFrame", foreground="white",)
+        super().__init__(master, background="#424864",
+                         relief=SOLID, text="AccountFrame", foreground="white",)
         self.master = master
-        if purpose=="login": 
+        if purpose == "login":
             self.LoginFrame()
-        elif purpose=="signup": 
+        elif purpose == "signup":
             self.SignupFrame()
         self.pack(anchor="nw", pady=5, padx=5, expand=True)
-    
+
     def LoginFrame(self):
         """
         Widgets de frame permettant de se connecter à un compte existant
@@ -410,28 +434,34 @@ class AccountFrame(LabelFrame):
         # Création variables des entrées
         iD = StringVar()
         passwd = StringVar()
+
         def LoginAttempt(iD, passwd):
             try:
-                self.master.master.Server.Login(iD.get(), passwd.get(), self.master.master.Server.adress+"/login")
+                self.master.master.Server.Login(
+                    iD.get(), passwd.get(), self.master.master.Server.adress+"/login")
                 self.master.master.title(
                     f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
-                msgbox.showinfo("Login Serveur",f"Connexion au compte {iD.get()} réussie")
+                msgbox.showinfo("Login Serveur",
+                                f"Connexion au compte {iD.get()} réussie")
                 self.destroy()
             except Exception as e:
                 self.master.master.Server.Account = None
                 print(f"Echec login au compte {iD.get()}")
-                msgbox.showerror("Login Serveur",f"Echec de la connexion, veuillez réessayer : {e}")
+                msgbox.showerror(
+                    "Login Serveur", f"Echec de la connexion, veuillez réessayer : {e}")
 
         self["text"] = "Connexion à un compte"
         # Création widgets
         Label(self, text="email :", font=(17), background=self["background"], foreground="white"
-            ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+              ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
         Label(self, text="password :", font=(17), background=self["background"], foreground="white"
-            ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+              ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
         ttk.Button(self, text="Login", command=partial(LoginAttempt, iD, passwd), width=20
-            ).grid(row=2, column=1, padx=10, pady=10)
-        idEntry = ttk.Entry(self, textvariable=iD, width=30, background=self["background"])
-        passwdEntry = ttk.Entry(self, textvariable=passwd, width=30, background=self["background"], show="*")
+                   ).grid(row=2, column=1, padx=10, pady=10)
+        idEntry = ttk.Entry(self, textvariable=iD, width=30,
+                            background=self["background"])
+        passwdEntry = ttk.Entry(self, textvariable=passwd,
+                                width=30, background=self["background"], show="*")
         idEntry.grid(row=0, column=1, padx=10, pady=10)
         passwdEntry.grid(row=1, column=1, padx=10, pady=10)
 
@@ -443,31 +473,38 @@ class AccountFrame(LabelFrame):
         iD = StringVar()
         passwd = StringVar()
         name = StringVar()
+
         def LoginAttempt(iD, name, passwd):
             try:
-                self.master.master.Server.Signup(iD.get(), passwd.get(), name.get(), self.master.master.Server.adress+"/signup")
+                self.master.master.Server.Signup(iD.get(), passwd.get(
+                ), name.get(), self.master.master.Server.adress+"/signup")
                 self.master.master.title(
                     f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
-                msgbox.showinfo("Signup Serveur",f"Création du compte {iD.get()} réussie")
+                msgbox.showinfo("Signup Serveur",
+                                f"Création du compte {iD.get()} réussie")
                 self.destroy()
             except Exception as e:
                 self.master.master.Server.Account = None
                 print(f"Echec signup compte {iD.get()}")
-                msgbox.showerror("Signup Serveur",f"Echec de la création, veuillez réessayer : {e}")
+                msgbox.showerror(
+                    "Signup Serveur", f"Echec de la création, veuillez réessayer : {e}")
 
         self["text"] = "Création d'un compte"
         # Création widgets
         Label(self, text="email :", font=(17), background=self["background"], foreground="white"
-            ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+              ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
         Label(self, text="name :", font=(17), background=self["background"], foreground="white"
-            ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+              ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
         Label(self, text="password :", font=(17), background=self["background"], foreground="white"
-            ).grid(row=2, column=0, padx=10, pady=10, sticky="w")
+              ).grid(row=2, column=0, padx=10, pady=10, sticky="w")
         ttk.Button(self, text="Signup", command=partial(LoginAttempt, iD, name, passwd), width=20
-            ).grid(row=3, column=1, padx=10, pady=10)
-        idEntry = ttk.Entry(self, textvariable=iD, width=30, background=self["background"])
-        nameEntry = ttk.Entry(self, textvariable=name, width=30, background=self["background"])
-        passwdEntry = ttk.Entry(self, textvariable=passwd, width=30, background=self["background"], show="*")
+                   ).grid(row=3, column=1, padx=10, pady=10)
+        idEntry = ttk.Entry(self, textvariable=iD, width=30,
+                            background=self["background"])
+        nameEntry = ttk.Entry(self, textvariable=name,
+                              width=30, background=self["background"])
+        passwdEntry = ttk.Entry(self, textvariable=passwd,
+                                width=30, background=self["background"], show="*")
         idEntry.grid(row=0, column=1, padx=10, pady=10)
         nameEntry.grid(row=1, column=1, padx=10, pady=10)
         passwdEntry.grid(row=2, column=1, padx=10, pady=10)
@@ -480,8 +517,8 @@ class ActionFrame(LabelFrame):
 
     def __init__(self, master) -> None:
         self.master = master
-        super().__init__(master, background="#5B648A", 
-            relief=RAISED, text="ActionFrame", foreground="white")
+        super().__init__(master, background="#5B648A",
+                         relief=RAISED, text="ActionFrame", foreground="white")
         #    height=self.master.geo[1], width=self.master.geo[0]/4)
         self.CreateWidgets()
         #self.grid(row=0, column=0, rowspan=2, columnspan=1, sticky='nesw')
@@ -491,7 +528,7 @@ class ActionFrame(LabelFrame):
         """
         Placement des widgets
         """
-        #Label(self, text="ActionFrame", font=("Arial", 20),
+        # Label(self, text="ActionFrame", font=("Arial", 20),
         #      background="grey").pack(anchor=CENTER)
 
 
@@ -502,8 +539,8 @@ class SubFrame(LabelFrame):
 
     def __init__(self, master) -> None:
         self.master = master
-        super().__init__(master, background="#A8B8FF", 
-            relief=RAISED, text="SubFrame", foreground="white")
+        super().__init__(master, background="#A8B8FF",
+                         relief=RAISED, text="SubFrame", foreground="white")
         #        height=self.master.geo[1]*.25, width=self.master.geo[0]*.75)
         self.CreateWidgets()
         #self.grid(row=1, column=1, rowspan=1, columnspan=1, sticky='nesw')
@@ -513,15 +550,17 @@ class SubFrame(LabelFrame):
         """
         Placement des widgets
         """
+        for w in self.winfo_children():
+            w.destroy()
         # config lignes et colonnes
         self.rowconfigure(0, weight=1)
         for i in range(5):
             self.columnconfigure(i, weight=1)
         # ajout des widgets
-        self.BackButton = ttk.Button(self, text="Previous page", state="disabled"
-                                    , style="SubFrame.TButton", command=self.PreviousPage)
-        self.NextButton = ttk.Button(self, text="Next page", state="disabled"
-                                    , style="SubFrame.TButton", command=self.NextPage)
+        self.BackButton = ttk.Button(
+            self, text="Previous page", state="disabled", style="SubFrame.TButton", command=self.PreviousPage)
+        self.NextButton = ttk.Button(
+            self, text="Next page", state="disabled", style="SubFrame.TButton", command=self.NextPage)
         self.ReaderInfo = Label(self, text="..-../..", font=("Arial", 20))
         self.BackButton.grid(row=0, column=1, ipadx=50, ipady=20)
         self.NextButton.grid(row=0, column=3, ipadx=50, ipady=20)
@@ -529,28 +568,27 @@ class SubFrame(LabelFrame):
         # config style boutons
         s = ttk.Style(self)
         s.configure("SubFrame.TButton", font=("Arial", 20))
-    
+
     def PreviousPage(self):
         """
         Commande appelée par le bouton self.BackButton permettant de revenir à la page précédente 
         (dans l'affichage des tâches)
         """
-        affmax = self.master.MainFrame.UpdateMaxAff() # récupération affmax
-        self.master.MainFrame.Ci -= affmax # maj intervalle des tâches à afficher
-        if self.master.MainFrame.Ci < 0: # afin d'éviter les index négatifs
+        affmax = self.master.MainFrame.UpdateMaxAff()  # récupération affmax
+        self.master.MainFrame.Ci -= affmax  # maj intervalle des tâches à afficher
+        if self.master.MainFrame.Ci < 0:  # afin d'éviter les index négatifs
             self.master.MainFrame.Ci = 0
-        self.master.MainFrame.ShowTasks() # maj affichage
-    
+        self.master.MainFrame.ShowTasks()  # maj affichage
+
     def NextPage(self):
         """
         Commande appelée par le bouton self.BackButton permettant d'afficher la page suivante
         (dans l'affichage des tâches)
         """
         affmax = self.master.MainFrame.UpdateMaxAff()
-        self.master.MainFrame.Ci += affmax # maj intervalle des tâches à afficher
-        self.master.MainFrame.ShowTasks() # maj affichage
+        self.master.MainFrame.Ci += affmax  # maj intervalle des tâches à afficher
+        self.master.MainFrame.ShowTasks()  # maj affichage
 
-        
 
 class TopLevel(Tk):
     """
@@ -562,7 +600,8 @@ class TopLevel(Tk):
         Initialisation de la fenêtre
         """
         super().__init__()
-        self.DefaultLabel = ["userID", "name", "date", "priority", "status", "label"]
+        self.DefaultLabel = ["userID", "name",
+                             "date", "priority", "status", "label"]
         self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(
