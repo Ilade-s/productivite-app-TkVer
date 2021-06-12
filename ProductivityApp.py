@@ -355,16 +355,19 @@ class MainFrame(LabelFrame):
         self.StateTasks = [IntVar() for i in range(
             len(self.Tasks[self.Ci:self.Ci+self.maxAff]))]
 
-        self.ShownTasks = [Checkbutton(self,
-                                       text=f"{task[2][:60]}... // {task[3]} // {task[4]}" if len(task[2]) > 60
-                                       else f"{task[2]} // {task[3]} // {task[4]}",
-                                       background="#5B648A", font=(17), anchor="w",
-                                       onvalue=1, offvalue=0)
-                           for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
+        self.ShownTasks = [ttk.Checkbutton(self,
+            text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
+            else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0
+            , style="Task.TCheckbutton")
+                for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
-            self.ShownTasks[task]["variable"] = self.StateTasks[task]
-            self.ShownTasks[task].pack(anchor="w", padx=20, pady=5)
+            self.ShownTasks[task]["variable"] = self.StateTasks[task] # assignation variable
+            self.ShownTasks[task].pack(anchor="w", padx=20, pady=5) # affichage tâche
+        # config style
+        s = ttk.Style(self)
+        s.configure("Task.TCheckbutton", 
+            background="#5B648A", font=(17), anchor="w")
         # Maj état des boutons de SubFrame
         if self.Ci == 0:  # début de la liste des tâches
             self.master.SubFrame.BackButton["state"] = "disabled"
