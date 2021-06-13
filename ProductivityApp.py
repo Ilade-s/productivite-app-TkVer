@@ -15,7 +15,7 @@ from tkinter import ttk  # meilleurs widgets
 from tkinter import filedialog as fldialog  # Choix de fichier etc...
 # Messages d'information ou d'avertissement
 from tkinter import messagebox as msgbox
-from tkinter import simpledialog as smpldial  # Demande d'informations simples
+#from tkinter import simpledialog as smpldial  # Demande d'informations simples
 import os  # Pour trouver le répertoire courant (os.getcwd)
 # permet d'exécuter des fonctions avec arguments avec des widgets tk
 from functools import partial
@@ -546,12 +546,14 @@ class EntryFrame(LabelFrame):
               ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
         ttk.Button(self, text="Connect to server", command=partial(ConnexionAttempt, adress), width=20
                    ).grid(row=1, column=1, padx=10, pady=10)
-        adressEntry = ttk.Entry(self, textvariable=adress, width=30,
+        adressEntry = ttk.Entry(self, textvariable=adress, width=40,
                             background=self["background"])
         adressEntry.grid(row=0, column=1, padx=10, pady=10)
     
     def TaskFrame(self):
         """
+        Frame permettant de récupérer les informations nécessaires à l'ajout d'une tâche (sous forme de liste)
+        Cette liste sera ensuite ajoutée au fichier CSV ou au serveur selon la connexion active
         """
 
 
@@ -595,7 +597,7 @@ class SubFrame(LabelFrame):
         """
         Placement des widgets
         """
-        self['text'] = "Navigation lecteur de tâches"
+        self['text'] = "Menu de navigation"
         for w in self.winfo_children():
             w.destroy()
         # config lignes et colonnes
@@ -631,8 +633,8 @@ class SubFrame(LabelFrame):
         Commande appelée par le bouton self.BackButton permettant d'afficher la page suivante
         (dans l'affichage des tâches)
         """
-        affmax = self.master.MainFrame.UpdateMaxAff()
-        self.master.MainFrame.Ci += affmax  # maj intervalle des tâches à afficher
+        self.master.MainFrame.Ci += self.master.MainFrame.maxAff  # maj intervalle des tâches à afficher
+        self.master.MainFrame.UpdateMaxAff() # maj affichage max
         self.master.MainFrame.ShowTasks()  # maj affichage
 
 
