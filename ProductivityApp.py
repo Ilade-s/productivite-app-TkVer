@@ -562,7 +562,7 @@ class ActionFrame(LabelFrame):
     Frame placé à gauche (prenant 1/4 de la longueur) permettant de choisir les actions à effectuer
     """
 
-    def __init__(self, master) -> None:
+    def __init__(self, master):
         self.master = master
         super().__init__(master, background="#5B648A",
                          relief=RAISED, text="ActionFrame", foreground="white")
@@ -575,8 +575,11 @@ class ActionFrame(LabelFrame):
         """
         Placement des widgets
         """
-        # Label(self, text="ActionFrame", font=("Arial", 20),
-        #      background="grey").pack(anchor=CENTER)
+        self.addImg = PhotoImage(file="Assets/add-icon.png")
+        # ajout widgets
+        self.AddButton = Button(self, text="Ajouter une tâche", image=self.addImg
+            , compound=TOP, borderwidth=5)
+        self.AddButton.pack()
 
 
 class SubFrame(LabelFrame):
@@ -604,18 +607,23 @@ class SubFrame(LabelFrame):
         self.rowconfigure(0, weight=1)
         for i in range(5):
             self.columnconfigure(i, weight=1)
+        # importation images
+        self.BackImg = PhotoImage(file="Assets/back-arrow.png")
+        self.NextImg = PhotoImage(file="Assets/next-arrow.png")
         # ajout des widgets
         self.BackButton = ttk.Button(
-            self, text="Previous page", state="disabled", style="SubFrame.TButton", command=self.PreviousPage)
+            self, text="Previous page", state="disabled", style="SubFrame.TButton"
+            , command=self.PreviousPage, image=self.BackImg)
         self.NextButton = ttk.Button(
-            self, text="Next page", state="disabled", style="SubFrame.TButton", command=self.NextPage)
+            self, text="Next page", state="disabled", style="SubFrame.TButton"
+            , command=self.NextPage, image=self.NextImg)
         self.ReaderInfo = Label(self, text="..-../..", font=("Arial", 20))
-        self.BackButton.grid(row=0, column=1, ipadx=50, ipady=20)
-        self.NextButton.grid(row=0, column=3, ipadx=50, ipady=20)
+        self.BackButton.grid(row=0, column=1)
+        self.NextButton.grid(row=0, column=3)
         self.ReaderInfo.grid(row=0, column=2, ipadx=50, ipady=20)
         # config style boutons
         s = ttk.Style(self)
-        s.configure("SubFrame.TButton", font=("Arial", 20))
+        s.configure("SubFrame.TButton", font=("Arial", 10))
 
     def PreviousPage(self):
         """
@@ -630,7 +638,7 @@ class SubFrame(LabelFrame):
 
     def NextPage(self):
         """
-        Commande appelée par le bouton self.BackButton permettant d'afficher la page suivante
+        Commande appelée par le bouton self.NextButton permettant d'afficher la page suivante
         (dans l'affichage des tâches)
         """
         self.master.MainFrame.Ci += self.master.MainFrame.maxAff  # maj intervalle des tâches à afficher
