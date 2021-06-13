@@ -577,8 +577,11 @@ class ActionFrame(LabelFrame):
         """
         self.addImg = PhotoImage(file="Assets/add-icon.png")
         # ajout widgets
-        self.AddButton = Button(self, text="Ajouter une tâche", image=self.addImg
-            , compound=TOP, borderwidth=5)
+        self.AddButton = ttk.Button(self, text="Ajouter une tâche", image=self.addImg
+            , compound=TOP, style="ActionFrame.TButton")
+        # config style
+        s = ttk.Style(self)
+        s.configure("ActionFrame.TButton", borderwidth=5)
         self.AddButton.pack()
 
 
