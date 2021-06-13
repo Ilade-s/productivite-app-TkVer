@@ -687,6 +687,7 @@ def main():
     print(f"Productivity App v{__version__}")
     print(f"Made by {__author__}")
     print("Source : https://github.com/Ilade-s/productivite-app-TkVer")
+    print("Server : https://github.com/Tifiloow/productivite-app")
     print("===============================================================")
     # Création fenêtre
     app = TopLevel()
