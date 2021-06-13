@@ -179,22 +179,17 @@ class MenuBar(Menu):
         """
         Dialogue pour connexion à un serveur web
         """
-        if self.master.Db != None:
-            self.CloseDatabase(False)
-        # Fenêtre de demande de l'adresse web
-        adresse = smpldial.askstring(
-            "Adresse du serveur", "Adresse web complète (IP ou normale):")
-        try:
-            self.master.Server = WebInterface(adress=adresse)
-            print(f"Connecté au serveur : {adresse}")
-            self.master.title(
-                f"Productivity App v{__version__} : {adresse} : Non identifié")
-            msgbox.showinfo(
-                "Connexion serveur", f"Connexion réussie au serveur à l'adresse {adresse}")
-        except Exception:
-            print(f"Connexion au serveur à l'adresse {adresse} échouée")
-            msgbox.showerror(
-                "Connexion serveur", f"Connexion au serveur à l'adresse {adresse} échouée")
+        if self.master.Server != None:  # déjà connecté à un serveur
+            msgbox.showinfo("Login Serveur",
+                            f"Vous êtes déjà connectés au serveur {self.master.Server.adress}")
+        else:
+            if self.master.Db != None:
+                self.CloseDatabase(False)
+            if self.master.EntryFrame != None:
+                self.master.EntryFrame.destroy()
+                self.master.EntryFrame = None
+            self.master.EntryFrame = EntryFrame(
+                self.master.MainFrame, "adress")
 
     def ServerLogin(self):
         """
@@ -207,10 +202,10 @@ class MenuBar(Menu):
             msgbox.showinfo("Login Serveur",
                             f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant de vous reconnecter")
         else:
-            if self.master.AccountFrame != None:
-                self.master.AccountFrame.destroy()
-                self.master.AccountFrame = None
-            self.master.AccountFrame = AccountFrame(
+            if self.master.EntryFrame != None:
+                self.master.EntryFrame.destroy()
+                self.master.EntryFrame = None
+            self.master.EntryFrame = EntryFrame(
                 self.master.MainFrame, "login")
 
     def ServerLogout(self, msg=True):
@@ -227,6 +222,7 @@ class MenuBar(Menu):
         else:
             self.master.MainFrame.UnpackTasks()  # Supprime les tâches
             self.master.SubFrame.CreateWidgets() # Réinitialise les widgets de SubFrame
+            self.master.MainFrame['text'] = "MainFrame" # Réinitialise le titre de MainFrame
             oldaccount = self.master.Server.Account
             self.master.Server.Account = None
             self.master.Server.session.close()  # fermeture session
@@ -247,8 +243,8 @@ class MenuBar(Menu):
         else:
             if self.master.Server.Account != None:
                 self.ServerLogout(False)
-            if self.master.AccountFrame != None:
-                self.master.AccountFrame.destroy()
+            if self.master.EntryFrame != None:
+                self.master.EntryFrame.destroy()
             oldserver = self.master.Server.adress
             self.master.Server = None
             self.master.title(
@@ -308,7 +304,7 @@ class MenuBar(Menu):
 
     def ServerSignup(self):
         """
-        dialogue (AccountFrame) permettant de créer un compte
+        dialogue (EntryFrame) permettant de créer un compte
         """
         if self.master.Server == None:  # Pas de serveur ouvert
             msgbox.showinfo("Signup Serveur",
@@ -317,10 +313,10 @@ class MenuBar(Menu):
             msgbox.showinfo("Signup Serveur",
                             f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant d'en créer un nouveau")
         else:
-            if self.master.AccountFrame != None:
-                self.master.AccountFrame.destroy()
-                self.master.AccountFrame = None
-            self.master.AccountFrame = AccountFrame(
+            if self.master.EntryFrame != None:
+                self.master.EntryFrame.destroy()
+                self.master.EntryFrame = None
+            self.master.EntryFrame = EntryFrame(
                 self.master.MainFrame, "signup")
 
 
@@ -346,6 +342,7 @@ class MainFrame(LabelFrame):
         """
         Affiche les tâches
         """
+        self['text'] = "Liste des tâches"
         # Unpack tâches précedemment affichées
         if self.ShownTasks != []:
             for task in self.ShownTasks:
@@ -406,9 +403,13 @@ class MainFrame(LabelFrame):
         return self.maxAff
 
 
-class AccountFrame(LabelFrame):
+class EntryFrame(LabelFrame):
     """
-    Frame utilisé pour la connexion à un compte ou à sa création
+    Frame utilisé pour la récupération d'information textuelles :
+        - Récupération d'une adresse web
+        - Connexion à un compte
+        - Création d'un compte
+        - Ajout d'une tâche
     située (packée) dans MainFrame
     """
 
@@ -419,15 +420,20 @@ class AccountFrame(LabelFrame):
         purpose : str : indique le but de la Frame à afficher (et donc les widgets à ajouter):
             - "login" : fenêtre de connexion avec id et mdp
             - "signup" : fenêtre de création de compte avec id, nom et mdp
+            - "adress": fenêtre de récupéation d'une adresse web
+            - "task" : bloc de récupération d'infos pour l'ajout d'une tâche
         """
-        assert purpose == "login" or purpose == "signup", "purpose invalide, affichage AccountFrame annulé"
         super().__init__(master, background="#424864",
-                         relief=SOLID, text="AccountFrame", foreground="white",)
+                         relief=SOLID, text="EntryFrame", foreground="white",)
         self.master = master
         if purpose == "login":
             self.LoginFrame()
         elif purpose == "signup":
             self.SignupFrame()
+        elif purpose == "adress":
+            self.AdressFrame()
+        elif purpose == "task":
+            self.TaskFrame()
         self.pack(anchor="nw", pady=5, padx=5, expand=True)
 
     def LoginFrame(self):
@@ -511,6 +517,42 @@ class AccountFrame(LabelFrame):
         idEntry.grid(row=0, column=1, padx=10, pady=10)
         nameEntry.grid(row=1, column=1, padx=10, pady=10)
         passwdEntry.grid(row=2, column=1, padx=10, pady=10)
+    
+    def AdressFrame(self):
+        """
+        Frame permettant de se connecter à un serveur à l'aide de son adresse web
+        """
+        # Création variables des entrées
+        adress = StringVar()
+
+        def ConnexionAttempt(adress):
+            adresse = adress.get()
+            try:
+                self.master.master.Server = WebInterface(adress=adresse)
+                print(f"Connecté au serveur : {adresse}")
+                self.master.master.title(
+                    f"Productivity App v{__version__} : {adresse} : Non identifié")
+                msgbox.showinfo(
+                    "Connexion serveur", f"Connexion réussie au serveur à l'adresse {adresse}")
+                self.destroy()
+            except Exception:
+                print(f"Connexion au serveur à l'adresse {adresse} échouée")
+                msgbox.showerror(
+                    "Connexion serveur", f"Connexion au serveur à l'adresse {adresse} échouée")
+
+        self["text"] = "Connexion à un serveur"
+        # Création widgets
+        Label(self, text="Adresse web :", font=(17), background=self["background"], foreground="white"
+              ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        ttk.Button(self, text="Connect to server", command=partial(ConnexionAttempt, adress), width=20
+                   ).grid(row=1, column=1, padx=10, pady=10)
+        adressEntry = ttk.Entry(self, textvariable=adress, width=30,
+                            background=self["background"])
+        adressEntry.grid(row=0, column=1, padx=10, pady=10)
+    
+    def TaskFrame(self):
+        """
+        """
 
 
 class ActionFrame(LabelFrame):
@@ -553,6 +595,7 @@ class SubFrame(LabelFrame):
         """
         Placement des widgets
         """
+        self['text'] = "Navigation lecteur de tâches"
         for w in self.winfo_children():
             w.destroy()
         # config lignes et colonnes
@@ -611,7 +654,7 @@ class TopLevel(Tk):
             f"Productivity App v{__version__} : Pas de base de donnée ouverte")
         self.Db = None
         self.Server = None
-        self.AccountFrame = None
+        self.EntryFrame = None
         self.geometry("{}x{}".format(x, y))
         #self.resizable(False, False)
         # Placement des Frames
