@@ -72,6 +72,9 @@ class MenuBar(Menu):
         msg : bool (indique si l'ouverture doit être discrète ou non et si on doit déconnecter le serveur)
         path : str (optionnel, si fourni, la fonction ne demandera pas le chemin à nouveau)
         """
+        if self.master.EntryFrame != None:
+            self.master.EntryFrame.destroy()
+            self.master.EntryFrame = None
         if self.master.Server != None:
             self.ServerDisconnect()
         if path == "":
@@ -96,6 +99,9 @@ class MenuBar(Menu):
         msg : bool (indique si la création doit être discrète ou non et si on doit déconnecter le serveur)
         SORTIE : (exitcode: int, path: str)
         """
+        if self.master.EntryFrame != None:
+            self.master.EntryFrame.destroy()
+            self.master.EntryFrame = None
         if self.master.Server != None:
             self.ServerDisconnect()
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
