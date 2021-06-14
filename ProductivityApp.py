@@ -300,7 +300,7 @@ class MenuBar(Menu):
                     print("File already exists... switching to func OpenDatabase")
                     self.OpenDatabase(False, path)
                 for task in TaskList:
-                    self.master.Db.Add(task[1:])
+                    self.master.Db.Add(task)
                 print("Extraction réussie")
                 msgbox.showinfo("Extract Database", "Extraction réussie")
             except Exception as e:
@@ -665,7 +665,7 @@ class TopLevel(Tk):
         Initialisation de la fenêtre
         """
         super().__init__()
-        self.DefaultLabel = ["userID", "name",
+        self.DefaultLabel = ["taskID", "userID", "name",
                              "date", "priority", "status", "tag"]
         self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
