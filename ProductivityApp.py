@@ -76,22 +76,29 @@ class MenuBar(Menu):
             self.master.EntryFrame.destroy()
             self.master.EntryFrame = None
         if self.master.Server != None:
-            self.ServerDisconnect()
+            self.ServerDisconnect(False)
         if path == "":
             path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
                                             title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None and path != "":
-            self.master.Db = DbM(path)
-            self.master.title(f"Productivity App v{__version__} : {path}")
-            print(f"Ouverture DB réussie : {path}")
-            if msg:
-                msgbox.showinfo("Ouverture database",
-                                f"Ouverture du fichier {path} réussie")
+            try:
+                self.master.Db = DbM(path)
+                self.master.title(f"Productivity App v{__version__} : {path}")
+                print(f"Ouverture DB réussie : {path}")
+                self.SyncDatabase() # affichage tâches
+                if msg:
+                    msgbox.showinfo("Ouverture database",
+                                    f"Ouverture du fichier {path} réussie")
+            except Exception as e:
+                print("Création DB échouée")
+                if msg:
+                    msgbox.showerror("Ouverture database",
+                                    "Ouverture database échouée")
         else:
             print("Ouverture DB annulée")
             if msg:
                 msgbox.showerror("Ouverture database",
-                                 "Ouverture database échouée/annulée")
+                                 "Ouverture database annulée")
 
     def CreateDatabase(self, msg=True):
         """
@@ -103,7 +110,7 @@ class MenuBar(Menu):
             self.master.EntryFrame.destroy()
             self.master.EntryFrame = None
         if self.master.Server != None:
-            self.ServerDisconnect()
+            self.ServerDisconnect(False)
         path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
                                           title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if os.path.exists(path):  # file already exists
@@ -111,24 +118,44 @@ class MenuBar(Menu):
         if path != None and path != "":
             if path[:-4] != ".csv":
                 path += ".csv"
-            # création d'un nouveau fichier CSV
-            self.master.Db = DbM(path, "x+")
-            # Ouverture fichier
-            self.master.Db = DbM(path)
-            # Ajout des labels de colonne
-            self.master.Db.Add(self.master.DefaultLabel)
-            self.master.title(f"Productivity App v{__version__} : {path}")
-            print(f"Création DB réussie : {path}")
-            if msg:
-                msgbox.showinfo("Création database",
-                                "Création et ouverture du fichier réussie")
-            return (1, path)
+            try:
+                # création d'un nouveau fichier CSV
+                self.master.Db = DbM(path, "x+")
+                # Ouverture fichier
+                self.master.Db = DbM(path)
+                # Ajout des labels de colonne
+                self.master.Db.Add(self.master.DefaultLabel)
+                self.master.title(f"Productivity App v{__version__} : {path}")
+                print(f"Création DB réussie : {path}")
+                self.SyncDatabase() # affichage tâches
+                if msg:
+                    msgbox.showinfo("Création database",
+                                    "Création et ouverture du fichier réussie")
+                return (1, path)
+            except Exception as e:
+                print("Création DB échouée")
+                if msg:
+                    msgbox.showerror("Création database",
+                                    "Création database échouée")
+                return (0, path)
+
         else:
             print("Création DB annulée")
             if msg:
                 msgbox.showerror("Création database",
                                  "Création database échouée/annulée")
             return (0, path)
+    
+    def SyncDatabase(self):
+        """
+        Sous-fonction appellée par OpenDatabase et CreateDatabase.
+
+        Permet d'afficher les tâches contenues dans le fichier CSV ouvert
+        """
+        self.master.MainFrame.Tasks = self.master.Db.GetTasks()
+        #print(f"Tasks : {self.master.MainFrame.Tasks}")
+        self.master.MainFrame.ShowTasks()
+        print("Synchronisation réussie")
 
     def CloseDatabase(self, msg=True):
         """
@@ -142,6 +169,9 @@ class MenuBar(Menu):
             try:
                 self.master.Db.file.close()
                 self.master.Db = None
+                self.master.MainFrame.UnpackTasks()  # Supprime les tâches
+                self.master.SubFrame.CreateWidgets() # Réinitialise les widgets de SubFrame
+                self.master.MainFrame['text'] = "MainFrame" # Réinitialise le titre de MainFrame
                 self.master.title(
                     f"Productivity App v{__version__} : Pas de base de donnée ouverte")
                 print("DB fermée")
@@ -239,9 +269,10 @@ class MenuBar(Menu):
                                 f"Déconnecté du compte {oldaccount}")
             print("Déconnecté du compte")
 
-    def ServerDisconnect(self):
+    def ServerDisconnect(self, msg=True):
         """
         Déconnexion d'un serveur web
+        msg : bool (indique si la fermeture doit être discrète ou non)
         """
         if self.master.Server == None:  # Pas de serveur ouvert
             msgbox.showinfo("Déconnexion Serveur",
@@ -256,8 +287,9 @@ class MenuBar(Menu):
             self.master.title(
                 f"Productivity App v{__version__} : Pas de base de donnée ouverte")
             print("Déconnecté du serveur")
-            msgbox.showinfo("Déconnexion Serveur",
-                            f"Déconnecté du serveur {oldserver}")
+            if msg:
+                msgbox.showinfo("Déconnexion Serveur",
+                                f"Déconnecté du serveur {oldserver}")
 
     def ServerSync(self):
         """
@@ -296,13 +328,13 @@ class MenuBar(Menu):
                 TaskList = self.master.Server.GetData()
                 #print(f"Tasks : {TaskList}")
                 (exitcode, path) = self.CreateDatabase(False)
-                if not exitcode:  # création impossile (le fichier existe déjà)
+                if not exitcode:  # création impossible (le fichier existe déjà)
                     print("File already exists... switching to func OpenDatabase")
                     self.OpenDatabase(False, path)
                 for task in TaskList:
                     self.master.Db.Add(task)
-                print("Extraction réussie")
-                msgbox.showinfo("Extract Database", "Extraction réussie")
+                print(f"Extraction réussie : {path}")
+                msgbox.showinfo("Extract Database", f"Extraction réussie dans {path}")
             except Exception as e:
                 print("Echec de l'extraction")
                 msgbox.showerror(

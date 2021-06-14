@@ -69,6 +69,17 @@ class CsvHandler():
         self.Data = [i for i in self.dbR]
         self.dbW = csv.writer(self.file, delimiter=self.Delimiter)
         #print(self.Data)
+    
+    def GetTasks(self):
+        """
+        Permet de récupérer la liste des tâches contenues dans le fichier
+        """
+        self.ReadAll() # mise à jour reader
+        # récupération tâches
+        tasks = [task for task in self.Data[1:]]
+        #print(tasks)
+
+        return tasks
 
     def Add(self, data):
         """
