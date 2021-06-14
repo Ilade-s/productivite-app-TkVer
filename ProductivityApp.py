@@ -85,8 +85,8 @@ class MenuBar(Menu):
                 self.master.Db = DbM(path)
                 self.master.title(f"Productivity App v{__version__} : {path}")
                 print(f"Ouverture DB réussie : {path}")
-                self.SyncDatabase() # affichage tâches
                 if msg:
+                    self.SyncDatabase() # affichage tâches
                     msgbox.showinfo("Ouverture database",
                                     f"Ouverture du fichier {path} réussie")
             except Exception as e:
@@ -127,8 +127,8 @@ class MenuBar(Menu):
                 self.master.Db.Add(self.master.DefaultLabel)
                 self.master.title(f"Productivity App v{__version__} : {path}")
                 print(f"Création DB réussie : {path}")
-                self.SyncDatabase() # affichage tâches
                 if msg:
+                    self.SyncDatabase() # affichage tâches
                     msgbox.showinfo("Création database",
                                     "Création et ouverture du fichier réussie")
                 return (1, path)
@@ -333,6 +333,7 @@ class MenuBar(Menu):
                     self.OpenDatabase(False, path)
                 for task in TaskList:
                     self.master.Db.Add(task)
+                self.SyncDatabase() # affichage des tâches
                 print(f"Extraction réussie : {path}")
                 msgbox.showinfo("Extract Database", f"Extraction réussie dans {path}")
             except Exception as e:
