@@ -666,7 +666,7 @@ class TopLevel(Tk):
         """
         super().__init__()
         self.DefaultLabel = ["userID", "name",
-                             "date", "priority", "status", "label"]
+                             "date", "priority", "status", "tag"]
         self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(
