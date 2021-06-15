@@ -19,6 +19,7 @@ from tkinter import messagebox as msgbox
 import os  # Pour trouver le répertoire courant (os.getcwd)
 # permet d'exécuter des fonctions avec arguments avec des widgets tk
 from functools import partial
+from datetime import date # récupération de la date (ajout de tâche)
 
 
 class MenuBar(Menu):
@@ -594,6 +595,59 @@ class EntryFrame(LabelFrame):
         Frame permettant de récupérer les informations nécessaires à l'ajout d'une tâche (sous forme de liste)
         Cette liste sera ensuite ajoutée au fichier CSV ou au serveur selon la connexion active
         """
+        # Création variables des entrées
+        task = StringVar()
+        taskdate = StringVar()
+        priority = StringVar()
+        priority.set("medium")
+        tag = StringVar()
+        # création dates sur le mois
+        cdate = str(date.today())
+        taskdate.set(cdate) # assignation taskdate à la date d'aujourd'hui
+        dates = [cdate[:-2]+str(int(cdate[-2:])+i)
+                    for i in range(31-int(cdate[-2:]))]
+        #print(dates)
+
+        def GetTask(task, date, priority, tag):
+            try:
+                # à faire
+                msgbox.showinfo("Add Task",
+                                f"Ajout de la tâche {task.get()} réussie")
+                self.destroy()
+            except Exception as e:
+                self.master.master.Server.Account = None
+                print(f"Echec de l'ajout de la tâche : {task.get()}")
+                msgbox.showerror(
+                    "Add Task", f"Echec de l'ajout de la tâche' : {e}")
+
+        self["text"] = "Ajout d'une tâche"
+        # Création widgets
+        Label(self, text="Task", font=(17), background=self["background"], foreground="white"
+              ).grid(row=0, column=0, padx=10, pady=10, sticky="n")
+        Label(self, text="Due date", font=(17), background=self["background"], foreground="white"
+              ).grid(row=0, column=1, padx=10, pady=10, sticky="n")
+        Label(self, text="Priority", font=(17), background=self["background"], foreground="white"
+              ).grid(row=0, column=2, padx=10, pady=10, sticky="n")
+        Label(self, text="Tag", font=(17), background=self["background"], foreground="white"
+              ).grid(row=0, column=3, padx=10, pady=10, sticky="n")
+        ttk.Button(self, text="Confirm", command=partial(GetTask, task, taskdate, priority, tag), width=20
+                   ).grid(row=1, column=4, padx=10, pady=10)
+        taskEntry = ttk.Entry(self, textvariable=task, width=20,
+                            background=self["background"])
+        priorityBox = ttk.Combobox(self, textvariable=priority, width=15,
+                            background=self["background"], state="readonly",
+                            values=["hight", "medium", "low"])
+        dateBox = ttk.Combobox(self, textvariable=taskdate, width=15,
+                            background=self["background"], state="readonly",
+                            values=dates)
+        tagEntry = ttk.Entry(self, textvariable=tag, width=15,
+                            background=self["background"])
+        taskEntry.grid(row=1, column=0, padx=10, pady=10)
+        dateBox.grid(row=1, column=1, padx=10, pady=10)
+        priorityBox.grid(row=1, column=2, padx=10, pady=10)
+        tagEntry.grid(row=1, column=3, padx=10, pady=10)
+        
+
 
 
 class ActionFrame(LabelFrame):
@@ -617,11 +671,18 @@ class ActionFrame(LabelFrame):
         self.addImg = PhotoImage(file="Assets/add-icon.png")
         # ajout widgets
         self.AddButton = ttk.Button(self, text="Ajouter une tâche", image=self.addImg
-            , compound=TOP, style="ActionFrame.TButton")
+            , compound=TOP, style="ActionFrame.TButton", command=self.AddTask)
         # config style
         s = ttk.Style(self)
         s.configure("ActionFrame.TButton", borderwidth=5)
         self.AddButton.pack()
+    
+    def AddTask(self):
+        """
+        Action déclenchée par le bouton "Ajouter une tâche"
+        """
+        self.master.EntryFrame = EntryFrame(
+                self.master.MainFrame, "task")
 
 
 class SubFrame(LabelFrame):
