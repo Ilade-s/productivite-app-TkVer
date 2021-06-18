@@ -404,7 +404,7 @@ class MainFrame(LabelFrame):
         # config style
         s = ttk.Style(self)
         s.configure("Task.TCheckbutton", 
-            background="#5B648A", font=(17), anchor="w")
+            background="#5B648A", font=(20), anchor="w")
         # Maj état des boutons de SubFrame
         if self.Ci == 0:  # début de la liste des tâches
             self.master.SubFrame.BackButton["state"] = "disabled"
@@ -604,21 +604,22 @@ class EntryFrame(LabelFrame):
         # création dates sur le mois
         cdate = str(date.today())
         taskdate.set(cdate) # assignation taskdate à la date d'aujourd'hui
-        dates = [cdate[:-2]+str(int(cdate[-2:])+i)
-                    for i in range(31-int(cdate[-2:]))]
+        dates = [cdate[:-2]+str(int(cdate[-2:])+i) # bonne chance
+                    for i in range(31-int(cdate[-2:]))]+[
+                        cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2]+("0"+str(i) if i<10 else str(i)) 
+                            if int(cdate[6])+1<=12 
+                        else cdate[:6]+"1"+cdate[7:-2]+("0"+str(i) if i<10 else str(i))
+                            for i in range(1,int(cdate[-2:])+1)]
         #print(dates)
 
-        def GetTask(task, date, priority, tag):
+        def GetTask(task, taskdate, priority, tag):
             try:
-                # à faire
-                msgbox.showinfo("Add Task",
-                                f"Ajout de la tâche {task.get()} réussie")
+                self.task = [task.get(), taskdate.get(), priority.get(), tag.get()]
+                # à faire ?
                 self.destroy()
             except Exception as e:
-                self.master.master.Server.Account = None
+                self.master.task = None
                 print(f"Echec de l'ajout de la tâche : {task.get()}")
-                msgbox.showerror(
-                    "Add Task", f"Echec de l'ajout de la tâche' : {e}")
 
         self["text"] = "Ajout d'une tâche"
         # Création widgets
