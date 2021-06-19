@@ -17,6 +17,7 @@ from tkinter import filedialog as fldialog  # Choix de fichier etc...
 from tkinter import messagebox as msgbox
 #from tkinter import simpledialog as smpldial  # Demande d'informations simples
 import os  # Pour trouver le répertoire courant (os.getcwd)
+from sys import platform # connaitre la plateforme
 # permet d'exécuter des fonctions avec arguments avec des widgets tk
 from functools import partial
 from datetime import date # récupération de la date (ajout de tâche)
@@ -117,7 +118,7 @@ class MenuBar(Menu):
         if os.path.exists(path):  # file already exists
             return (0, path)
         if path != None and path != "":
-            if path[:-4] != ".csv":
+            if path[:-4] != ".csv" and platform=="win32":
                 path += ".csv"
             try:
                 # création d'un nouveau fichier CSV
@@ -383,6 +384,9 @@ class MainFrame(LabelFrame):
         Affiche les tâches
         """
         self['text'] = "Liste des tâches"
+        # Remove and replace task Entryframe 
+        if self.master.EntryFrame != None:
+            self.master.EntryFrame.destroy()
         # Unpack tâches précedemment affichées
         if self.ShownTasks != []:
             for task in self.ShownTasks:
@@ -404,7 +408,7 @@ class MainFrame(LabelFrame):
         # config style
         s = ttk.Style(self)
         s.configure("Task.TCheckbutton", 
-            background="#5B648A", font=(20), anchor="w")
+            background="#5B648A", font=("Arial", 16), anchor="w")
         # Maj état des boutons de SubFrame
         if self.Ci == 0:  # début de la liste des tâches
             self.master.SubFrame.BackButton["state"] = "disabled"
@@ -474,7 +478,7 @@ class EntryFrame(LabelFrame):
             self.AdressFrame()
         elif purpose == "task":
             self.TaskFrame()
-        self.pack(anchor="nw", pady=5, padx=5, expand=True)
+        self.pack(anchor="nw", pady=5, padx=20, expand=True)
 
     def LoginFrame(self):
         """
@@ -614,7 +618,8 @@ class EntryFrame(LabelFrame):
 
         def GetTask(task, taskdate, priority, tag):
             try:
-                self.task = [task.get(), taskdate.get(), priority.get(), tag.get()]
+                self.master.task = [task.get(), taskdate.get(), priority.get(), tag.get()]
+                print(self.master.task)
                 # à faire ?
                 self.destroy()
             except Exception as e:
@@ -762,6 +767,9 @@ class TopLevel(Tk):
         super().__init__()
         self.DefaultLabel = ["taskID", "userID", "name",
                              "date", "priority", "status", "tag"]
+        self.style = ttk.Style()
+        if platform=="linux":
+            self.style.theme_use("clam")
         self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(
