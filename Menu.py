@@ -5,7 +5,6 @@ from tkinter import filedialog as fldialog  # Choix de fichier etc...
 from tkinter import messagebox as msgbox
 import os  # Pour trouver le répertoire courant (os.getcwd)
 from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
-from PlotHandler import *  # fonctions de création de graphique
 from Global import __version__, ShowVersion, platform # variables globales
 from EntryFrame import *
 
