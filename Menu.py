@@ -5,7 +5,7 @@ from tkinter import filedialog as fldialog  # Choix de fichier etc...
 from tkinter import messagebox as msgbox
 import os  # Pour trouver le répertoire courant (os.getcwd)
 from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
-from Global import __version__, ShowVersion, platform # variables globales
+from Global import __version__, ShowVersion, platform, DefaultLabel, platform, x, y # variables globales
 from EntryFrame import *
 
 class MenuBar(Menu):
@@ -77,10 +77,10 @@ class MenuBar(Menu):
                     msgbox.showinfo("Ouverture database",
                                     f"Ouverture du fichier {path} réussie")
             except Exception as e:
-                print("Création DB échouée")
+                print(f"Création DB échouée : {e}")
                 if msg:
                     msgbox.showerror("Ouverture database",
-                                    "Ouverture database échouée")
+                                    f"Ouverture database échouée : {e}")
         else:
             print("Ouverture DB annulée")
             if msg:
@@ -103,7 +103,7 @@ class MenuBar(Menu):
         if os.path.exists(path):  # file already exists
             return (0, path)
         if path != None and path != "":
-            if path[:-4] != ".csv" and platform=="win32":
+            if path[:-4] != ".csv" and (platform == "win32" or platform == "win64"):
                 path += ".csv"
             try:
                 # création d'un nouveau fichier CSV
@@ -115,15 +115,16 @@ class MenuBar(Menu):
                 self.master.title(f"Productivity App v{__version__} : {path}")
                 print(f"Création DB réussie : {path}")
                 if msg:
-                    self.SyncDatabase() # affichage tâches
+                    if __name__!='__main__': # désactivé lors d'un test individuel
+                        self.SyncDatabase() # affichage tâches
                     msgbox.showinfo("Création database",
                                     "Création et ouverture du fichier réussie")
                 return (1, path)
             except Exception as e:
-                print("Création DB échouée")
+                print(f"Création DB échouée {e}")
                 if msg:
                     msgbox.showerror("Création database",
-                                    "Création database échouée")
+                                    f"Création database échouée {e}")
                 return (0, path)
 
         else:
@@ -292,7 +293,8 @@ class MenuBar(Menu):
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
                 #print(f"Tasks : {self.master.MainFrame.Tasks}")
-                self.master.MainFrame.ShowTasks()
+                if __name__!='__main__': # désactivé lors d'un test individuel
+                    self.master.MainFrame.ShowTasks()
                 print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database", "Synchronisation réussie")
             except Exception as e:
@@ -351,8 +353,9 @@ if __name__=='__main__': # test affichage
     ShowVersion() # affichage info prog
 
     root = Tk()
+    root.DefaultLabel = DefaultLabel
     root.title("Test Menu")
-    root.geometry("{}x{}".format(1200,600))
+    root.geometry("{}x{}".format(x,y))
     Menu = MenuBar(root)
     root.config(menu=Menu)
     # setup test

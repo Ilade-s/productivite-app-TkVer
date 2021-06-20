@@ -33,6 +33,9 @@ class ActionFrame(LabelFrame):
         """
         Action déclenchée par le bouton "Ajouter une tâche"
         """
+        if self.master.EntryFrame != None:
+            self.master.EntryFrame.destroy()
+            self.master.EntryFrame = None
         self.master.EntryFrame = EntryFrame(
                 self.master.MainFrame, "task")
 
@@ -48,6 +51,7 @@ if __name__=='__main__': # test affichage et boutons
     root.geometry("{}x{}".format(x,y))
     frame = ActionFrame(root)
     # setup test
+    root.EntryFrame = None
     root.MainFrame = MainFrame(root)
 
     root.mainloop()

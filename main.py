@@ -4,7 +4,7 @@ supporte la connexion au serveur correspondant et l'exportation en CSV
 on peut afficher les tâches en se synchronisant au serveur
 """
 
-from Global import __version__, __author__, x, y, ShowVersion, platform # variables globales
+from Global import __version__, __author__, x, y, ShowVersion, platform, DefaultLabel # variables globales
 # importation des frames
 from SubFrame import *
 from MainFrame import *
@@ -23,8 +23,7 @@ class TopLevel(Tk):
         Initialisation de la fenêtre
         """
         super().__init__()
-        self.DefaultLabel = ["taskID", "userID", "name",
-                             "date", "priority", "status", "tag"]
+        self.DefaultLabel = DefaultLabel
         self.style = ttk.Style()
         if platform=="linux":
             self.style.theme_use("clam")
