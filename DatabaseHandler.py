@@ -1,20 +1,18 @@
 """
-Sous programme servant à gérer les bases de données
+Sous programme servant à gérer les bases de données au format CSV
 Utilisé dans le programme principal ProductivityApp
 
-CLASSES :
+CsvHandler :
 -----------
-    - CsvHandler :
-        - permet de gérer et lire une base de donnée au format CSV
-        - FONCTIONS :
-            - Search : chercher une ligne ou un élément d'une ligne à partir d'une clé
-            - Add : ajouter une donnée/ligne
-            - Remove : retirer une ligne
-            - Edit : éditer une ligne ou un élément de ligne
+    - permet de gérer et lire une base de donnée au format CSV
+    - FONCTIONS :
+        - Search : chercher une ligne ou un élément d'une ligne à partir d'une clé
+        - Add : ajouter une donnée/ligne
+        - Remove : retirer une ligne
+        - Edit : éditer une ligne ou un élément de ligne
 """
 
 import csv  # Module mère gestion CSV
-import sys  # Pour arrêt des fonctions en cas d'erreur (+ messages d'erreur)
 
 class CsvHandler():
     """
