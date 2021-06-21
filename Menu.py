@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 from tkinter import filedialog as fldialog  # Choix de fichier etc...
 # Messages d'information ou d'avertissement
 from tkinter import messagebox as msgbox
@@ -143,6 +142,7 @@ class MenuBar(Menu):
         self.master.MainFrame.Tasks = self.master.Db.GetTasks()
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
         self.master.MainFrame.ShowTasks()
+        self.master.ActionFrame.AddButton['state'] = "normal"
         print("Synchronisation réussie")
 
     def CloseDatabase(self, msg=True):
@@ -160,6 +160,7 @@ class MenuBar(Menu):
                 self.master.MainFrame.UnpackTasks()  # Supprime les tâches
                 self.master.SubFrame.CreateWidgets() # Réinitialise les widgets de SubFrame
                 self.master.MainFrame['text'] = "MainFrame" # Réinitialise le titre de MainFrame
+                self.master.ActionFrame.AddButton['state'] = "disabled"
                 self.master.title(
                     f"Productivity App v{__version__} : Pas de base de donnée ouverte")
                 print("DB fermée")
@@ -244,9 +245,12 @@ class MenuBar(Menu):
             msgbox.showinfo("Logout Serveur",
                             "Vous n'êtes pas connectés à un compte")
         else:
+            if self.master.EntryFrame != None:
+                self.master.EntryFrame.destroy()
             self.master.MainFrame.UnpackTasks()  # Supprime les tâches
             self.master.SubFrame.CreateWidgets() # Réinitialise les widgets de SubFrame
             self.master.MainFrame['text'] = "MainFrame" # Réinitialise le titre de MainFrame
+            self.master.ActionFrame.AddButton['state'] = "disabled"
             oldaccount = self.master.Server.Account
             self.master.Server.Account = None
             self.master.Server.session.close()  # fermeture session
@@ -268,8 +272,6 @@ class MenuBar(Menu):
         else:
             if self.master.Server.Account != None:
                 self.ServerLogout(False)
-            if self.master.EntryFrame != None:
-                self.master.EntryFrame.destroy()
             oldserver = self.master.Server.adress
             self.master.Server = None
             self.master.title(
@@ -295,6 +297,7 @@ class MenuBar(Menu):
                 #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 if __name__!='__main__': # désactivé lors d'un test individuel
                     self.master.MainFrame.ShowTasks()
+                    self.master.ActionFrame.AddButton['state'] = "normal"
                 print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database", "Synchronisation réussie")
             except Exception as e:
