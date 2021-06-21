@@ -182,16 +182,23 @@ class EntryFrame(LabelFrame):
                 if self.master.master.Server != None: # connecté à un serveur
                     print("Ajout de la tâche au serveur...")
                     newtask = { #
+                        "goal" : "addElement",
                         "task" : task.get(),
                         "date" : taskdate.get(),
                         "priority" : priority.get(),
                         "tag" : tag.get(),
                         "status" : "enable"}
-                    print(newtask)
+                    print("Tâche :", newtask)
+                    self.master.master.Server.Add(newtask)
+                    print("Synchronisation des modifications...")
+                    self.master.Tasks = self.master.master.Server.GetData() # mise à jour liste des tâches
+                    self.master.Ci = len(self.master.Tasks)-self.master.UpdateMaxAff() # mise à jour index (pour montrer la nouvelle tâche)
+                    self.master.ShowTasks() # mise à jour lecteur
+
                         
                 elif self.master.master.Db != None: # base de donnée CSV ouverte
                     newtask = [str(int(self.master.Tasks[-1][0])+1), self.master.Tasks[-1][1], task.get(), taskdate.get(), priority.get(), "enable", tag.get()]
-                    print(newtask)
+                    print("Tâche :", newtask)
                     print("Ajout de la tâche au fichier CSV...")
                     self.master.master.Db.Add(newtask)
                     print("Synchronisation des modifications...")

@@ -4,6 +4,7 @@ La classe est initialisée avec l'adresse du serveur en argument
 """
 
 import requests
+import json
 
 class WebInterface():
     """
@@ -118,7 +119,22 @@ class WebInterface():
 
         return r.json()
 
-    def AddTask(self): # à faire
+    def Add(self, task): # à faire
         """
         Ajoute un tâche
+
+        PARAMETRE :
+            - task : dict
+                - dictionnaire au format {userID, task, date, priority, tag} représentant la tâche à ajouter
         """
+        r = self.session.post(self.adress, data=json.dumps(task, separators=(',', ':')))
+
+        try:
+            r.raise_for_status()
+        except Exception as e:
+            print(e)
+        
+        #if r.json() != 'Success': # échec de l'ajout de la tâche
+        #    print("échec ajout : ID déjà présent :", r.json())
+        #    raise(Exception)
+
