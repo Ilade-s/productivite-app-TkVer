@@ -166,10 +166,11 @@ class EntryFrame(LabelFrame):
         priority.set("medium")
         tag = StringVar()
         # création dates sur le mois
-        cdate = str(date.today())
+        cdate = str(date.today()) # date actuelle
+        jMois = [31,28,31,30,31,30,31,31,30,31,30,31] # nombre de jour par mois (année non bissextile, dans l'ordre de janvier à décembre)
         taskdate.set(cdate) # assignation taskdate à la date d'aujourd'hui
         dates = [cdate[:-2]+str(int(cdate[-2:])+i) # bonne chance
-                    for i in range(31-int(cdate[-2:]))]+[
+                    for i in range(jMois[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
                         cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2]+("0"+str(i) if i<10 else str(i)) 
                             if int(cdate[6])+1<=12 
                         else cdate[:6]+"1"+cdate[7:-2]+("0"+str(i) if i<10 else str(i))
@@ -178,13 +179,34 @@ class EntryFrame(LabelFrame):
 
         def GetTask(task, taskdate, priority, tag):
             try:
-                self.master.task = [task.get(), taskdate.get(), priority.get(), tag.get()]
-                print(self.master.task)
-                # à faire ?
+                if self.master.master.Server != None: # connecté à un serveur
+                    print("Ajout de la tâche au serveur...")
+                    newtask = { #
+                        "task" : task.get(),
+                        "date" : taskdate.get(),
+                        "priority" : priority.get(),
+                        "tag" : tag.get(),
+                        "status" : "enable"}
+                    print(newtask)
+                        
+                elif self.master.master.Db != None: # base de donnée CSV ouverte
+                    newtask = [str(int(self.master.Tasks[-1][0])+1), self.master.Tasks[-1][1], task.get(), taskdate.get(), priority.get(), "enable", tag.get()]
+                    print(newtask)
+                    print("Ajout de la tâche au fichier CSV...")
+                    self.master.master.Db.Add(newtask)
+                    print("Synchronisation des modifications...")
+                    self.master.Tasks = self.master.master.Db.GetTasks() # mise à jour liste des tâches
+                    self.master.Ci = len(self.master.Tasks)-self.master.UpdateMaxAff() # mise à jour index (pour montrer la nouvelle tâche)
+                    self.master.ShowTasks() # mise à jour lecteur
+                    
+                else: # Erreur : rien d'ouvert (normalement impossible en conditions normales)
+                    print("Aucune BDD ouverte, ajout d'une tâche impossible")
+                    msgbox.showerror("Ajout d'une tâche",
+                    f"Echec de l'ajout de la tâche {task.get()} \nAucune base de donnée n'est ouverte")
                 self.destroy()
             except Exception as e:
                 self.master.task = None
-                print(f"Echec de l'ajout de la tâche : {task.get()}")
+                print(f"Echec de l'ajout de la tâche : {task.get()} \n {e}")
 
         self["text"] = "Ajout d'une tâche"
         # Création widgets
@@ -215,4 +237,4 @@ class EntryFrame(LabelFrame):
 
 
 if __name__=='__main__':
-    print("Le test d'EntryFrame se fait via celui du Menu")
+    print("Le test d'EntryFrame se fait via celui du Menu ou d'ActionFrame")

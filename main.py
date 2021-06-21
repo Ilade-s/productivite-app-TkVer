@@ -4,7 +4,8 @@ supporte la connexion au serveur correspondant et l'exportation en CSV
 on peut afficher les tâches en se synchronisant au serveur
 """
 
-from Global import __version__, __author__, x, y, ShowVersion, platform, DefaultLabel # variables globales
+# variables globales
+from Global import __version__, __author__, x, y, ShowVersion, platform, DefaultLabel
 # importation des frames
 from SubFrame import *
 from MainFrame import *

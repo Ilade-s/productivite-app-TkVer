@@ -29,7 +29,7 @@ class MenuBar(Menu):
         self.FileMenu.add_separator()  # séparateur
         self.FileMenu.add_command(
             label="Close database", command=self.CloseDatabase)
-        self.FileMenu.add_separator()  # séparateu
+        self.FileMenu.add_separator()  # séparateur
         self.FileMenu.add_command(
             label="Exit", command=self.master.destroy)
         # Menu Web
@@ -192,7 +192,7 @@ class MenuBar(Menu):
                     NewFile.Add(row)
                 print(f"Sauvegarde DB réussie : {path}")
                 msgbox.showinfo("Sauvegarde database",
-                                "Sauvegarde du fichier réussie")
+                                f"Sauvegarde du fichier réussie {path}")
             else:
                 print("Sauvegarde DB annulée")
                 msgbox.showerror("Sauvegarde database",
