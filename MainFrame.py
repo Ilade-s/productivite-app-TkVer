@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from SubFrame import SubFrame
 from Global import ShowVersion
+from functools import partial # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 
 class MainFrame(LabelFrame):
     """
@@ -12,6 +13,7 @@ class MainFrame(LabelFrame):
         self.master = master
         self.Tasks = []
         self.ShownTasks = []
+        self.StateTasks = []
         self.Ci = 0
         # nombre de tâches affichables sans clippage (dynamique)
         self.maxAff = 7
@@ -25,6 +27,14 @@ class MainFrame(LabelFrame):
         """
         Affiche les tâches
         """
+        def TaskSelected(taskID):
+            """
+            Action d'un CheckButton de tâche lorsque que l'user interagit avec lui
+            param taskID : str : numéro sous forme de string qui peret de retrouver une tâche dans la liste
+            """
+            print("Tâche selectionnée :", taskID)
+            print("Etats boutons :", [state.get() for state in self.StateTasks])
+
         self['text'] = "Liste des tâches"
         # Remove and replace task Entryframe 
         if self.master.EntryFrame != None:
@@ -33,19 +43,24 @@ class MainFrame(LabelFrame):
         if self.ShownTasks != []:
             for task in self.ShownTasks:
                 task.destroy()
-
         # création et affichage des widgets
-        self.StateTasks = [IntVar() for i in range(
-            len(self.Tasks[self.Ci:self.Ci+self.maxAff]))]
+
+        # création variables à assigner aux tâches si nécessaire (si vide)
+        if not self.StateTasks:
+            self.StateTasks = [IntVar() for i in range(len(self.Tasks))]
+        elif len(self.StateTasks) < len(self.Tasks): # nouvelles tâches
+            self.StateTasks.extend([IntVar() for i in range(len(self.Tasks)-len(self.StateTasks))])
+        elif len(self.StateTasks) > len(self.Tasks): # tâches supprimées
+            self.StateTasks = self.StateTasks[:len(self.Tasks)]
 
         self.ShownTasks = [ttk.Checkbutton(self,
             text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
             else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0
-            , style="Task.TCheckbutton")
+            , style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
                 for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
-            self.ShownTasks[task]["variable"] = self.StateTasks[task] # assignation variable
+            self.ShownTasks[task]["variable"] = self.StateTasks[self.Ci+task] # assignation variable
             self.ShownTasks[task].pack(anchor="w", padx=20, pady=5) # affichage tâche
         # config style
         s = ttk.Style(self)
@@ -83,7 +98,7 @@ class MainFrame(LabelFrame):
         (et avec un espace pour la Frame d'ajout de tâches)
         """
         # on sait que taille de base = 600*.75 = 450 or on peut y afficher 9 tâches - 2 pour l'espace restant
-        # donc yTask = 50 et à la fin on doit retirer 2 au résultat
+        # donc yTask = 50 et à la fin on doit retirer 2 au résultat : 50*nTaches - 2 == yMainFrame
         CurrentHeight = self.winfo_height()
         #print(f"taille MainFrame : {CurrentHeight}")
         self.maxAff = CurrentHeight//50 - 2

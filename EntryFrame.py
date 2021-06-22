@@ -166,10 +166,10 @@ class EntryFrame(LabelFrame):
         priority.set("medium")
         tag = StringVar()
         # création dates sur le mois
-        cdate = str(date.today()) # date actuelle
+        cdate = str(date.today()) # date actuelle (format AAAA-MM-JJ)
         jMois = [31,28,31,30,31,30,31,31,30,31,30,31] # nombre de jour par mois (année non bissextile, dans l'ordre de janvier à décembre)
         taskdate.set(cdate) # assignation taskdate à la date d'aujourd'hui
-        dates = [cdate[:-2]+str(int(cdate[-2:])+i) # bonne chance
+        dates = [cdate[:-2]+str(int(cdate[-2:])+i) # création de la liste des dates sur un mois
                     for i in range(jMois[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
                         cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2]+("0"+str(i) if i<10 else str(i)) 
                             if int(cdate[6])+1<=12 
@@ -213,7 +213,7 @@ class EntryFrame(LabelFrame):
                 self.destroy()
             except Exception as e:
                 self.master.task = None
-                print(f"Echec de l'ajout de la tâche : {task.get()} \n {e}")
+                print(f"Echec de l'ajout de la tâche : {task.get()} : \n-->{e}")
 
         self["text"] = "Ajout d'une tâche"
         # Création widgets
@@ -229,12 +229,12 @@ class EntryFrame(LabelFrame):
                    ).grid(row=1, column=4, padx=10, pady=10)
         taskEntry = ttk.Entry(self, textvariable=task, width=20,
                             background=self["background"])
-        priorityBox = ttk.Combobox(self, textvariable=priority, width=15,
-                            background=self["background"], state="readonly",
-                            values=["hight", "medium", "low"])
         dateBox = ttk.Combobox(self, textvariable=taskdate, width=15,
                             background=self["background"], state="readonly",
                             values=dates)
+        priorityBox = ttk.Combobox(self, textvariable=priority, width=15,
+                            background=self["background"], state="readonly",
+                            values=["hight", "medium", "low"])
         tagEntry = ttk.Entry(self, textvariable=tag, width=15,
                             background=self["background"])
         taskEntry.grid(row=1, column=0, padx=10, pady=10)
