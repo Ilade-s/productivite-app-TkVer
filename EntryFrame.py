@@ -1,3 +1,4 @@
+from sys import maxsize
 from tkinter import *
 from tkinter import ttk
 from Global import __version__, __author__ # variables globales
@@ -197,13 +198,13 @@ class EntryFrame(LabelFrame):
 
                         
                 elif self.master.master.Db != None: # base de donnée CSV ouverte
-                    newtask = [str(int(self.master.Tasks[-1][0])+1), self.master.Tasks[-1][1], task.get(), taskdate.get(), priority.get(), "enable", tag.get()]
+                    newtask = [(str(int(self.master.Tasks[-1][0])+1) if self.master.Tasks else "0"), (self.master.Tasks[-1][1] if self.master.Tasks else "anonymous"), task.get(), taskdate.get(), priority.get(), "enable", tag.get()]
                     print("Tâche :", newtask)
                     print("Ajout de la tâche au fichier CSV...")
                     self.master.master.Db.Add(newtask)
                     print("Synchronisation des modifications...")
                     self.master.Tasks = self.master.master.Db.GetTasks() # mise à jour liste des tâches
-                    self.master.Ci = len(self.master.Tasks)-self.master.UpdateMaxAff() # mise à jour index (pour montrer la nouvelle tâche)
+                    self.master.Ci = (len(self.master.Tasks)-self.master.UpdateMaxAff() if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0) # mise à jour index (pour montrer la nouvelle tâche)
                     self.master.ShowTasks() # mise à jour lecteur
                     
                 else: # Erreur : rien d'ouvert (normalement impossible en conditions normales)

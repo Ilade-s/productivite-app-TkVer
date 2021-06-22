@@ -13,6 +13,7 @@ CsvHandler :
 """
 
 import csv  # Module mère gestion CSV
+from Global import DefaultLabel
 
 class CsvHandler():
     """
@@ -102,11 +103,11 @@ class CsvHandler():
         pass
 
 def main():
-    Db = CsvHandler("Data/test.csv")
+    Db = CsvHandler("Data/test2.csv")
     print(Db.Data)
-    Db.Add(["name", "creation", "duedate","type"])
-    Db.ReadAll()
-    print(Db.Data)
+    #Db.Add(DefaultLabel)
+    #Db.ReadAll()
+    #print(Db.Data)
 
 if __name__=='__main__': # test
     main()

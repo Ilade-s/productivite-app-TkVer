@@ -70,13 +70,13 @@ class MenuBar(Menu):
             try:
                 self.master.Db = DbM(path)
                 self.master.title(f"Productivity App v{__version__} : {path}")
-                print(f"Ouverture DB réussie : {path}")
                 if msg:
                     self.SyncDatabase() # affichage tâches
+                    print(f"Ouverture DB réussie : {path}")
                     msgbox.showinfo("Ouverture database",
                                     f"Ouverture du fichier {path} réussie")
             except Exception as e:
-                print(f"Création DB échouée : {e}")
+                print(f"Ouverture DB échouée : {e}")
                 if msg:
                     msgbox.showerror("Ouverture database",
                                     f"Ouverture database échouée : {e}")

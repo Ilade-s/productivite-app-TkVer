@@ -40,7 +40,7 @@ class MainFrame(LabelFrame):
         if self.master.EntryFrame != None:
             self.master.EntryFrame.destroy()
         # Unpack tâches précedemment affichées
-        if self.ShownTasks != []:
+        if self.ShownTasks:
             for task in self.ShownTasks:
                 task.destroy()
         # création et affichage des widgets
@@ -67,7 +67,7 @@ class MainFrame(LabelFrame):
         s.configure("Task.TCheckbutton", 
             background="#5B648A", font=("Arial", 16), anchor="w")
         # Maj état des boutons de SubFrame
-        if len(self.Tasks) == 0: # pas de fichier (test)
+        if len(self.Tasks) == 0 or len(self.Tasks) <= self.maxAff: # une seule page
             self.master.SubFrame.BackButton["state"] = "disabled"
             self.master.SubFrame.NextButton["state"] = "disabled"
         elif self.Ci == 0:  # début de la liste des tâches
@@ -81,7 +81,7 @@ class MainFrame(LabelFrame):
             self.master.SubFrame.BackButton["state"] = "normal"
             self.master.SubFrame.NextButton["state"] = "normal"
         self.master.SubFrame.ReaderInfo[
-            'text'] = f"{self.Ci+1}-{self.Ci+len(self.ShownTasks)}/{len(self.Tasks)}"
+            'text'] = f"{self.Ci+1 if len(self.Tasks) > 0 else 0}-{self.Ci+len(self.ShownTasks)}/{len(self.Tasks)}"
 
     def UnpackTasks(self):
         """
