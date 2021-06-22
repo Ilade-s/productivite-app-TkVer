@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
+
 class SubFrame(LabelFrame):
     """
     Frame située en dessous de MainFrame servant à changer de page et indiquer la page affichée
@@ -31,11 +32,11 @@ class SubFrame(LabelFrame):
         self.NextImg = PhotoImage(file="Assets/next-arrow.png")
         # ajout des widgets
         self.BackButton = ttk.Button(
-            self, text="Previous page", state="disabled", style="SubFrame.TButton"
-            , command=self.PreviousPage, image=self.BackImg)
+            self, text="Previous page", state="disabled", style="SubFrame.TButton", 
+                command=self.PreviousPage, image=self.BackImg)
         self.NextButton = ttk.Button(
-            self, text="Next page", state="disabled", style="SubFrame.TButton"
-            , command=self.NextPage, image=self.NextImg)
+            self, text="Next page", state="disabled", style="SubFrame.TButton", 
+                command=self.NextPage, image=self.NextImg)
         self.ReaderInfo = Label(self, text="..-../..", font=("Arial", 20))
         self.BackButton.grid(row=0, column=1)
         self.NextButton.grid(row=0, column=3)
@@ -61,16 +62,17 @@ class SubFrame(LabelFrame):
         (dans l'affichage des tâches)
         """
         self.master.MainFrame.Ci += self.master.MainFrame.maxAff  # maj intervalle des tâches à afficher
-        self.master.MainFrame.UpdateMaxAff() # maj affichage max
+        self.master.MainFrame.UpdateMaxAff()  # maj affichage max
         self.master.MainFrame.ShowTasks()  # maj affichage
 
-if __name__=='__main__': # test de la frame (affichage)
+
+if __name__ == '__main__':  # test de la frame (affichage)
     from Global import x, y, ShowVersion
-    ShowVersion() # affichage info prog
+    ShowVersion()  # affichage info prog
 
     root = Tk()
     root.title("Test Subframe")
-    root.geometry("{}x{}".format(x,y))
+    root.geometry("{}x{}".format(x, y))
     frame = SubFrame(root)
     #frame.BackButton['state'] = "normal"
     #frame.NextButton['state'] = "normal"

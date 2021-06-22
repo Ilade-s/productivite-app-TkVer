@@ -4,8 +4,10 @@ from tkinter import filedialog as fldialog  # Choix de fichier etc...
 from tkinter import messagebox as msgbox
 import os  # Pour trouver le répertoire courant (os.getcwd)
 from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
-from Global import __version__, ShowVersion, platform, DefaultLabel, platform, x, y # variables globales
+# variables globales
+from Global import __version__, ShowVersion, platform, DefaultLabel, platform, x, y
 from EntryFrame import *
+
 
 class MenuBar(Menu):
     """
@@ -71,7 +73,7 @@ class MenuBar(Menu):
                 self.master.Db = DbM(path)
                 self.master.title(f"Productivity App v{__version__} : {path}")
                 if msg:
-                    self.SyncDatabase() # affichage tâches
+                    self.SyncDatabase()  # affichage tâches
                     print(f"Ouverture DB réussie : {path}")
                     msgbox.showinfo("Ouverture database",
                                     f"Ouverture du fichier {path} réussie")
@@ -79,7 +81,7 @@ class MenuBar(Menu):
                 print(f"Ouverture DB échouée : {e}")
                 if msg:
                     msgbox.showerror("Ouverture database",
-                                    f"Ouverture database échouée : {e}")
+                                     f"Ouverture database échouée : {e}")
         else:
             print("Ouverture DB annulée")
             if msg:
@@ -114,8 +116,8 @@ class MenuBar(Menu):
                 self.master.title(f"Productivity App v{__version__} : {path}")
                 print(f"Création DB réussie : {path}")
                 if msg:
-                    if __name__!='__main__': # désactivé lors d'un test individuel
-                        self.SyncDatabase() # affichage tâches
+                    if __name__ != '__main__':  # désactivé lors d'un test individuel
+                        self.SyncDatabase()  # affichage tâches
                     msgbox.showinfo("Création database",
                                     "Création et ouverture du fichier réussie")
                 return (1, path)
@@ -123,7 +125,7 @@ class MenuBar(Menu):
                 print(f"Création DB échouée {e}")
                 if msg:
                     msgbox.showerror("Création database",
-                                    f"Création database échouée {e}")
+                                     f"Création database échouée {e}")
                 return (0, path)
 
         else:
@@ -132,7 +134,7 @@ class MenuBar(Menu):
                 msgbox.showerror("Création database",
                                  "Création database échouée/annulée")
             return (0, path)
-    
+
     def SyncDatabase(self):
         """
         Sous-fonction appellée par OpenDatabase et CreateDatabase.
@@ -158,8 +160,9 @@ class MenuBar(Menu):
                 self.master.Db.file.close()
                 self.master.Db = None
                 self.master.MainFrame.UnpackTasks()  # Supprime les tâches
-                self.master.SubFrame.CreateWidgets() # Réinitialise les widgets de SubFrame
-                self.master.MainFrame['text'] = "MainFrame" # Réinitialise le titre de MainFrame
+                self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
+                # Réinitialise le titre de MainFrame
+                self.master.MainFrame['text'] = "MainFrame"
                 self.master.ActionFrame.AddButton['state'] = "disabled"
                 self.master.title(
                     f"Productivity App v{__version__} : Pas de base de donnée ouverte")
@@ -248,8 +251,9 @@ class MenuBar(Menu):
             if self.master.EntryFrame != None:
                 self.master.EntryFrame.destroy()
             self.master.MainFrame.UnpackTasks()  # Supprime les tâches
-            self.master.SubFrame.CreateWidgets() # Réinitialise les widgets de SubFrame
-            self.master.MainFrame['text'] = "MainFrame" # Réinitialise le titre de MainFrame
+            self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
+            # Réinitialise le titre de MainFrame
+            self.master.MainFrame['text'] = "MainFrame"
             self.master.ActionFrame.AddButton['state'] = "disabled"
             oldaccount = self.master.Server.Account
             self.master.Server.Account = None
@@ -295,7 +299,7 @@ class MenuBar(Menu):
             try:
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
                 #print(f"Tasks : {self.master.MainFrame.Tasks}")
-                if __name__!='__main__': # désactivé lors d'un test individuel
+                if __name__ != '__main__':  # désactivé lors d'un test individuel
                     self.master.MainFrame.ShowTasks()
                     self.master.ActionFrame.AddButton['state'] = "normal"
                 print("Synchronisation réussie")
@@ -320,14 +324,16 @@ class MenuBar(Menu):
                 TaskList = self.master.Server.GetData()
                 #print(f"Tasks : {TaskList}")
                 (exitcode, path) = self.CreateDatabase(False)
-                if not exitcode:  # création impossible (le fichier existe déjà)
+                # création impossible (le fichier existe déjà)
+                if not exitcode:
                     print("File already exists... switching to func OpenDatabase")
                     self.OpenDatabase(False, path)
                 for task in TaskList:
                     self.master.Db.Add(task)
-                self.SyncDatabase() # affichage des tâches
+                self.SyncDatabase()  # affichage des tâches
                 print(f"Extraction réussie : {path}")
-                msgbox.showinfo("Extract Database", f"Extraction réussie dans {path}")
+                msgbox.showinfo("Extract Database",
+                                f"Extraction réussie dans {path}")
             except Exception as e:
                 print("Echec de l'extraction")
                 msgbox.showerror(
@@ -351,14 +357,14 @@ class MenuBar(Menu):
                 self.master.MainFrame, "signup")
 
 
-if __name__=='__main__': # test affichage
+if __name__ == '__main__':  # test affichage
     from MainFrame import *
-    ShowVersion() # affichage info prog
+    ShowVersion()  # affichage info prog
 
     root = Tk()
     root.DefaultLabel = DefaultLabel
     root.title("Test Menu")
-    root.geometry("{}x{}".format(x,y))
+    root.geometry("{}x{}".format(x, y))
     Menu = MenuBar(root)
     root.config(menu=Menu)
     # setup test

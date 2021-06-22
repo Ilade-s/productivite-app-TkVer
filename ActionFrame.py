@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from EntryFrame import *
 
+
 class ActionFrame(LabelFrame):
     """
     Frame placé à gauche (prenant 1/4 de la longueur) permettant de choisir les actions à effectuer
@@ -22,13 +23,14 @@ class ActionFrame(LabelFrame):
         """
         self.addImg = PhotoImage(file="Assets/add-icon.png")
         # ajout widgets
-        self.AddButton = ttk.Button(self, text="Ajouter une tâche", image=self.addImg
-            , compound=TOP, style="ActionFrame.TButton", command=self.AddTask, state="disabled")
+        self.AddButton = ttk.Button(self, text="Ajouter une tâche", image=self.addImg,
+                                    compound=TOP, style="ActionFrame.TButton", 
+                                    command=self.AddTask, state="disabled")
         # config style
         s = ttk.Style(self)
         s.configure("ActionFrame.TButton", borderwidth=5)
         self.AddButton.pack()
-    
+
     def AddTask(self):
         """
         Action déclenchée par le bouton "Ajouter une tâche"
@@ -37,18 +39,18 @@ class ActionFrame(LabelFrame):
             self.master.EntryFrame.destroy()
             self.master.EntryFrame = None
         self.master.EntryFrame = EntryFrame(
-                self.master.MainFrame, "task")
+            self.master.MainFrame, "task")
 
 
-if __name__=='__main__': # test affichage et boutons
+if __name__ == '__main__':  # test affichage et boutons
 
     from MainFrame import *
     from Global import x, y, ShowVersion
-    ShowVersion() # affichage info prog
-    
+    ShowVersion()  # affichage info prog
+
     root = Tk()
     root.title("Test Actionframe")
-    root.geometry("{}x{}".format(x,y))
+    root.geometry("{}x{}".format(x, y))
     frame = ActionFrame(root)
     # setup test
     root.EntryFrame = None

@@ -2,7 +2,9 @@ from tkinter import *
 from tkinter import ttk
 from SubFrame import SubFrame
 from Global import ShowVersion
-from functools import partial # permet d'exécuter des fonctions avec des paramètres avec un widget tk
+# permet d'exécuter des fonctions avec des paramètres avec un widget tk
+from functools import partial
+
 
 class MainFrame(LabelFrame):
     """
@@ -33,10 +35,11 @@ class MainFrame(LabelFrame):
             param taskID : str : numéro sous forme de string qui peret de retrouver une tâche dans la liste
             """
             print("Tâche selectionnée :", taskID)
-            print("Etats boutons :", [state.get() for state in self.StateTasks])
+            print("Etats boutons :", [state.get()
+                  for state in self.StateTasks])
 
         self['text'] = "Liste des tâches"
-        # Remove and replace task Entryframe 
+        # Remove and replace task Entryframe
         if self.master.EntryFrame != None:
             self.master.EntryFrame.destroy()
         # Unpack tâches précedemment affichées
@@ -48,26 +51,28 @@ class MainFrame(LabelFrame):
         # création variables à assigner aux tâches si nécessaire (si vide)
         if not self.StateTasks:
             self.StateTasks = [IntVar() for i in range(len(self.Tasks))]
-        elif len(self.StateTasks) < len(self.Tasks): # nouvelles tâches
-            self.StateTasks.extend([IntVar() for i in range(len(self.Tasks)-len(self.StateTasks))])
-        elif len(self.StateTasks) > len(self.Tasks): # tâches supprimées
+        elif len(self.StateTasks) < len(self.Tasks):  # nouvelles tâches
+            self.StateTasks.extend(
+                [IntVar() for i in range(len(self.Tasks)-len(self.StateTasks))])
+        elif len(self.StateTasks) > len(self.Tasks):  # tâches supprimées
             self.StateTasks = self.StateTasks[:len(self.Tasks)]
 
         self.ShownTasks = [ttk.Checkbutton(self,
             text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
-            else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0
-            , style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
-                for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
+            else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0, style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
+                           for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
-            self.ShownTasks[task]["variable"] = self.StateTasks[self.Ci+task] # assignation variable
-            self.ShownTasks[task].pack(anchor="w", padx=20, pady=5) # affichage tâche
+            # assignation variable
+            self.ShownTasks[task]["variable"] = self.StateTasks[self.Ci+task]
+            self.ShownTasks[task].pack(
+                anchor="w", padx=20, pady=5)  # affichage tâche
         # config style
         s = ttk.Style(self)
-        s.configure("Task.TCheckbutton", 
-            background="#5B648A", font=("Arial", 16), anchor="w")
+        s.configure("Task.TCheckbutton",
+                    background="#5B648A", font=("Arial", 16), anchor="w")
         # Maj état des boutons de SubFrame
-        if len(self.Tasks) == 0 or len(self.Tasks) <= self.maxAff: # une seule page
+        if len(self.Tasks) == 0 or len(self.Tasks) <= self.maxAff:  # une seule page
             self.master.SubFrame.BackButton["state"] = "disabled"
             self.master.SubFrame.NextButton["state"] = "disabled"
         elif self.Ci == 0:  # début de la liste des tâches
@@ -106,13 +111,14 @@ class MainFrame(LabelFrame):
         # on renvoie ensuite self.maxaff pour SubFrame
         return self.maxAff
 
-if __name__=='__main__': # test de la frame (affichage)
-    ShowVersion() # affichage info prog
+
+if __name__ == '__main__':  # test de la frame (affichage)
+    ShowVersion()  # affichage info prog
     from Global import x, y
 
     root = Tk()
     root.title("Test Mainframe")
-    root.geometry("{}x{}".format(x,y))
+    root.geometry("{}x{}".format(x, y))
     root.MainFrame = MainFrame(root)
     # setup test
     root.SubFrame = SubFrame(root)
