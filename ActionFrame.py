@@ -21,15 +21,22 @@ class ActionFrame(LabelFrame):
         """
         Placement des widgets
         """
+        self['text'] = "Barre d'outils"
         self.addImg = PhotoImage(file="Assets/add-icon.png")
+        self.removeImg = PhotoImage(file="Assets/remove-icon.png")
         # ajout widgets
         self.AddButton = ttk.Button(self, text="Ajouter une tâche", image=self.addImg,
                                     compound=TOP, style="ActionFrame.TButton", 
                                     command=self.AddTask, state="disabled")
+        self.RemoveButton = ttk.Button(self, text="Retirer des tâches", image=self.removeImg,
+                                    compound=TOP, style="ActionFrame.TButton", 
+                                    command=self.RemoveTasks, state="disabled")
         # config style
         s = ttk.Style(self)
         s.configure("ActionFrame.TButton", borderwidth=5)
-        self.AddButton.pack()
+        # affichage widgets
+        self.AddButton.pack(pady=10)
+        self.RemoveButton.pack(pady=10)
 
     def AddTask(self):
         """
@@ -40,6 +47,24 @@ class ActionFrame(LabelFrame):
             self.master.EntryFrame = None
         self.master.EntryFrame = EntryFrame(
             self.master.MainFrame, "task")
+    
+    def RemoveTasks(self):
+        """
+        Action déclenchée par le bouton "retirer des tâches"
+        """
+        # aucune tâche sélectionnée
+        if sum([state.get() for state in self.master.MainFrame.StateTasks]) == 0:
+            print("Suppression impossible : aucune tâche n'est sélectionnée")
+            msgbox.showerror("Remove tasks",
+            "Aucune tâche à retirer n'est sélectionnée")
+        pass
+
+    def ActivateButtons(self):
+        """
+        Permet d'activer tous les boutons d'ActionFrame
+        """
+        self.AddButton['state'] = "normal"
+        self.RemoveButton['state'] = "normal"
 
 
 if __name__ == '__main__':  # test affichage et boutons
