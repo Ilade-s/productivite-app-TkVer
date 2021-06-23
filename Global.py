@@ -7,7 +7,7 @@ __author__ = "Merlet Raphaël"
 DefaultLabel = ["taskID", "userID", "name",
                              "date", "priority", "status", "tag"]
 # taille fenêtre (utilisé dans Tk.geometry())
-x = 1200 
+x = 1000 
 y = 600
 
 def ShowVersion():

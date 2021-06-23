@@ -15,19 +15,15 @@ class ActionFrame(LabelFrame):
         #    height=self.master.geo[1], width=self.master.geo[0]/4)
         self.CreateWidgets()
         #self.grid(row=0, column=0, rowspan=2, columnspan=1, sticky='nesw')
-        self.place(relx=0, rely=0, relheight=1, relwidth=.25)
+        self.place(relx=0, rely=0, relheight=1, relwidth=.15)
 
     def CreateWidgets(self):
         """
         Placement des widgets
         """
         self['text'] = "Barre d'outils"
-        self.addImg = PhotoImage(file="Assets/add-icon.png")
         self.removeImg = PhotoImage(file="Assets/remove-icon.png")
         # ajout widgets
-        self.AddButton = ttk.Button(self, text="Ajouter une tâche", image=self.addImg,
-                                    compound=TOP, style="ActionFrame.TButton", 
-                                    command=self.AddTask, state="disabled")
         self.RemoveButton = ttk.Button(self, text="Retirer des tâches", image=self.removeImg,
                                     compound=TOP, style="ActionFrame.TButton", 
                                     command=self.RemoveTasks, state="disabled")
@@ -35,18 +31,7 @@ class ActionFrame(LabelFrame):
         s = ttk.Style(self)
         s.configure("ActionFrame.TButton", borderwidth=5)
         # affichage widgets
-        self.AddButton.pack(pady=10)
         self.RemoveButton.pack(pady=10)
-
-    def AddTask(self):
-        """
-        Action déclenchée par le bouton "Ajouter une tâche"
-        """
-        if self.master.EntryFrame != None:
-            self.master.EntryFrame.destroy()
-            self.master.EntryFrame = None
-        self.master.EntryFrame = EntryFrame(
-            self.master.MainFrame, "task")
     
     def RemoveTasks(self):
         """
@@ -57,13 +42,31 @@ class ActionFrame(LabelFrame):
             print("Suppression impossible : aucune tâche n'est sélectionnée")
             msgbox.showerror("Remove tasks",
             "Aucune tâche à retirer n'est sélectionnée")
-        pass
+        else:
+            for i in range(self.master.MainFrame.StateTasks): # balayage indexs états boutons
+                keysID = []
+                # récupération ID de tâche
+                if self.master.MainFrame.StateTasks[i].get() == 1:
+                    keysID.append(self.master.MainFrame.Tasks[i][0])
+
+            # supression lignes du CSV ou du serveur
+            if self.master.Server != None: # connecté à un serveur
+                pass
+
+            elif self.master.Db != None: # BDD CSV ouverte
+                self.master.Db.Remove(keysID)
+            
+            else: # pas de BDD ouverte
+                print("Aucune BDD ouverte, supression de tâches impossible")
+                msgbox.showerror("Suppression de tâche",
+                                f"Echec de l'ajout de la tâche  \nAucune base de donnée n'est ouverte")
+
+
 
     def ActivateButtons(self):
         """
         Permet d'activer tous les boutons d'ActionFrame
         """
-        self.AddButton['state'] = "normal"
         self.RemoveButton['state'] = "normal"
 
 

@@ -163,7 +163,6 @@ class MenuBar(Menu):
                 self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
                 # Réinitialise le titre de MainFrame
                 self.master.MainFrame['text'] = "MainFrame"
-                self.master.ActionFrame.AddButton['state'] = "disabled"
                 self.master.title(
                     f"Productivity App v{__version__} : Pas de base de donnée ouverte")
                 print("DB fermée")
@@ -254,7 +253,6 @@ class MenuBar(Menu):
             self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
             # Réinitialise le titre de MainFrame
             self.master.MainFrame['text'] = "MainFrame"
-            self.master.ActionFrame.AddButton['state'] = "disabled"
             oldaccount = self.master.Server.Account
             self.master.Server.Account = None
             self.master.Server.session.close()  # fermeture session

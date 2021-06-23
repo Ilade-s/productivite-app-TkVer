@@ -14,7 +14,7 @@ class SubFrame(LabelFrame):
         #        height=self.master.geo[1]*.25, width=self.master.geo[0]*.75)
         self.CreateWidgets()
         #self.grid(row=1, column=1, rowspan=1, columnspan=1, sticky='nesw')
-        self.place(relx=.25, rely=.75, relheight=.25, relwidth=.75)
+        self.place(relx=.15, rely=.75, relheight=.25, relwidth=.85)
 
     def CreateWidgets(self):
         """

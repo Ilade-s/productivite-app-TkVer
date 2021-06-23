@@ -237,6 +237,8 @@ class EntryFrame(LabelFrame):
               ).grid(row=0, column=2, padx=10, pady=10, sticky="n")
         Label(self, text="Tag", font=(17), background=self["background"], foreground="white"
               ).grid(row=0, column=3, padx=10, pady=10, sticky="n")
+        ttk.Button(self, text="Cancel", command=self.master.ShowTasks, width=20
+                    ).grid(row=0, column=4, padx=10, pady=10)
         ttk.Button(self, text="Confirm", command=partial(GetTask, task, taskdate, priority, tag), width=20
                    ).grid(row=1, column=4, padx=10, pady=10)
         taskEntry = ttk.Entry(self, textvariable=task, width=20,

@@ -4,6 +4,7 @@ from SubFrame import SubFrame
 from Global import ShowVersion
 # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 from functools import partial
+from EntryFrame import *
 
 
 class MainFrame(LabelFrame):
@@ -17,13 +18,15 @@ class MainFrame(LabelFrame):
         self.ShownTasks = []
         self.StateTasks = []
         self.Ci = 0
+        self.AddButton = None
+        self.addImg = PhotoImage(file="Assets/add-icon.png")
         # nombre de tâches affichables sans clippage (dynamique)
         self.maxAff = 7
         super().__init__(master, background="#292D3E",
                          relief=SOLID, text="MainFrame", foreground="white")
         #        height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
         #self.grid(row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
-        self.place(relx=.25, rely=0, relheight=.75, relwidth=.75)
+        self.place(relx=.15, rely=0, relheight=.75, relwidth=.85)
 
     def ShowTasks(self):
         """
@@ -46,6 +49,9 @@ class MainFrame(LabelFrame):
         if self.ShownTasks:
             for task in self.ShownTasks:
                 task.destroy()
+        # unpack bouton d'ajout de tâche
+        if self.AddButton != None:
+            self.AddButton.destroy()
         # création et affichage des widgets
 
         # création variables à assigner aux tâches si nécessaire (si vide)
@@ -59,7 +65,8 @@ class MainFrame(LabelFrame):
 
         self.ShownTasks = [ttk.Checkbutton(self,
             text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
-            else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0, style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
+            else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0,
+            style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
                            for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
@@ -67,6 +74,8 @@ class MainFrame(LabelFrame):
             self.ShownTasks[task]["variable"] = self.StateTasks[self.Ci+task]
             self.ShownTasks[task].pack(
                 anchor="w", padx=20, pady=5)  # affichage tâche
+        # création bouton d'ajout de tâche
+        self.AddTaskButton()
         # config style
         s = ttk.Style(self)
         s.configure("Task.TCheckbutton",
@@ -87,6 +96,24 @@ class MainFrame(LabelFrame):
             self.master.SubFrame.NextButton["state"] = "normal"
         self.master.SubFrame.ReaderInfo[
             'text'] = f"{self.Ci+1 if len(self.Tasks) > 0 else 0}-{self.Ci+len(self.ShownTasks)}/{len(self.Tasks)}"
+
+    def AddTaskButton(self):
+        """
+        Ajoute le bouton "Ajout de tâche" à MainFrame
+        """
+        self.AddButton = ttk.Button(self, text="Ajouter une tâche",
+                                    image=self.addImg, command=self.AddTask)
+        self.AddButton.pack(pady=10, padx=20, anchor="w")
+
+    def AddTask(self):
+        """
+        Action déclenchée par le bouton "Ajouter une tâche"
+        """
+        self.AddButton.destroy() # retire le bouton pour faire place à l'EntryFrame
+        if self.master.EntryFrame != None:
+            self.master.EntryFrame.destroy()
+            self.master.EntryFrame = None
+        self.master.EntryFrame = EntryFrame(self, "task")
 
     def UnpackTasks(self):
         """

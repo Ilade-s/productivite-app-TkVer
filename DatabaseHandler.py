@@ -96,8 +96,22 @@ class CsvHandler():
         self.dbW.writerow(data)
         self.ReadAll()
 
-    def Remove(self, key):
-        pass
+    def Remove(self, keys):
+        """    
+        Retire toutes les lignes du fichier correspondantes à la liste de clés
+       
+        PARAMETRES :
+        ------------
+            - keys : list[str]
+                - liste de clés contenues dans les lignes à supprimer
+        """
+        for key in keys:
+            self.Data = list(filter(lambda l: key not in l, self.Date)) # filtrage
+
+        with open(self.path, "w") as file:
+            file.writelines(self.Data)
+        
+        self.ReadAll() # mise à jour
 
     def Edit(self, key, data, dataheader=None):
         pass
