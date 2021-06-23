@@ -119,7 +119,9 @@ class MainFrame(LabelFrame):
         """
         Retire toutes les tâches
         """
-        for task in self.ShownTasks:
+        if self.master.EntryFrame != None:
+            self.master.EntryFrame.destroy()
+        for task in self.winfo_children():
             task.destroy()
         for w in self.master.SubFrame.winfo_children():
             w.destroy()

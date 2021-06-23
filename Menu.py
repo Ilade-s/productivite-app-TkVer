@@ -169,11 +169,11 @@ class MenuBar(Menu):
                 if msg:
                     msgbox.showinfo("Fermeture database",
                                     "Fermeture du fichier réussie")
-            except Exception:
-                print("Echec fermeture : pas de fichier ouvert ?")
+            except Exception as e:
+                print("Echec fermeture :",e)
                 if msg:
                     msgbox.showerror("Fermeture database",
-                                     "Fermeture database échouée/annulée")
+                                     f"Fermeture database échouée/annulée : {e}")
 
     def SaveDatabase(self):
         """
