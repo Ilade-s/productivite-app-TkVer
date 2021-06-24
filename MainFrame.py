@@ -150,7 +150,7 @@ class TaskFrame(Frame):
     
     def CreateWidgets(self):
         """
-        Ajoute les widgets dand la frame
+        Ajoute les widgets dans la frame
         """
         task = self.task
 
@@ -161,14 +161,35 @@ class TaskFrame(Frame):
             """
             print("Tâche selectionnée :", taskID)
             print("Etats boutons :", [state.get()
-                  for state in self.StateTasks])
+                  for state in self.master.StateTasks])
 
-        def RemoveTask():
+        def RemoveTask(taskID):
             """
-            Action du bouton qui permet de retirer la tâche du fichier ou du serveur
-            Supprime ensuite la Frame
+            Action du bouton qui permet de retirer la tâche du fichier ou du serveur et de mettre à jour MainFrame
+            param taskID : str : ID (task[0]) de la tâche à retirer
             """
-            pass
+            print(taskID) # debug
+            try:
+                if self.master.master.Db != None: # fichier CSV ouvert
+                    self.master.master.Db.Remove(taskID)
+                    self.master.Tasks = self.master.master.Db.GetTasks()
+
+                elif self.master.master.Server != None: # connecté à un serveur
+                    pass
+                
+                else: # pas connecté à une BDD (normalement impossible)
+                    print("Aucune BDD ouverte, ajout d'une tâche impossible")
+                    msgbox.showerror("Suppression d'une tâche",
+                        f"Echec de la suppression de la tâche {taskID} \nAucune base de donnée n'est ouverte")
+                    return 0
+                self.master.ShowTasks()
+                print(f"Tâche {taskID} retirée avec succés")
+            except Exception as e:
+                print(f"Echec de la suppression de la tâche {taskID} {e}")
+                msgbox.showerror("Suppression d'une tâche",
+                    f"Echec de la suppression de la tâche {taskID} : {e}")
+
+            
 
         # ajout widgets
         # widget tâche
@@ -179,7 +200,7 @@ class TaskFrame(Frame):
         self.CheckB.grid(row=0, column=0, sticky="w")
         # bouton de suppression
         ttk.Button(self, text="Supprimer tâche",
-                    image=self.SupprImg, command=RemoveTask
+                    image=self.SupprImg, command=partial(RemoveTask, task[0])
                         ).place(rely=0, relx=.9)
         # config style
         s = ttk.Style(self)
