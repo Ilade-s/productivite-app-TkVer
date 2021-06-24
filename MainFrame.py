@@ -168,15 +168,16 @@ class TaskFrame(Frame):
             Action du bouton qui permet de retirer la tâche du fichier ou du serveur et de mettre à jour MainFrame
             param taskID : str : ID (task[0]) de la tâche à retirer
             """
-            print(taskID) # debug
+            #print(taskID) # debug
             try:
                 if self.master.master.Db != None: # fichier CSV ouvert
                     self.master.master.Db.Remove(taskID)
                     self.master.Tasks = self.master.master.Db.GetTasks()
 
                 elif self.master.master.Server != None: # connecté à un serveur
-                    pass
-                
+                    self.master.master.Server.Remove(taskID)
+                    self.master.Tasks = self.master.master.Server.GetData()
+
                 else: # pas connecté à une BDD (normalement impossible)
                     print("Aucune BDD ouverte, ajout d'une tâche impossible")
                     msgbox.showerror("Suppression d'une tâche",

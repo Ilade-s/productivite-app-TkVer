@@ -106,7 +106,6 @@ class WebInterface():
 
         self.Login(username, password, self.adress+"login")
 
-
     def GetData(self, subpage="/getdata"):
         """
         Permet de récupérer la base de données de toutes les tâches liées à l'utilisateur
@@ -119,7 +118,7 @@ class WebInterface():
 
         return r.json()
 
-    def Add(self, task): # à faire
+    def Add(self, task):
         """
         Ajoute un tâche
 
@@ -138,3 +137,22 @@ class WebInterface():
         #    print("échec ajout : ID déjà présent :", r.json())
         #    raise(Exception)
 
+    def Remove(self, taskID):
+        """
+        Supprime une tâche
+
+        PARAMETRE :
+            - taskID : str | int
+                - identifiant unique permettant de reconnaitre chaque tâche
+        """
+        payload = {
+            "goal" : "removeElement",
+            "taskID" : str(taskID)
+        }
+
+        r = self.session.post(self.adress, data=json.dumps(payload, separators=(',', ':')))
+
+        try:
+            r.raise_for_status()
+        except Exception as e:
+            print(e)

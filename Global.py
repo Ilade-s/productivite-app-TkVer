@@ -1,5 +1,5 @@
 """
-Contient les variables fonctions nécessaires dans plusieurs fichiers
+Contient les variables et fonctions nécessaires dans plusieurs fichiers
 """
 from sys import platform # connaitre la plateforme/OS
 __version__ = "0.1"
@@ -18,5 +18,5 @@ def ShowVersion():
     print(f"Productivity App v{__version__}")
     print(f"Made by {__author__}")
     print("Source : https://github.com/Ilade-s/productivite-app-TkVer")
-    print("Server : https://github.com/Tifiloow/productivite-app")
+    print("Server (optionnal) : https://github.com/Tifiloow/productivite-app")
     print("===============================================================")
