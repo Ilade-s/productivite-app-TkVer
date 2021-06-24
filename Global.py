@@ -2,7 +2,7 @@
 Contient les variables et fonctions nécessaires dans plusieurs fichiers
 """
 from sys import platform # connaitre la plateforme/OS
-__version__ = "0.1"
+__version__ = "1.0"
 __author__ = "Merlet Raphaël"
 DefaultLabel = ["taskID", "userID", "name",
                              "date", "priority", "status", "tag"]
