@@ -26,7 +26,7 @@ class MainFrame(LabelFrame):
                          relief=SOLID, text="MainFrame", foreground="white")
         #        height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
         #self.grid(row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
-        self.place(relx=.15, rely=0, relheight=.75, relwidth=.85)
+        self.place(relx=0, rely=0, relheight=.75, relwidth=1)
 
     def ShowTasks(self):
         """

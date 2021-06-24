@@ -144,7 +144,6 @@ class MenuBar(Menu):
         self.master.MainFrame.Tasks = self.master.Db.GetTasks()
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
         self.master.MainFrame.ShowTasks()
-        self.master.ActionFrame.ActivateButtons()
         print("Synchronisation réussie")
 
     def CloseDatabase(self, msg=True):
@@ -299,7 +298,6 @@ class MenuBar(Menu):
                 #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 if __name__ != '__main__':  # désactivé lors d'un test individuel
                     self.master.MainFrame.ShowTasks()
-                    self.master.ActionFrame.ActivateButtons()
                 print("Synchronisation réussie")
                 msgbox.showinfo("Sync Database", "Synchronisation réussie")
             except Exception as e:

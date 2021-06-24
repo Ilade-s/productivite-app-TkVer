@@ -258,4 +258,4 @@ class EntryFrame(LabelFrame):
 
 
 if __name__ == '__main__':
-    print("Le test d'EntryFrame se fait via celui du Menu ou d'ActionFrame")
+    print("Le test d'EntryFrame se fait via celui du Menu")

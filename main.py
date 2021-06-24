@@ -10,7 +10,6 @@ from Global import __version__, __author__, x, y, ShowVersion, platform, Default
 from SubFrame import *
 from MainFrame import *
 from EntryFrame import *
-from ActionFrame import *
 from Menu import *
 
 
@@ -49,9 +48,6 @@ class TopLevel(Tk):
         print("Création Menu...")
         self.Menu = MenuBar(self)
         self.config(menu=self.Menu)
-        # placement Menu d'actions
-        print("Création ActionFrame...")
-        self.ActionFrame = ActionFrame(self)
         # Placement MainFrame
         print("Création MainFrame...")
         self.MainFrame = MainFrame(self)
