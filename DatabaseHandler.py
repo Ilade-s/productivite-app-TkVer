@@ -113,8 +113,27 @@ class CsvHandler():
         
         self.__init__(self.path) # réouverture du fichier en mode r+ (lecture/écriture)
 
-    def Edit(self, key, data, dataheader=None):
-        pass
+    def Edit(self, key, status):
+        """    
+        Edite l'êtat de la tâche (ligne) correspondante à la clé
+       
+        PARAMETRES :
+        ------------
+            - key : str
+                - clé contenue dans la ou les lignes à editer
+            - status : str
+                - nouvel état à donner à la ligne
+        """
+        # édition données
+        for l in self.Data:
+            if key in l:
+                l[DefaultLabel.index("status")] = status
+
+        with open(self.path, "w", encoding="utf-8", newline='\n') as file:
+            writer = csv.writer(file, delimiter=",")
+            writer.writerows(self.Data)
+        
+        self.__init__(self.path) # réouverture du fichier en mode r+ (lecture/écriture)
 
 def main():
     Db = CsvHandler("Data/test.csv")

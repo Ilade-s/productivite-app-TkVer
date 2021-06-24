@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from SubFrame import SubFrame
-from Global import ShowVersion
+from Global import DefaultLabel, ShowVersion
 # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 from functools import partial
 from EntryFrame import *
@@ -58,8 +58,12 @@ class MainFrame(LabelFrame):
                             for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
-            # assignation variable
+            # assignation variable et set en fonction de status
+            self.StateTasks[self.Ci+task].set(0 
+                if self.Tasks[task][DefaultLabel.index("status")] == "enable" 
+                    else 1)
             self.ShownTasks[task].CheckB["variable"] = self.StateTasks[self.Ci+task]
+            self.ShownTasks[task].taskState = self.StateTasks[self.Ci+task]
             self.ShownTasks[task].pack(
                 anchor="w", padx=20, pady=5, ipadx=self.winfo_width()*.9)  # affichage tâche
         # création bouton d'ajout de tâche
@@ -156,12 +160,29 @@ class TaskFrame(Frame):
 
         def TaskSelected(taskID):
             """
-            Action d'un CheckButton de tâche lorsque que l'user interagit avec lui
+            Action d'un CheckButton de tâche lorsque que l'user interagit avec lui (pour la mettre comme faite ou non)
             param taskID : str : numéro sous forme de string qui peret de retrouver une tâche dans la liste
             """
-            print("Tâche selectionnée :", taskID)
-            print("Etats boutons :", [state.get()
-                  for state in self.master.StateTasks])
+            #print("Tâche selectionnée :", taskID) # debug
+            #print("Etat de la tâche :", ("faite" if self.taskState.get() else "à faire")) # debug
+            try:
+                if self.master.master.Db != None: # fichier CSV ouvert
+                    self.master.master.Db.Edit(taskID,
+                        ("disable" if self.taskState.get() else "enable"))
+                    self.master.Tasks = self.master.master.Db.GetTasks()
+
+                elif self.master.master.Server != None: # connecté à un serveur
+                    self.master.master.Server.Edit(taskID,
+                        ("disable" if self.taskState.get() else "enable"))
+                    self.master.Tasks = self.master.master.Server.GetData()
+                
+                print(f"Etat de la tâche {taskID} mis à jour")
+
+            except Exception as e:
+                print(f"Echec de l'interaction avec la tâche {taskID} : {e}")
+                msgbox.showerror("Interaction avec une tâche",
+                    f"Echec de l'interaction avec la tâche {taskID} : {e}") 
+
 
         def RemoveTask(taskID):
             """
@@ -178,19 +199,12 @@ class TaskFrame(Frame):
                     self.master.master.Server.Remove(taskID)
                     self.master.Tasks = self.master.master.Server.GetData()
 
-                else: # pas connecté à une BDD (normalement impossible)
-                    print("Aucune BDD ouverte, ajout d'une tâche impossible")
-                    msgbox.showerror("Suppression d'une tâche",
-                        f"Echec de la suppression de la tâche {taskID} \nAucune base de donnée n'est ouverte")
-                    return 0
                 self.master.ShowTasks()
                 print(f"Tâche {taskID} retirée avec succés")
             except Exception as e:
                 print(f"Echec de la suppression de la tâche {taskID} {e}")
                 msgbox.showerror("Suppression d'une tâche",
-                    f"Echec de la suppression de la tâche {taskID} : {e}")
-
-            
+                    f"Echec de la suppression de la tâche {taskID} : {e}") 
 
         # ajout widgets
         # widget tâche
@@ -207,8 +221,6 @@ class TaskFrame(Frame):
         s = ttk.Style(self)
         s.configure("Task.TCheckbutton",
                     background="#5B648A", font=("Arial", 16), anchor="w")
-
-
 
 
 if __name__ == '__main__':  # test de la frame (affichage)

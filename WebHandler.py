@@ -156,3 +156,26 @@ class WebInterface():
             r.raise_for_status()
         except Exception as e:
             print(e)
+    
+    def Edit(self, taskID, status):
+        """
+        Edite l'êtat d'une tâche
+
+        PARAMETRE :
+            - taskID : str | int
+                - identifiant unique permettant de reconnaitre chaque tâche
+            - status : str
+                - nouvel êtat à donner à la tâche
+        """
+        payload = {
+            "goal" : "updateStatus",
+            "taskID" : str(taskID),
+            "status" : status
+        }
+
+        r = self.session.post(self.adress, data=json.dumps(payload, separators=(',', ':')))
+
+        try:
+            r.raise_for_status()
+        except Exception as e:
+            print(e)
