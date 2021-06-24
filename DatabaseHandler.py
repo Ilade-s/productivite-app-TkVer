@@ -106,21 +106,23 @@ class CsvHandler():
                 - liste de clés contenues dans les lignes à supprimer
         """
         for key in keys:
-            self.Data = list(filter(lambda l: key not in l, self.Date)) # filtrage
+            self.Data = list(filter(lambda l: key not in l, self.Data)) # filtrage
 
-        with open(self.path, "w") as file:
-            file.writelines(self.Data)
+        with open(self.path, "w", encoding="utf-8", newline='\n') as file:
+            writer = csv.writer(file, delimiter=",")
+            writer.writerows(self.Data)
         
-        self.ReadAll() # mise à jour
+        self.__init__(self.path) # réouverture du fichier en mode r+ (lecture/écriture)
 
     def Edit(self, key, data, dataheader=None):
         pass
 
 def main():
-    Db = CsvHandler("Data/test2.csv")
-    print(Db.Data)
+    Db = CsvHandler("Data/test.csv")
+    #print(Db.Data)
     #Db.Add(DefaultLabel)
     #Db.ReadAll()
+    Db.Remove(["85"])
     #print(Db.Data)
 
 if __name__=='__main__': # test
