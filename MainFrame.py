@@ -32,15 +32,6 @@ class MainFrame(LabelFrame):
         """
         Affiche les tâches
         """
-        def TaskSelected(taskID):
-            """
-            Action d'un CheckButton de tâche lorsque que l'user interagit avec lui
-            param taskID : str : numéro sous forme de string qui peret de retrouver une tâche dans la liste
-            """
-            print("Tâche selectionnée :", taskID)
-            print("Etats boutons :", [state.get()
-                  for state in self.StateTasks])
-
         self['text'] = "Liste des tâches"
         # Remove and replace task Entryframe
         if self.master.EntryFrame != None:
@@ -63,23 +54,16 @@ class MainFrame(LabelFrame):
         elif len(self.StateTasks) > len(self.Tasks):  # tâches supprimées
             self.StateTasks = self.StateTasks[:len(self.Tasks)]
 
-        self.ShownTasks = [ttk.Checkbutton(self,
-            text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
-            else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0,
-            style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
-                           for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
+        self.ShownTasks = [TaskFrame(self, task) 
+                            for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
             # assignation variable
-            self.ShownTasks[task]["variable"] = self.StateTasks[self.Ci+task]
+            self.ShownTasks[task].CheckB["variable"] = self.StateTasks[self.Ci+task]
             self.ShownTasks[task].pack(
-                anchor="w", padx=20, pady=5)  # affichage tâche
+                anchor="w", padx=20, pady=5, ipadx=self.winfo_width()*.9)  # affichage tâche
         # création bouton d'ajout de tâche
         self.AddTaskButton()
-        # config style
-        s = ttk.Style(self)
-        s.configure("Task.TCheckbutton",
-                    background="#5B648A", font=("Arial", 16), anchor="w")
         # Maj état des boutons de SubFrame
         if len(self.Tasks) == 0 or len(self.Tasks) <= self.maxAff:  # une seule page
             self.master.SubFrame.BackButton["state"] = "disabled"
@@ -139,6 +123,70 @@ class MainFrame(LabelFrame):
         #print(f"nombre de tâches max : {self.maxAff}")
         # on renvoie ensuite self.maxaff pour SubFrame
         return self.maxAff
+    
+class TaskFrame(Frame):
+    """
+    Template de frame qui sera packée dans MainFrame.
+
+    Contient la tâche en CheckButton à gauche ainsi qu'un bouton à droite permettant de supprimer la tâche (placés en grid)
+    """
+
+    def __init__(self, master, task) -> None:
+        """
+        Constructeur de Frame de tâche
+
+        PARAMETRE : 
+            - master : class
+                - instance de MainFrame en cours
+            - task : list
+                - la tâche à afficher
+        """
+        self.master = master
+        self.task = task
+        self.SupprImg = PhotoImage(file="Assets/remove-icon.png")
+        super().__init__(master, background=self.master['background'],
+                        relief=SOLID)
+        self.CreateWidgets()
+    
+    def CreateWidgets(self):
+        """
+        Ajoute les widgets dand la frame
+        """
+        task = self.task
+
+        def TaskSelected(taskID):
+            """
+            Action d'un CheckButton de tâche lorsque que l'user interagit avec lui
+            param taskID : str : numéro sous forme de string qui peret de retrouver une tâche dans la liste
+            """
+            print("Tâche selectionnée :", taskID)
+            print("Etats boutons :", [state.get()
+                  for state in self.StateTasks])
+
+        def RemoveTask():
+            """
+            Action du bouton qui permet de retirer la tâche du fichier ou du serveur
+            Supprime ensuite la Frame
+            """
+            pass
+
+        # ajout widgets
+        # widget tâche
+        self.CheckB = ttk.Checkbutton(self,
+            text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
+            else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0,
+            style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
+        self.CheckB.grid(row=0, column=0, sticky="w")
+        # bouton de suppression
+        ttk.Button(self, text="Supprimer tâche",
+                    image=self.SupprImg, command=RemoveTask
+                        ).place(rely=0, relx=.9)
+        # config style
+        s = ttk.Style(self)
+        s.configure("Task.TCheckbutton",
+                    background="#5B648A", font=("Arial", 16), anchor="w")
+
+
 
 
 if __name__ == '__main__':  # test de la frame (affichage)

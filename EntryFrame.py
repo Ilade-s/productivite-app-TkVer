@@ -30,7 +30,7 @@ class EntryFrame(LabelFrame):
             - "task" : bloc de récupération d'infos pour l'ajout d'une tâche
         """
         super().__init__(master, background="#424864",
-                         relief=SOLID, text="EntryFrame", foreground="white",)
+                         relief=SOLID, text="EntryFrame", foreground="white")
         self.master = master
         if purpose == "login":
             self.LoginFrame()
