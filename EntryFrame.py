@@ -198,8 +198,8 @@ class EntryFrame(LabelFrame):
                     # mise à jour liste des tâches
                     self.master.Tasks = self.master.master.Server.GetData()
                     # mise à jour index (pour montrer la nouvelle tâche)
-                    self.master.Ci = len(self.master.Tasks) - \
-                        self.master.UpdateMaxAff()
+                    self.master.Ci = (len(self.master.Tasks)-self.master.UpdateMaxAff()
+                                      if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
                     self.master.ShowTasks()  # mise à jour lecteur
 
                 elif self.master.master.Db != None:  # base de donnée CSV ouverte
