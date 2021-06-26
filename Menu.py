@@ -19,39 +19,59 @@ class MenuBar(Menu):
     def __init__(self, master) -> None:
         super().__init__(master)
         self.master = master
-        self.FileMenu = Menu(self, tearoff=False)
-        self.add_cascade(label="File", underline=0, menu=self.FileMenu)
-        self.FileMenu.add_command(
+        FileMenu = Menu(self, tearoff=False)
+        self.add_cascade(label="File", underline=0, menu=FileMenu)
+        FileMenu.add_command(
             label="Create new database", command=self.CreateDatabase)
-        self.FileMenu.add_command(
+        FileMenu.add_command(
             label="Open existant database", command=self.OpenDatabase)
-        self.FileMenu.add_command(
+        FileMenu.add_command(
             label="Save database", command=self.SaveDatabase)
-        self.FileMenu.add_separator()  # séparateur
-        self.FileMenu.add_command(
+        FileMenu.add_separator()  # séparateur
+        FileMenu.add_command(
             label="Close database", command=self.CloseDatabase)
-        self.FileMenu.add_separator()  # séparateur
-        self.FileMenu.add_command(
+        FileMenu.add_separator()  # séparateur
+        FileMenu.add_command(
             label="Exit", command=self.master.destroy)
         # Menu Web
-        self.WebMenu = Menu(self, tearoff=False)
-        self.add_cascade(label="Web", menu=self.WebMenu)
-        self.WebMenu.add_command(
+        WebMenu = Menu(self, tearoff=False)
+        self.add_cascade(label="Web", menu=WebMenu)
+        WebMenu.add_command(
             label="Connect to server", command=self.ServerConnect)
-        self.WebMenu.add_command(
+        WebMenu.add_command(
             label="Login", command=self.ServerLogin)
-        self.WebMenu.add_command(
+        WebMenu.add_command(
             label="Signup", command=self.ServerSignup)
-        self.WebMenu.add_separator()  # séparateur
-        self.WebMenu.add_command(
+        WebMenu.add_separator()  # séparateur
+        WebMenu.add_command(
             label="Sync to database", command=self.ServerSync)
-        self.WebMenu.add_command(
+        WebMenu.add_command(
             label="Extract database to csv", command=self.ServerExtract)
-        self.WebMenu.add_separator()  # séparateur
-        self.WebMenu.add_command(
+        WebMenu.add_separator()  # séparateur
+        WebMenu.add_command(
             label="Disconnect", command=self.ServerDisconnect)
-        self.WebMenu.add_command(
+        WebMenu.add_command(
             label="Logout", command=self.ServerLogout)
+        # Menu View
+        ViewMenu = Menu(self, tearoff=False)
+        self.add_cascade(label="View", menu=ViewMenu)
+        Show = Menu(self, tearoff=False)
+        self.master.ShowVars = {}
+        for priority in ("hight", "medium", "low"):
+            self.master.ShowVars[priority] = IntVar()
+            self.master.ShowVars[priority].set(1)
+            Show.add_checkbutton(
+                label=priority, variable=self.master.ShowVars[priority])
+        ViewMenu.add_cascade(label="Show...", menu=Show)
+        ViewMenu.add_separator() # séparateur
+        Sort = Menu(self, tearoff=False)
+        self.master.SortingElement = StringVar()
+        self.master.SortingElement.set("userID")
+        for e in ("userID", "priority", "tag"):    
+            Sort.add_radiobutton(
+                label=e, variable=self.master.SortingElement, value=e)
+        ViewMenu.add_cascade(label="Sort by...", menu=Sort)
+
 
     # fonctions du menu déroulant File
     def OpenDatabase(self, msg=True, path=""):
