@@ -5,7 +5,7 @@ from tkinter import messagebox as msgbox
 import os  # Pour trouver le répertoire courant (os.getcwd)
 from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
 # variables globales
-from Global import __version__, ShowVersion, platform, DefaultLabel, platform, x, y
+from Global import __version__, ShowVersion, platform, DefaultLabel, x, y
 from EntryFrame import *
 
 
@@ -22,17 +22,14 @@ class MenuBar(Menu):
         FileMenu = Menu(self, tearoff=False)
         self.add_cascade(label="File", underline=0, menu=FileMenu)
         FileMenu.add_command(
-            label="Create new database", command=self.CreateDatabase)
+            label="New...", command=self.CreateDatabase)
         FileMenu.add_command(
-            label="Open existant database", command=self.OpenDatabase)
-        FileMenu.add_command(
-            label="Save database", command=self.SaveDatabase)
+            label="Open...", command=self.OpenDatabase)
         FileMenu.add_separator()  # séparateur
+        FileMenu.add_command(
+            label="Save as...", command=self.SaveDatabase)
         FileMenu.add_command(
             label="Close database", command=self.CloseDatabase)
-        FileMenu.add_separator()  # séparateur
-        FileMenu.add_command(
-            label="Exit", command=self.master.destroy)
         # Menu Web
         WebMenu = Menu(self, tearoff=False)
         self.add_cascade(label="Web", menu=WebMenu)
@@ -73,7 +70,9 @@ class MenuBar(Menu):
                 label=e, variable=self.master.SortingElement, 
                 value=SortChoices.index(e), command=self.master.MainFrame.ShowTasks)
         ViewMenu.add_cascade(label="Order by...", menu=Sort)
-
+        ViewMenu.add_separator() # séparateur
+        ViewMenu.add_command(
+            label="Reset all", command=self.ResetView)
 
     # fonctions du menu déroulant File
     def OpenDatabase(self, msg=True, path=""):
@@ -107,7 +106,7 @@ class MenuBar(Menu):
         else:
             print("Ouverture DB annulée")
             if msg:
-                msgbox.showerror("Ouverture database",
+                msgbox.showinfo("Ouverture database",
                                  "Ouverture database annulée")
 
     def CreateDatabase(self, msg=True):
@@ -153,8 +152,8 @@ class MenuBar(Menu):
         else:
             print("Création DB annulée")
             if msg:
-                msgbox.showerror("Création database",
-                                 "Création database échouée/annulée")
+                msgbox.showinfo("Création database",
+                                 "Création database annulée")
             return (0, path)
 
     def SyncDatabase(self):
@@ -195,7 +194,7 @@ class MenuBar(Menu):
                 print("Echec fermeture :",e)
                 if msg:
                     msgbox.showerror("Fermeture database",
-                                     f"Fermeture database échouée/annulée : {e}")
+                                     f"Fermeture database échouée : {e}")
 
     def SaveDatabase(self):
         """
@@ -220,8 +219,8 @@ class MenuBar(Menu):
                                 f"Sauvegarde du fichier réussie {path}")
             else:
                 print("Sauvegarde DB annulée")
-                msgbox.showerror("Sauvegarde database",
-                                 "Sauvegarde database échouée/annulée")
+                msgbox.showinfo("Sauvegarde database",
+                                 "Sauvegarde database annulée")
 
     # fonctions du menu déroulant Web
     def ServerConnect(self):
@@ -376,6 +375,17 @@ class MenuBar(Menu):
             self.master.EntryFrame = EntryFrame(
                 self.master.MainFrame, "signup")
 
+    # fonction du menu déroulant View
+    def ResetView(self):
+        """
+        Commande permettant de réinitialiser la vue du reader (tout afficher, dans l'ordre d'ajout, plus vieux au plus récent)
+        """
+        self.master.SortingElement.set(0)
+        for var in self.master.ShowVars.values():
+            var.set(1)
+        self.master.MainFrame.ShowTasks()
+
+
 
 if __name__ == '__main__':  # test affichage
     from MainFrame import *
@@ -385,12 +395,11 @@ if __name__ == '__main__':  # test affichage
     root.DefaultLabel = DefaultLabel
     root.title("Test Menu")
     root.geometry("{}x{}".format(x, y))
-    Menu = MenuBar(root)
-    root.config(menu=Menu)
     # setup test
     root.MainFrame = MainFrame(root)
     root.Db = None
     root.Server = None
     root.EntryFrame = None
-
+    Menu = MenuBar(root)
+    root.config(menu=Menu)
     root.mainloop()

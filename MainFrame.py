@@ -66,6 +66,9 @@ class MainFrame(LabelFrame):
 
         else: self.TasksTS = self.Tasks
         #print(self.TasksTS)
+        if self.Ci > len(self.TasksTS):
+            self.Ci = (len(self.TasksTS)-self.UpdateMaxAff()
+                        if len(self.TasksTS)-self.UpdateMaxAff() >= 0 else 0)
         # création et affichage des widgets
 
         # création variables à assigner aux tâches si nécessaire (si vide)
