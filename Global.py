@@ -2,14 +2,16 @@
 Contient les variables et fonctions nécessaires dans plusieurs fichiers
 """
 from sys import platform # connaitre la plateforme/OS
-__version__ = "1.0"
-__author__ = "Merlet Raphaël"
+__version__ = "1.1"
+__author__ = "Raphaël"
 __advisor__ = "Elisa"
 DefaultLabel = ["taskID", "userID", "name",
                              "date", "priority", "status", "tag"]
 # taille fenêtre (utilisé dans Tk.geometry())
 x = 1000 
 y = 600
+# nombre de jour par mois (année non bissextile, dans l'ordre de janvier à décembre)
+jMois = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 def ShowVersion():
     """

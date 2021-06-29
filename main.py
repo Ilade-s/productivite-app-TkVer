@@ -45,15 +45,16 @@ class TopLevel(Tk):
         """
         print("Placement Frames...")
         # Placement Frames dans les colonnes
-        print("Création Menu...")
-        self.Menu = MenuBar(self)
-        self.config(menu=self.Menu)
         # Placement MainFrame
         print("Création MainFrame...")
         self.MainFrame = MainFrame(self)
         # Placement SubFrame
         print("Création SubFrame...")
         self.SubFrame = SubFrame(self)
+        # Placement Menu
+        print("Création Menu...")
+        self.Menu = MenuBar(self)
+        self.config(menu=self.Menu)
 
 
 def main():

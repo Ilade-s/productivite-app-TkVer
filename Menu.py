@@ -61,16 +61,18 @@ class MenuBar(Menu):
             self.master.ShowVars[priority] = IntVar()
             self.master.ShowVars[priority].set(1)
             Show.add_checkbutton(
-                label=priority, variable=self.master.ShowVars[priority])
+                label=priority, variable=self.master.ShowVars[priority],
+                onvalue=1, offvalue=0, command=self.master.MainFrame.ShowTasks)
         ViewMenu.add_cascade(label="Show...", menu=Show)
-        ViewMenu.add_separator() # séparateur
         Sort = Menu(self, tearoff=False)
-        self.master.SortingElement = StringVar()
-        self.master.SortingElement.set("userID")
-        for e in ("userID", "priority", "tag"):    
+        self.master.SortingElement = IntVar()
+        self.master.SortingElement.set(0)
+        SortChoices = ("Old", "New", "Tag", "Due date")
+        for e in SortChoices:    
             Sort.add_radiobutton(
-                label=e, variable=self.master.SortingElement, value=e)
-        ViewMenu.add_cascade(label="Sort by...", menu=Sort)
+                label=e, variable=self.master.SortingElement, 
+                value=SortChoices.index(e), command=self.master.MainFrame.ShowTasks)
+        ViewMenu.add_cascade(label="Order by...", menu=Sort)
 
 
     # fonctions du menu déroulant File
@@ -161,6 +163,7 @@ class MenuBar(Menu):
 
         Permet d'afficher les tâches contenues dans le fichier CSV ouvert
         """
+        self.master.MainFrame.Ci = 0
         self.master.MainFrame.Tasks = self.master.Db.GetTasks()
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
         self.master.MainFrame.ShowTasks()
@@ -314,6 +317,7 @@ class MenuBar(Menu):
                             "Vous n'êtes pas connectés à un compte")
         else:
             try:
+                self.master.MainFrame.Ci = 0
                 self.master.MainFrame.Tasks = self.master.Server.GetData()
                 #print(f"Tasks : {self.master.MainFrame.Tasks}")
                 if __name__ != '__main__':  # désactivé lors d'un test individuel

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from SubFrame import SubFrame
-from Global import DefaultLabel, ShowVersion
+from Global import DefaultLabel, ShowVersion, jMois
 # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 from functools import partial
 from EntryFrame import *
@@ -32,6 +32,10 @@ class MainFrame(LabelFrame):
         """
         Affiche les tâches
         """
+        if __name__!='__main__':
+            # checks if a database is open, if not, exits the function
+            if self.master.Db == None and self.master.Server == None:
+                return 0
         self['text'] = "Liste des tâches"
         # Remove and replace task Entryframe
         if self.master.EntryFrame != None:
@@ -43,24 +47,43 @@ class MainFrame(LabelFrame):
         # unpack bouton d'ajout de tâche
         if self.AddButton != None:
             self.AddButton.destroy()
+        if __name__!='__main__':
+            # Filtrage des tâches selon les choix de l'utilisateur
+            self.TasksTS = list(filter(lambda t: self.master.ShowVars[t[DefaultLabel.index("priority")]].get() == 1,
+                                        self.Tasks))
+            # Tri des tâches
+            # Tri par ordre d'ajout (New ou Old)
+            if self.master.SortingElement.get() in (0, 1):
+                self.TasksTS.sort(key=lambda x: int(x[0])
+                    ,reverse=self.master.SortingElement.get())
+            # Tri par tag
+            elif self.master.SortingElement.get() == 2:
+                self.TasksTS.sort(key=lambda x: x[DefaultLabel.index("tag")])
+            # Tri par date dûe
+            elif self.master.SortingElement.get() == 3:
+                self.TasksTS.sort(key=lambda x: int(x[DefaultLabel.index("date")][-2:])+
+                    int(x[DefaultLabel.index("date")][-5:-3])*jMois[int(x[DefaultLabel.index("date")][-5:-3])])
+
+        else: self.TasksTS = self.Tasks
+        #print(self.TasksTS)
         # création et affichage des widgets
 
         # création variables à assigner aux tâches si nécessaire (si vide)
         if not self.StateTasks:
             self.StateTasks = [IntVar() for i in range(len(self.Tasks))]
-        elif len(self.StateTasks) < len(self.Tasks):  # nouvelles tâches
+        elif len(self.StateTasks) < len(self.TasksTS):  # nouvelles tâches
             self.StateTasks.extend(
-                [IntVar() for i in range(len(self.Tasks)-len(self.StateTasks))])
-        elif len(self.StateTasks) > len(self.Tasks):  # tâches supprimées
-            self.StateTasks = self.StateTasks[:len(self.Tasks)]
+                [IntVar() for i in range(len(self.TasksTS)-len(self.StateTasks))])
+        elif len(self.StateTasks) > len(self.TasksTS):  # tâches supprimées
+            self.StateTasks = self.StateTasks[:len(self.TasksTS)]
 
         self.ShownTasks = [TaskFrame(self, task) 
-                            for task in self.Tasks[self.Ci:self.Ci+self.maxAff]]
+                            for task in self.TasksTS[self.Ci:self.Ci+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
             # assignation variable et set en fonction de status
             self.StateTasks[self.Ci+task].set(0 
-                if self.Tasks[task][DefaultLabel.index("status")] == "enable" 
+                if self.TasksTS[task][DefaultLabel.index("status")] == "enable" 
                     else 1)
             self.ShownTasks[task].CheckB["variable"] = self.StateTasks[self.Ci+task]
             self.ShownTasks[task].taskState = self.StateTasks[self.Ci+task]
@@ -69,21 +92,21 @@ class MainFrame(LabelFrame):
         # création bouton d'ajout de tâche
         self.AddTaskButton()
         # Maj état des boutons de SubFrame
-        if len(self.Tasks) == 0 or len(self.Tasks) <= self.maxAff:  # une seule page
+        if len(self.TasksTS) == 0 or len(self.TasksTS) <= self.maxAff:  # une seule page
             self.master.SubFrame.BackButton["state"] = "disabled"
             self.master.SubFrame.NextButton["state"] = "disabled"
         elif self.Ci == 0:  # début de la liste des tâches
             self.master.SubFrame.BackButton["state"] = "disabled"
             self.master.SubFrame.NextButton["state"] = "normal"
         # fin de la liste des tâches
-        elif self.Ci+self.maxAff >= len(self.Tasks):
+        elif self.Ci+self.maxAff >= len(self.TasksTS):
             self.master.SubFrame.BackButton["state"] = "normal"
             self.master.SubFrame.NextButton["state"] = "disabled"
         else:  # autre intervalle
             self.master.SubFrame.BackButton["state"] = "normal"
             self.master.SubFrame.NextButton["state"] = "normal"
         self.master.SubFrame.ReaderInfo[
-            'text'] = f"{self.Ci+1 if len(self.Tasks) > 0 else 0}-{self.Ci+len(self.ShownTasks)}/{len(self.Tasks)}"
+            'text'] = f"{self.Ci+1 if len(self.Tasks) > 0 else 0}-{self.Ci+len(self.ShownTasks)}/{len(self.TasksTS)} (/{len(self.Tasks)})"
 
     def AddTaskButton(self):
         """

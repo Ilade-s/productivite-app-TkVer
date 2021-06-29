@@ -1,7 +1,7 @@
 from sys import maxsize
 from tkinter import *
 from tkinter import ttk
-from Global import __version__, __author__  # variables globales
+from Global import __version__, __author__, jMois  # variables globales
 from tkinter import messagebox as msgbox
 # permet d'exécuter des fonctions avec arguments avec des widgets tk
 from functools import partial
@@ -169,8 +169,6 @@ class EntryFrame(LabelFrame):
         tag = StringVar()
         # création dates sur le mois
         cdate = str(date.today())  # date actuelle (format AAAA-MM-JJ)
-        # nombre de jour par mois (année non bissextile, dans l'ordre de janvier à décembre)
-        jMois = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         taskdate.set(cdate)  # assignation taskdate à la date d'aujourd'hui
         dates = [cdate[:-2]+str(int(cdate[-2:])+i)  # création de la liste des dates sur un mois
                  for i in range(jMois[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[

@@ -37,7 +37,7 @@ class SubFrame(LabelFrame):
         self.NextButton = ttk.Button(
             self, text="Next page", state="disabled", style="SubFrame.TButton", 
                 command=self.NextPage, image=self.NextImg)
-        self.ReaderInfo = Label(self, text="..-../..", font=("Arial", 20))
+        self.ReaderInfo = Label(self, text="..-../.. (/..)", font=("Arial", 20))
         self.BackButton.grid(row=0, column=1)
         self.NextButton.grid(row=0, column=3)
         self.ReaderInfo.grid(row=0, column=2, ipadx=50, ipady=20)
