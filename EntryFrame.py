@@ -58,6 +58,7 @@ class EntryFrame(LabelFrame):
                     f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
                 msgbox.showinfo("Login Serveur",
                                 f"Connexion au compte {iD.get()} réussie")
+                self.ServerSync()
                 self.destroy()
             except Exception as e:
                 self.master.master.Server.Account = None
@@ -97,12 +98,13 @@ class EntryFrame(LabelFrame):
                     f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
                 msgbox.showinfo("Signup Serveur",
                                 f"Création du compte {iD.get()} réussie")
+                self.ServerSync()
                 self.destroy()
             except Exception as e:
                 self.master.master.Server.Account = None
                 print(f"Echec signup compte {iD.get()}")
                 msgbox.showerror(
-                    "Signup Serveur", f"Echec de la création, veuillez réessayer : {e}")
+                    "Signup Serveur", f"Echec de la création du compte, veuillez réessayer : {e}")
 
         self["text"] = "Création d'un compte"
         # Création widgets
@@ -123,6 +125,17 @@ class EntryFrame(LabelFrame):
         idEntry.grid(row=0, column=1, padx=10, pady=10)
         nameEntry.grid(row=1, column=1, padx=10, pady=10)
         passwdEntry.grid(row=2, column=1, padx=10, pady=10)
+
+    def ServerSync(self):
+        """
+        Permet de se synchroniser à la base de donnée (après être connecté à un compte)
+        """
+        self.master.Ci = 0
+        self.master.Tasks = self.master.master.Server.GetData()
+        #print(f"Tasks : {self.master.MainFrame.Tasks}")
+        if __name__ != '__main__':  # désactivé lors d'un test individuel
+            self.master.ShowTasks()
+        print("Synchronisation réussie")
 
     def AdressFrame(self):
         """

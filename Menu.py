@@ -41,14 +41,12 @@ class MenuBar(Menu):
             label="Signup", command=self.ServerSignup)
         WebMenu.add_separator()  # séparateur
         WebMenu.add_command(
-            label="Sync to database", command=self.ServerSync)
-        WebMenu.add_command(
-            label="Extract database to csv", command=self.ServerExtract)
-        WebMenu.add_separator()  # séparateur
-        WebMenu.add_command(
             label="Disconnect", command=self.ServerDisconnect)
         WebMenu.add_command(
             label="Logout", command=self.ServerLogout)
+        WebMenu.add_separator()  # séparateur
+        WebMenu.add_command(
+            label="Extract database to csv", command=self.ServerExtract)
         # Menu View
         ViewMenu = Menu(self, tearoff=False)
         self.add_cascade(label="View", menu=ViewMenu)
@@ -303,30 +301,6 @@ class MenuBar(Menu):
             if msg:
                 msgbox.showinfo("Déconnexion Serveur",
                                 f"Déconnecté du serveur {oldserver}")
-
-    def ServerSync(self):
-        """
-        Permet de se synchroniser à la base de donnée (après être connecté à un compte)
-        """
-        if self.master.Server == None:  # Pas de serveur ouvert
-            msgbox.showinfo("Sync Database",
-                            "Vous n'êtes pas connectés à un serveur")
-        elif self.master.Server.Account == None:  # Pas de compte connecté
-            msgbox.showinfo("Sync Database",
-                            "Vous n'êtes pas connectés à un compte")
-        else:
-            try:
-                self.master.MainFrame.Ci = 0
-                self.master.MainFrame.Tasks = self.master.Server.GetData()
-                #print(f"Tasks : {self.master.MainFrame.Tasks}")
-                if __name__ != '__main__':  # désactivé lors d'un test individuel
-                    self.master.MainFrame.ShowTasks()
-                print("Synchronisation réussie")
-                msgbox.showinfo("Sync Database", "Synchronisation réussie")
-            except Exception as e:
-                print("Echec de la synchronisation")
-                msgbox.showerror(
-                    "Sync Database", f"La base de donnée n'a pas pu être synchronisée : {e}")
 
     def ServerExtract(self):
         """
