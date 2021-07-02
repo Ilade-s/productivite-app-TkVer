@@ -151,6 +151,7 @@ class EntryFrame(LabelFrame):
                 print(f"Connecté au serveur : {adresse}")
                 self.master.master.title(
                     f"Productivity App v{__version__} : {adresse} : Non identifié")
+                self.master.master.Menu.entryconfig("File", state=DISABLED)
                 msgbox.showinfo(
                     "Connexion serveur", f"Connexion réussie au serveur à l'adresse {adresse}")
                 self.destroy()
@@ -165,6 +166,8 @@ class EntryFrame(LabelFrame):
               ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
         ttk.Button(self, text="Connect to server", command=partial(ConnexionAttempt, adress), width=20
                    ).grid(row=1, column=1, padx=10, pady=10)
+        ttk.Button(self, text="Cancel", command=self.destroy, width=20
+                   ).grid(row=1, column=0, padx=10, pady=10)
         adressEntry = ttk.Entry(self, textvariable=adress, width=40,
                                 background=self["background"])
         adressEntry.grid(row=0, column=1, padx=10, pady=10)

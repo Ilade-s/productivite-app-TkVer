@@ -31,22 +31,24 @@ class MenuBar(Menu):
         FileMenu.add_command(
             label="Close database", command=self.CloseDatabase)
         # Menu Web
-        WebMenu = Menu(self, tearoff=False)
-        self.add_cascade(label="Web", menu=WebMenu)
-        WebMenu.add_command(
+        self.WebMenu = Menu(self, tearoff=False)
+        self.add_cascade(label="Web", menu=self.WebMenu)
+        self.WebMenu.add_command(
             label="Connect to server", command=self.ServerConnect)
-        WebMenu.add_command(
+        self.WebMenu.add_command(
             label="Login", command=self.ServerLogin)
-        WebMenu.add_command(
+        self.WebMenu.add_command(
             label="Signup", command=self.ServerSignup)
-        WebMenu.add_separator()  # séparateur
-        WebMenu.add_command(
+        self.WebMenu.add_separator()  # séparateur
+        self.WebMenu.add_command(
             label="Disconnect", command=self.ServerDisconnect)
-        WebMenu.add_command(
+        self.WebMenu.add_command(
             label="Logout", command=self.ServerLogout)
-        WebMenu.add_separator()  # séparateur
-        WebMenu.add_command(
+        self.WebMenu.add_separator()  # séparateur
+        self.WebMenu.add_command(
             label="Extract database to csv", command=self.ServerExtract)
+        self.WebMenu.add_command(
+            label="Add tasks from csv", command=self.ServerImport)
         # Menu View
         ViewMenu = Menu(self, tearoff=False)
         self.add_cascade(label="View", menu=ViewMenu)
@@ -82,8 +84,6 @@ class MenuBar(Menu):
         if self.master.EntryFrame != None:
             self.master.EntryFrame.destroy()
             self.master.EntryFrame = None
-        if self.master.Server != None:
-            self.ServerDisconnect(False)
         if path == "":
             path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
                                             title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
@@ -162,6 +162,7 @@ class MenuBar(Menu):
         """
         self.master.MainFrame.Ci = 0
         self.master.MainFrame.Tasks = self.master.Db.GetTasks()
+        self.entryconfig("Web", state=DISABLED)
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
         self.master.MainFrame.ShowTasks()
         print("Synchronisation réussie")
@@ -182,6 +183,7 @@ class MenuBar(Menu):
                 self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
                 # Réinitialise le titre de MainFrame
                 self.master.MainFrame['text'] = "MainFrame"
+                self.entryconfig("Web", state=NORMAL)
                 self.master.title(
                     f"Productivity App v{__version__} : Pas de base de donnée ouverte")
                 print("DB fermée")
@@ -229,8 +231,6 @@ class MenuBar(Menu):
             msgbox.showinfo("Login Serveur",
                             f"Vous êtes déjà connectés au serveur {self.master.Server.adress}")
         else:
-            if self.master.Db != None:
-                self.CloseDatabase(False)
             if self.master.EntryFrame != None:
                 self.master.EntryFrame.destroy()
                 self.master.EntryFrame = None
@@ -270,6 +270,7 @@ class MenuBar(Menu):
                 self.master.EntryFrame.destroy()
             self.master.MainFrame.UnpackTasks()  # Supprime les tâches
             self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
+            self.entryconfig("File", state=NORMAL)
             # Réinitialise le titre de MainFrame
             self.master.MainFrame['text'] = "MainFrame"
             oldaccount = self.master.Server.Account
@@ -282,6 +283,23 @@ class MenuBar(Menu):
                                 f"Déconnecté du compte {oldaccount}")
             print("Déconnecté du compte")
 
+    def ServerSignup(self):
+        """
+        dialogue (EntryFrame) permettant de créer un compte
+        """
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Signup Serveur",
+                            "Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account != None:
+            msgbox.showinfo("Signup Serveur",
+                            f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant d'en créer un nouveau")
+        else:
+            if self.master.EntryFrame != None:
+                self.master.EntryFrame.destroy()
+                self.master.EntryFrame = None
+            self.master.EntryFrame = EntryFrame(
+                self.master.MainFrame, "signup")
+                
     def ServerDisconnect(self, msg=True):
         """
         Déconnexion d'un serveur web
@@ -293,6 +311,7 @@ class MenuBar(Menu):
         else:
             if self.master.Server.Account != None:
                 self.ServerLogout(False)
+            self.entryconfig("File", state=NORMAL)
             oldserver = self.master.Server.adress
             self.master.Server = None
             self.master.title(
@@ -332,22 +351,11 @@ class MenuBar(Menu):
                 msgbox.showerror(
                     "Extract Database", f"La base de donnée n'a pas pu être extraite : {e}")
 
-    def ServerSignup(self):
+    def ServerImport(self):
         """
-        dialogue (EntryFrame) permettant de créer un compte
+        Permet d'ajouter des tâches au serveur depuis un fichier CSV
         """
-        if self.master.Server == None:  # Pas de serveur ouvert
-            msgbox.showinfo("Signup Serveur",
-                            "Vous n'êtes pas connectés à un serveur")
-        elif self.master.Server.Account != None:
-            msgbox.showinfo("Signup Serveur",
-                            f"Vous êtes déjà connectés au compte {self.master.Server.Account}\nVeuilez vous déconnecter avant d'en créer un nouveau")
-        else:
-            if self.master.EntryFrame != None:
-                self.master.EntryFrame.destroy()
-                self.master.EntryFrame = None
-            self.master.EntryFrame = EntryFrame(
-                self.master.MainFrame, "signup")
+
 
     # fonction du menu déroulant View
     def ResetView(self):
