@@ -186,7 +186,7 @@ class EntryFrame(LabelFrame):
         # création dates sur le mois
         cdate = str(date.today())  # date actuelle (format AAAA-MM-JJ)
         taskdate.set(cdate)  # assignation taskdate à la date d'aujourd'hui
-        dates = [cdate[:-2]+str(int(cdate[-2:])+i)  # création de la liste des dates sur un mois
+        dates = [cdate[:-2]+(str(int(cdate[-2:])+i) if int(cdate[-2:])+i > 9 else cdate[-2]+str(int(cdate[-1])+i))  # création de la liste des dates sur un mois
                  for i in range(jMois[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
             cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2] + \
             ("0"+str(i) if i < 10 else str(i))
@@ -252,7 +252,7 @@ class EntryFrame(LabelFrame):
         Label(self, text="Tag", font=(17), background=self["background"], foreground="white"
               ).grid(row=0, column=3, padx=10, pady=10, sticky="n")
         ttk.Button(self, text="Cancel", command=self.master.ShowTasks, width=20
-                    ).grid(row=0, column=4, padx=10, pady=10)
+                   ).grid(row=0, column=4, padx=10, pady=10)
         ttk.Button(self, text="Confirm", command=partial(GetTask, task, taskdate, priority, tag), width=20
                    ).grid(row=1, column=4, padx=10, pady=10)
         taskEntry = ttk.Entry(self, textvariable=task, width=20,

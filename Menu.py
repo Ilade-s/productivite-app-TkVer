@@ -355,7 +355,7 @@ class MenuBar(Menu):
         """
         Permet d'ajouter des tâches au serveur depuis un fichier CSV
         """
-
+        
 
     # fonction du menu déroulant View
     def ResetView(self):
