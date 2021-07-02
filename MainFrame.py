@@ -171,9 +171,14 @@ class TaskFrame(Frame):
             - task : list
                 - la tâche à afficher
         """
+        self.colors = { # couleurs de polices en fonction de la priorité
+            'hight': '#3C1414', # rouge sombre
+            'medium': '#3E281B', # orange sombre
+            'low': '#3C3919' # jaune sombre
+        }
         self.master = master
-        self.task = task
-        self.SupprImg = PhotoImage(file="Assets/remove-icon.png")
+        self.task = task # liste de tâche
+        self.SupprImg = PhotoImage(file="Assets/remove-icon.png") # icône du bouton de supression
         super().__init__(master, background=self.master['background'],
                         relief=SOLID)
         self.CreateWidgets()
@@ -237,7 +242,7 @@ class TaskFrame(Frame):
         self.CheckB = ttk.Checkbutton(self,
             text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
             else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0,
-            style="Task.TCheckbutton", command=partial(TaskSelected, task[0]))
+            style=f"{task[2]}.TCheckbutton", command=partial(TaskSelected, task[0]))
         self.CheckB.grid(row=0, column=0, sticky="w")
         # bouton de suppression
         ttk.Button(self, text="Supprimer tâche",
@@ -245,8 +250,9 @@ class TaskFrame(Frame):
                         ).place(rely=0, relx=.9)
         # config style
         s = ttk.Style(self)
-        s.configure("Task.TCheckbutton",
-                    background="#5B648A", font=("Arial", 16), anchor="w")
+        s.configure(f"{task[2]}.TCheckbutton",
+                    background="#5B648A", font=("Arial", 16), anchor="w",
+                    foreground=self.colors[task[4]])
 
 
 if __name__ == '__main__':  # test de la frame (affichage)
