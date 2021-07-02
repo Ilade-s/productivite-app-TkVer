@@ -174,7 +174,7 @@ class TaskFrame(Frame):
         self.colors = { # couleurs de polices en fonction de la priorité
             'hight': '#3C1414', # rouge sombre
             'medium': '#3E281B', # orange sombre
-            'low': '#3C3919' # jaune sombre
+            'low': '#30482D' # vert sombre
         }
         self.master = master
         self.task = task # liste de tâche
