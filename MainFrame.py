@@ -242,7 +242,7 @@ class TaskFrame(Frame):
         self.CheckB = ttk.Checkbutton(self,
             text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
             else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0,
-            style=f"{task[2]}.TCheckbutton", command=partial(TaskSelected, task[0]))
+            style=f"{task[0]}.TCheckbutton", command=partial(TaskSelected, task[0]))
         self.CheckB.grid(row=0, column=0, sticky="w")
         # bouton de suppression
         ttk.Button(self, text="Supprimer tâche",
@@ -250,7 +250,7 @@ class TaskFrame(Frame):
                         ).place(rely=0, relx=.9)
         # config style
         s = ttk.Style(self)
-        s.configure(f"{task[2]}.TCheckbutton",
+        s.configure(f"{task[0]}.TCheckbutton",
                     background="#5B648A", font=("Arial", 16), anchor="w",
                     foreground=self.colors[task[4]])
 
