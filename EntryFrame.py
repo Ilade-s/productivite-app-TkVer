@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from Global import __version__, __author__, jMois, CDATE  # variables globales
+from Global import __VERSION__, __AUTHOR__, jMois, CDATE  # variables globales
 from tkinter import messagebox as msgbox
 # permet d'exécuter des fonctions avec arguments avec des widgets tk
 from functools import partial
@@ -53,7 +53,7 @@ class EntryFrame(LabelFrame):
                 self.master.master.Server.Login(
                     iD.get(), passwd.get(), self.master.master.Server.adress+"/login")
                 self.master.master.title(
-                    f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
+                    f"Productivity App v{__VERSION__} : {self.master.master.Server.adress} : {iD.get()}")
                 msgbox.showinfo("Login Serveur",
                                 f"Connexion au compte {iD.get()} réussie")
                 self.ServerSync()
@@ -93,7 +93,7 @@ class EntryFrame(LabelFrame):
                 self.master.master.Server.Signup(iD.get(), passwd.get(
                 ), name.get(), self.master.master.Server.adress+"/signup")
                 self.master.master.title(
-                    f"Productivity App v{__version__} : {self.master.master.Server.adress} : {iD.get()}")
+                    f"Productivity App v{__VERSION__} : {self.master.master.Server.adress} : {iD.get()}")
                 msgbox.showinfo("Signup Serveur",
                                 f"Création du compte {iD.get()} réussie")
                 self.ServerSync()
@@ -148,7 +148,7 @@ class EntryFrame(LabelFrame):
                 self.master.master.Server = WebInterface(adress=adresse)
                 print(f"Connecté au serveur : {adresse}")
                 self.master.master.title(
-                    f"Productivity App v{__version__} : {adresse} : Non identifié")
+                    f"Productivity App v{__VERSION__} : {adresse} : Non identifié")
                 self.master.master.Menu.entryconfig("File", state=DISABLED)
                 msgbox.showinfo(
                     "Connexion serveur", f"Connexion réussie au serveur à l'adresse {adresse}")

@@ -13,7 +13,7 @@ CsvHandler :
 """
 
 import csv  # Module mère gestion CSV
-from Global import DefaultLabel
+from Global import LABELS
 
 class CsvHandler():
     """
@@ -127,7 +127,7 @@ class CsvHandler():
         # édition données
         for l in self.Data:
             if key in l:
-                l[DefaultLabel.index("status")] = status
+                l[LABELS.index("status")] = status
 
         with open(self.path, "w", encoding="utf-8", newline='\n') as file:
             writer = csv.writer(file, delimiter=",")
@@ -138,7 +138,7 @@ class CsvHandler():
 def main():
     Db = CsvHandler("Data/test.csv")
     #print(Db.Data)
-    #Db.Add(DefaultLabel)
+    #Db.Add(LABELS)
     #Db.ReadAll()
     Db.Remove(["85"])
     #print(Db.Data)

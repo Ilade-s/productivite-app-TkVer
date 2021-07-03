@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from NavBar import NavBar
-from Global import DefaultLabel, ShowVersion, jMois
+from Global import LABELS, ShowVersion, jMois
 # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 from functools import partial
 from EntryFrame import *
@@ -72,13 +72,13 @@ class MainFrame(LabelFrame):
         for task in range(len(self.ShownTasks)):
             # assignation variable et set en fonction de status
             self.StateTasks[self.ReaderIndex+task].set(0 
-                if self.TasksTS[task][DefaultLabel.index("status")] == "enable" 
+                if self.TasksTS[task][LABELS.index("status")] == "enable" 
                     else 1)
             self.ShownTasks[task].CheckB["variable"] = self.StateTasks[self.ReaderIndex+task]
             self.ShownTasks[task].taskState = self.StateTasks[self.ReaderIndex+task]
             self.ShownTasks[task].pack(
                 anchor="w", padx=20, pady=5, ipadx=self.winfo_width()*.9)  # affichage tâche
-                
+
         # création bouton d'ajout de tâche
         self.AddTaskButton()
         # Maj état des boutons de NavBar
@@ -107,7 +107,7 @@ class MainFrame(LabelFrame):
         """
         # Filtrage des tâches selon les choix de l'utilisateur
         self.TasksTS = list(filter(
-            lambda t: self.master.ShowVars[t[DefaultLabel.index("priority")]].get() == 1,
+            lambda t: self.master.ShowVars[t[LABELS.index("priority")]].get() == 1,
                                     self.Tasks))
         # Tri des tâches
         # Tri par ordre d'ajout (New ou Old)
@@ -116,11 +116,11 @@ class MainFrame(LabelFrame):
                 ,reverse=self.master.SortingElement.get())
         # Tri par tag
         elif self.master.SortingElement.get() == 2:
-            self.TasksTS.sort(key=lambda x: x[DefaultLabel.index("tag")])
+            self.TasksTS.sort(key=lambda x: x[LABELS.index("tag")])
         # Tri par date dûe
         elif self.master.SortingElement.get() == 3:
-            self.TasksTS.sort(key=lambda x: int(x[DefaultLabel.index("date")][-2:])+
-                int(x[DefaultLabel.index("date")][-5:-3])*jMois[int(x[DefaultLabel.index("date")][-5:-3])])
+            self.TasksTS.sort(key=lambda x: int(x[LABELS.index("date")][-2:])+
+                int(x[LABELS.index("date")][-5:-3])*jMois[int(x[LABELS.index("date")][-5:-3])])
 
     def AddTaskButton(self):
         """

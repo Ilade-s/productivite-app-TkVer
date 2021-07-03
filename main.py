@@ -5,7 +5,7 @@ on peut afficher les tâches en se synchronisant au serveur
 """
 
 # variables globales
-from Global import __version__, __author__, x, y, ShowVersion, platform, DefaultLabel
+from Global import __VERSION__, __AUTHOR__, X, Y, ShowVersion, platform, LABELS
 # importation des frames
 from NavBar import *
 from MainFrame import *
@@ -23,14 +23,14 @@ class TopLevel(Tk):
         Initialisation de la fenêtre
         """
         super().__init__()
-        self.DefaultLabel = DefaultLabel
+        self.LABELS = LABELS
         self.style = ttk.Style()
         if platform=="linux":
             self.style.theme_use("clam")
         self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(
-            f"Productivity App v{__version__} : Pas de base de donnée ouverte")
+            f"Productivity App v{__VERSION__} : Pas de base de donnée ouverte")
         self.Db = None
         self.Server = None
         self.EntryFrame = None

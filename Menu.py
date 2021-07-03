@@ -5,7 +5,7 @@ from tkinter import messagebox as msgbox
 import os  # Pour trouver le répertoire courant (os.getcwd)
 from DatabaseHandler import CsvHandler as DbM  # Gestion base de donnée
 # variables globales
-from Global import __version__, ShowVersion, platform, DefaultLabel, x, y
+from Global import __VERSION__, ShowVersion, platform, LABELS, x, y
 from EntryFrame import *
 
 
@@ -98,7 +98,7 @@ class MenuBar(Menu):
         if path != None and path != "":
             try:
                 self.master.Db = DbM(path)
-                self.master.title(f"Productivity App v{__version__} : {path}")
+                self.master.title(f"Productivity App v{__VERSION__} : {path}")
                 if msg:
                     self.SyncDatabase()  # affichage tâches
                     print(f"Ouverture DB réussie : {path}")
@@ -139,8 +139,8 @@ class MenuBar(Menu):
                 # Ouverture fichier
                 self.master.Db = DbM(path)
                 # Ajout des labels de colonne
-                self.master.Db.Add(self.master.DefaultLabel)
-                self.master.title(f"Productivity App v{__version__} : {path}")
+                self.master.Db.Add(self.master.LABELS)
+                self.master.title(f"Productivity App v{__VERSION__} : {path}")
                 print(f"Création DB réussie : {path}")
                 if msg:
                     if __name__ != '__main__':  # désactivé lors d'un test individuel
@@ -193,7 +193,7 @@ class MenuBar(Menu):
                 self.master.MainFrame['text'] = "MainFrame"
                 self.entryconfig("Web", state=NORMAL)
                 self.master.title(
-                    f"Productivity App v{__version__} : Pas de base de donnée ouverte")
+                    f"Productivity App v{__VERSION__} : Pas de base de donnée ouverte")
                 print("DB fermée")
                 if msg:
                     msgbox.showinfo("Fermeture database",
@@ -285,7 +285,7 @@ class MenuBar(Menu):
             self.master.Server.Account = None
             self.master.Server.session.close()  # fermeture session
             self.master.title(
-                f"Productivity App v{__version__} : {self.master.Server.adress} : non identifié")
+                f"Productivity App v{__VERSION__} : {self.master.Server.adress} : non identifié")
             if msg:
                 msgbox.showinfo("Login Serveur",
                                 f"Déconnecté du compte {oldaccount}")
@@ -323,7 +323,7 @@ class MenuBar(Menu):
             oldserver = self.master.Server.adress
             self.master.Server = None
             self.master.title(
-                f"Productivity App v{__version__} : Pas de base de donnée ouverte")
+                f"Productivity App v{__VERSION__} : Pas de base de donnée ouverte")
             print("Déconnecté du serveur")
             if msg:
                 msgbox.showinfo("Déconnexion Serveur",
@@ -382,7 +382,7 @@ if __name__ == '__main__':  # test affichage
     ShowVersion()  # affichage info prog
 
     root = Tk()
-    root.DefaultLabel = DefaultLabel
+    root.LABELS = LABELS
     root.title("Test Menu")
     root.geometry("{}x{}".format(x, y))
     # setup test
