@@ -13,7 +13,7 @@ LABELS = ["taskID", "userID", "name",
 x = 1000 
 y = 600
 # nombre de jour par mois (année non bissextile, dans l'ordre de janvier à décembre)
-jMois = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+JMOIS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 def ShowVersion():
     """

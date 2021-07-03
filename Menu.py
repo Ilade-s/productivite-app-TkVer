@@ -97,7 +97,7 @@ class MenuBar(Menu):
                                             title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None and path != "":
             try:
-                self.master.Db = DbM(path)
+                self.master.File = DbM(path)
                 self.master.title(f"Productivity App v{__VERSION__} : {path}")
                 if msg:
                     self.SyncDatabase()  # affichage tâches
@@ -135,11 +135,11 @@ class MenuBar(Menu):
                 path += ".csv"
             try:
                 # création d'un nouveau fichier CSV
-                self.master.Db = DbM(path, "x+")
+                self.master.File = DbM(path, "x+")
                 # Ouverture fichier
-                self.master.Db = DbM(path)
+                self.master.File = DbM(path)
                 # Ajout des labels de colonne
-                self.master.Db.Add(self.master.LABELS)
+                self.master.File.Add(LABELS)
                 self.master.title(f"Productivity App v{__VERSION__} : {path}")
                 print(f"Création DB réussie : {path}")
                 if msg:
@@ -169,7 +169,7 @@ class MenuBar(Menu):
         Permet d'afficher les tâches contenues dans le fichier CSV ouvert
         """
         self.master.MainFrame.ReaderIndex = 0
-        self.master.MainFrame.Tasks = self.master.Db.GetTasks()
+        self.master.MainFrame.Tasks = self.master.File.GetTasks()
         self.entryconfig("Web", state=DISABLED)
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
         self.master.MainFrame.ShowTasks()
@@ -180,13 +180,13 @@ class MenuBar(Menu):
         Fermeture de la base de donnée (si il y en a une d'ouverte)
         msg : bool (indique si la fermeture doit être discrète ou non)
         """
-        if self.master.Db == None:
+        if self.master.File == None:
             msgbox.showinfo("Fermeture database",
                             "Il n'y a pas de base de donnée ouverte")
         else:
             try:
-                self.master.Db.file.close()
-                self.master.Db = None
+                self.master.File.file.close()
+                self.master.File = None
                 self.master.MainFrame.UnpackTasks()  # Supprime les tâches
                 self.master.NavBar.CreateWidgets()  # Réinitialise les widgets de NavBar
                 # Réinitialise le titre de MainFrame
@@ -208,7 +208,7 @@ class MenuBar(Menu):
         """
         Sauvegarde base de donnée dans un nouveau fichier
         """
-        if self.master.Db == None:
+        if self.master.File == None:
             msgbox.showinfo("Sauvegarde database",
                             "Il n'y a pas de base de donnée ouverte")
         else:
@@ -219,8 +219,8 @@ class MenuBar(Menu):
             if path != None:
                 NewFile = DbM(path, "x+")
                 NewFile = DbM(path)
-                self.master.Db.ReadAll()
-                for row in self.master.Db.Data:
+                self.master.File.ReadAll()
+                for row in self.master.File.Data:
                     NewFile.Add(row)
                 print(f"Sauvegarde DB réussie : {path}")
                 msgbox.showinfo("Sauvegarde database",
@@ -349,7 +349,7 @@ class MenuBar(Menu):
                     print("File already exists... switching to func OpenDatabase")
                     self.OpenDatabase(False, path)
                 for task in TaskList:
-                    self.master.Db.Add(task)
+                    self.master.File.Add(task)
                 self.SyncDatabase()  # affichage des tâches
                 print(f"Extraction réussie : {path}")
                 msgbox.showinfo("Extract Database",
@@ -382,12 +382,11 @@ if __name__ == '__main__':  # test affichage
     ShowVersion()  # affichage info prog
 
     root = Tk()
-    root.LABELS = LABELS
     root.title("Test Menu")
     root.geometry("{}x{}".format(x, y))
     # setup test
     root.MainFrame = MainFrame(root)
-    root.Db = None
+    root.File = None
     root.Server = None
     root.EntryFrame = None
     Menu = MenuBar(root)

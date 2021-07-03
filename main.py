@@ -23,19 +23,16 @@ class TopLevel(Tk):
         Initialisation de la fenêtre
         """
         super().__init__()
-        self.LABELS = LABELS
         self.style = ttk.Style()
         if platform=="linux":
             self.style.theme_use("clam")
-        self.geo = (x, y)
         self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
         self.title(
             f"Productivity App v{__VERSION__} : Pas de base de donnée ouverte")
-        self.Db = None
+        self.File = None
         self.Server = None
         self.EntryFrame = None
         self.geometry("{}x{}".format(x, y))
-        #self.resizable(False, False)
         # Placement des Frames
         self.SetupFrames()
 
@@ -44,7 +41,7 @@ class TopLevel(Tk):
         Place les Frames dans la grille
         """
         print("Placement Frames...")
-        # Placement Frames dans les colonnes
+        # Placement Frames (initialisation des classes)
         # Placement MainFrame
         print("Création MainFrame...")
         self.MainFrame = MainFrame(self)
@@ -64,5 +61,5 @@ def main():
     app.mainloop()
 
 
-if __name__ == '__main__':  # test
+if __name__ == '__main__':
     main()

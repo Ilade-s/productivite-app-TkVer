@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from NavBar import NavBar
-from Global import LABELS, ShowVersion, jMois
+from Global import LABELS, ShowVersion, JMOIS
 # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 from functools import partial
 from EntryFrame import *
@@ -24,8 +24,6 @@ class MainFrame(LabelFrame):
         self.maxAff = 7
         super().__init__(master, background="#292D3E",
                          relief=SOLID, text="MainFrame", foreground="white")
-        #        height=self.master.geo[1]*.75, width=self.master.geo[0]*.75)
-        #self.grid(row=0, column=1, rowspan=1, columnspan=1, sticky='nesw')
         self.place(relx=0, rely=0, relheight=.75, relwidth=1)
 
     def ShowTasks(self):
@@ -34,7 +32,7 @@ class MainFrame(LabelFrame):
         """
         if __name__!='__main__':
             # checks if a database is open, if not, exits the function
-            if self.master.Db == None and self.master.Server == None:
+            if self.master.File == None and self.master.Server == None:
                 return 0
             self.FilterTasks() # filter and sort the task list
             # maj index de lecture après filtrage (si la liste est raccourcie)
@@ -120,7 +118,7 @@ class MainFrame(LabelFrame):
         # Tri par date dûe
         elif self.master.SortingElement.get() == 3:
             self.TasksTS.sort(key=lambda x: int(x[LABELS.index("date")][-2:])+
-                int(x[LABELS.index("date")][-5:-3])*jMois[int(x[LABELS.index("date")][-5:-3])])
+                int(x[LABELS.index("date")][-5:-3])*JMOIS[int(x[LABELS.index("date")][-5:-3])])
 
     def AddTaskButton(self):
         """
@@ -208,10 +206,10 @@ class TaskFrame(Frame):
             #print("Tâche selectionnée :", taskID) # debug
             #print("Etat de la tâche :", ("faite" if self.taskState.get() else "à faire")) # debug
             try:
-                if self.master.master.Db != None: # fichier CSV ouvert
-                    self.master.master.Db.Edit(taskID,
+                if self.master.master.File != None: # fichier CSV ouvert
+                    self.master.master.File.Edit(taskID,
                         ("disable" if self.taskState.get() else "enable"))
-                    self.master.Tasks = self.master.master.Db.GetTasks()
+                    self.master.Tasks = self.master.master.File.GetTasks()
 
                 elif self.master.master.Server != None: # connecté à un serveur
                     self.master.master.Server.Edit(taskID,
@@ -233,9 +231,9 @@ class TaskFrame(Frame):
             """
             #print(taskID) # debug
             try:
-                if self.master.master.Db != None: # fichier CSV ouvert
-                    self.master.master.Db.Remove(taskID)
-                    self.master.Tasks = self.master.master.Db.GetTasks()
+                if self.master.master.File != None: # fichier CSV ouvert
+                    self.master.master.File.Remove(taskID)
+                    self.master.Tasks = self.master.master.File.GetTasks()
 
                 elif self.master.master.Server != None: # connecté à un serveur
                     self.master.master.Server.Remove(taskID)

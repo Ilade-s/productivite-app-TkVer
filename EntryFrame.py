@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from Global import __VERSION__, __AUTHOR__, jMois, CDATE  # variables globales
+from Global import __VERSION__, __AUTHOR__, JMOIS, CDATE  # variables globales
 from tkinter import messagebox as msgbox
 # permet d'exécuter des fonctions avec arguments avec des widgets tk
 from functools import partial
@@ -206,16 +206,16 @@ class EntryFrame(LabelFrame):
                                       if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
                     self.master.ShowTasks()  # mise à jour lecteur
 
-                elif self.master.master.Db != None:  # base de donnée CSV ouverte
+                elif self.master.master.File != None:  # base de donnée CSV ouverte
                     newtask = [(str(int(self.master.Tasks[-1][0])+1) if self.master.Tasks else "0"),
                                (self.master.Tasks[-1][1]
                                 if self.master.Tasks else "anonymous"),
                                task.get(), taskdate.get(), priority.get(), "enable", tag.get()]
                     print("Tâche :", newtask)
                     print("Ajout de la tâche au fichier CSV...")
-                    self.master.master.Db.Add(newtask)
+                    self.master.master.File.Add(newtask)
                     print("Synchronisation des modifications...")
-                    self.master.Tasks = self.master.master.Db.GetTasks()  # mise à jour liste des tâches
+                    self.master.Tasks = self.master.master.File.GetTasks()  # mise à jour liste des tâches
                     self.master.ReaderIndex = (len(self.master.Tasks)-self.master.UpdateMaxAff()
                                       if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
                     self.master.ShowTasks()  # mise à jour lecteur
@@ -265,7 +265,7 @@ class EntryFrame(LabelFrame):
         retourne une liste des dates dans le format AAAA-MM-JJ sur 30 jours inclus avec cdate
         """
         return [cdate[:-2]+(str(int(cdate[-2:])+i) if int(cdate[-2:])+i > 9 else cdate[-2]+str(int(cdate[-1])+i))  # création de la liste des dates sur un mois
-                 for i in range(jMois[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
+                 for i in range(JMOIS[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
             cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2] + \
             ("0"+str(i) if i < 10 else str(i))
             if int(cdate[6])+1 <= 12

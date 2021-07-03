@@ -11,9 +11,7 @@ class NavBar(LabelFrame):
         self.master = master
         super().__init__(master, background="#A8B8FF",
                          relief=RAISED, text="NavBar", foreground="white")
-        #        height=self.master.geo[1]*.25, width=self.master.geo[0]*.75)
         self.CreateWidgets()
-        #self.grid(row=1, column=1, rowspan=1, columnspan=1, sticky='nesw')
         self.place(relx=0, rely=.75, relheight=.25, relwidth=1)
 
     def CreateWidgets(self):
