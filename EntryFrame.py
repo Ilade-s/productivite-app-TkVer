@@ -1,11 +1,9 @@
-from sys import maxsize
 from tkinter import *
 from tkinter import ttk
-from Global import __version__, __author__, jMois  # variables globales
+from Global import __version__, __author__, jMois, CDATE  # variables globales
 from tkinter import messagebox as msgbox
 # permet d'exécuter des fonctions avec arguments avec des widgets tk
 from functools import partial
-from datetime import date  # récupération de la date (ajout de tâche)
 from WebHandler import WebInterface  # Classe d'interfacage avec un serveur web
 
 
@@ -130,7 +128,7 @@ class EntryFrame(LabelFrame):
         """
         Permet de se synchroniser à la base de donnée (après être connecté à un compte)
         """
-        self.master.Ci = 0
+        self.master.ReaderIndex = 0
         self.master.Tasks = self.master.master.Server.GetData()
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
         if __name__ != '__main__':  # désactivé lors d'un test individuel
@@ -184,16 +182,8 @@ class EntryFrame(LabelFrame):
         priority.set("medium")
         tag = StringVar()
         # création dates sur le mois
-        cdate = str(date.today())  # date actuelle (format AAAA-MM-JJ)
-        taskdate.set(cdate)  # assignation taskdate à la date d'aujourd'hui
-        dates = [cdate[:-2]+(str(int(cdate[-2:])+i) if int(cdate[-2:])+i > 9 else cdate[-2]+str(int(cdate[-1])+i))  # création de la liste des dates sur un mois
-                 for i in range(jMois[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
-            cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2] + \
-            ("0"+str(i) if i < 10 else str(i))
-            if int(cdate[6])+1 <= 12
-            else cdate[:6]+"1"+cdate[7:-2]+("0"+str(i) if i < 10 else str(i))
-            for i in range(1, int(cdate[-2:])+1)]
-        # print(dates)
+        self.dates = self.CreateDateList(CDATE)
+        taskdate.set(CDATE)  # assignation taskdate à la date d'aujourd'hui
 
         def GetTask(task, taskdate, priority, tag):
             try:
@@ -212,7 +202,7 @@ class EntryFrame(LabelFrame):
                     # mise à jour liste des tâches
                     self.master.Tasks = self.master.master.Server.GetData()
                     # mise à jour index (pour montrer la nouvelle tâche)
-                    self.master.Ci = (len(self.master.Tasks)-self.master.UpdateMaxAff()
+                    self.master.ReaderIndex = (len(self.master.Tasks)-self.master.UpdateMaxAff()
                                       if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
                     self.master.ShowTasks()  # mise à jour lecteur
 
@@ -226,7 +216,7 @@ class EntryFrame(LabelFrame):
                     self.master.master.Db.Add(newtask)
                     print("Synchronisation des modifications...")
                     self.master.Tasks = self.master.master.Db.GetTasks()  # mise à jour liste des tâches
-                    self.master.Ci = (len(self.master.Tasks)-self.master.UpdateMaxAff()
+                    self.master.ReaderIndex = (len(self.master.Tasks)-self.master.UpdateMaxAff()
                                       if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
                     self.master.ShowTasks()  # mise à jour lecteur
 
@@ -259,7 +249,7 @@ class EntryFrame(LabelFrame):
                               background=self["background"])
         dateBox = ttk.Combobox(self, textvariable=taskdate, width=15,
                                background=self["background"], state="readonly",
-                               values=dates)
+                               values=self.dates)
         priorityBox = ttk.Combobox(self, textvariable=priority, width=15,
                                    background=self["background"], state="readonly",
                                    values=["hight", "medium", "low"])
@@ -269,6 +259,18 @@ class EntryFrame(LabelFrame):
         dateBox.grid(row=1, column=1, padx=10, pady=10)
         priorityBox.grid(row=1, column=2, padx=10, pady=10)
         tagEntry.grid(row=1, column=3, padx=10, pady=10)
+
+    def CreateDateList(self, cdate):
+        """
+        retourne une liste des dates dans le format AAAA-MM-JJ sur 30 jours inclus avec cdate
+        """
+        return [cdate[:-2]+(str(int(cdate[-2:])+i) if int(cdate[-2:])+i > 9 else cdate[-2]+str(int(cdate[-1])+i))  # création de la liste des dates sur un mois
+                 for i in range(jMois[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
+            cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2] + \
+            ("0"+str(i) if i < 10 else str(i))
+            if int(cdate[6])+1 <= 12
+            else cdate[:6]+"1"+cdate[7:-2]+("0"+str(i) if i < 10 else str(i))
+            for i in range(1, int(cdate[-2:])+1)]
 
 
 if __name__ == '__main__':

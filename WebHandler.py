@@ -30,7 +30,6 @@ class WebInterface():
         r = requests.get(self.adress) # test GET
         if r.status_code != requests.codes.ok:
             raise(Exception)
-
     
     def Login(self, username, password, adress):
         """

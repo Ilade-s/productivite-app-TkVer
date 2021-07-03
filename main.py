@@ -7,7 +7,7 @@ on peut afficher les tâches en se synchronisant au serveur
 # variables globales
 from Global import __version__, __author__, x, y, ShowVersion, platform, DefaultLabel
 # importation des frames
-from SubFrame import *
+from NavBar import *
 from MainFrame import *
 from EntryFrame import *
 from Menu import *
@@ -48,9 +48,9 @@ class TopLevel(Tk):
         # Placement MainFrame
         print("Création MainFrame...")
         self.MainFrame = MainFrame(self)
-        # Placement SubFrame
-        print("Création SubFrame...")
-        self.SubFrame = SubFrame(self)
+        # Placement NavBar
+        print("Création NavBar...")
+        self.NavBar = NavBar(self)
         # Placement Menu
         print("Création Menu...")
         self.Menu = MenuBar(self)

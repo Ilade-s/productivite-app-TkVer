@@ -19,6 +19,12 @@ class MenuBar(Menu):
     def __init__(self, master) -> None:
         super().__init__(master)
         self.master = master
+        # Création des menus déroulants
+        self.CreateFileMenu() # Menu File
+        self.CreateWebMenu() # Menu Web
+        self.CreateViewMenu() # Menu View
+
+    def CreateFileMenu(self):
         FileMenu = Menu(self, tearoff=False)
         self.add_cascade(label="File", underline=0, menu=FileMenu)
         FileMenu.add_command(
@@ -30,7 +36,8 @@ class MenuBar(Menu):
             label="Save as...", command=self.SaveDatabase)
         FileMenu.add_command(
             label="Close database", command=self.CloseDatabase)
-        # Menu Web
+
+    def CreateWebMenu(self):
         self.WebMenu = Menu(self, tearoff=False)
         self.add_cascade(label="Web", menu=self.WebMenu)
         self.WebMenu.add_command(
@@ -49,7 +56,8 @@ class MenuBar(Menu):
             label="Extract database to csv", command=self.ServerExtract)
         self.WebMenu.add_command(
             label="Add tasks from csv", command=self.ServerImport)
-        # Menu View
+
+    def CreateViewMenu(self):
         ViewMenu = Menu(self, tearoff=False)
         self.add_cascade(label="View", menu=ViewMenu)
         Show = Menu(self, tearoff=False)
@@ -160,7 +168,7 @@ class MenuBar(Menu):
 
         Permet d'afficher les tâches contenues dans le fichier CSV ouvert
         """
-        self.master.MainFrame.Ci = 0
+        self.master.MainFrame.ReaderIndex = 0
         self.master.MainFrame.Tasks = self.master.Db.GetTasks()
         self.entryconfig("Web", state=DISABLED)
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
@@ -180,7 +188,7 @@ class MenuBar(Menu):
                 self.master.Db.file.close()
                 self.master.Db = None
                 self.master.MainFrame.UnpackTasks()  # Supprime les tâches
-                self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
+                self.master.NavBar.CreateWidgets()  # Réinitialise les widgets de NavBar
                 # Réinitialise le titre de MainFrame
                 self.master.MainFrame['text'] = "MainFrame"
                 self.entryconfig("Web", state=NORMAL)
@@ -269,7 +277,7 @@ class MenuBar(Menu):
             if self.master.EntryFrame != None:
                 self.master.EntryFrame.destroy()
             self.master.MainFrame.UnpackTasks()  # Supprime les tâches
-            self.master.SubFrame.CreateWidgets()  # Réinitialise les widgets de SubFrame
+            self.master.NavBar.CreateWidgets()  # Réinitialise les widgets de NavBar
             self.entryconfig("File", state=NORMAL)
             # Réinitialise le titre de MainFrame
             self.master.MainFrame['text'] = "MainFrame"

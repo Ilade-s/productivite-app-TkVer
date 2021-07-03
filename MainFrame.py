@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from SubFrame import SubFrame
+from NavBar import NavBar
 from Global import DefaultLabel, ShowVersion, jMois
 # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 from functools import partial
@@ -17,7 +17,7 @@ class MainFrame(LabelFrame):
         self.Tasks = []
         self.ShownTasks = []
         self.StateTasks = []
-        self.Ci = 0
+        self.ReaderIndex = 0
         self.AddButton = None
         self.addImg = PhotoImage(file="Assets/add-icon.png")
         # nombre de tâches affichables sans clippage (dynamique)
@@ -36,6 +36,14 @@ class MainFrame(LabelFrame):
             # checks if a database is open, if not, exits the function
             if self.master.Db == None and self.master.Server == None:
                 return 0
+            self.FilterTasks() # filter and sort the task list
+            # maj index de lecture après filtrage (si la liste est raccourcie)
+            if self.ReaderIndex > len(self.TasksTS):
+                self.ReaderIndex = (len(self.TasksTS)-self.UpdateMaxAff()
+                            if len(self.TasksTS)-self.UpdateMaxAff() >= 0 else 0)
+        else: 
+            self.TasksTS = self.Tasks
+
         self['text'] = "Liste des tâches"
         # Remove and replace task Entryframe
         if self.master.EntryFrame != None:
@@ -47,30 +55,7 @@ class MainFrame(LabelFrame):
         # unpack bouton d'ajout de tâche
         if self.AddButton != None:
             self.AddButton.destroy()
-        if __name__!='__main__':
-            # Filtrage des tâches selon les choix de l'utilisateur
-            self.TasksTS = list(filter(lambda t: self.master.ShowVars[t[DefaultLabel.index("priority")]].get() == 1,
-                                        self.Tasks))
-            # Tri des tâches
-            # Tri par ordre d'ajout (New ou Old)
-            if self.master.SortingElement.get() in (0, 1):
-                self.TasksTS.sort(key=lambda x: int(x[0])
-                    ,reverse=self.master.SortingElement.get())
-            # Tri par tag
-            elif self.master.SortingElement.get() == 2:
-                self.TasksTS.sort(key=lambda x: x[DefaultLabel.index("tag")])
-            # Tri par date dûe
-            elif self.master.SortingElement.get() == 3:
-                self.TasksTS.sort(key=lambda x: int(x[DefaultLabel.index("date")][-2:])+
-                    int(x[DefaultLabel.index("date")][-5:-3])*jMois[int(x[DefaultLabel.index("date")][-5:-3])])
-
-        else: self.TasksTS = self.Tasks
-        #print(self.TasksTS)
-        if self.Ci > len(self.TasksTS):
-            self.Ci = (len(self.TasksTS)-self.UpdateMaxAff()
-                        if len(self.TasksTS)-self.UpdateMaxAff() >= 0 else 0)
-        # création et affichage des widgets
-
+                        
         # création variables à assigner aux tâches si nécessaire (si vide)
         if not self.StateTasks:
             self.StateTasks = [IntVar() for i in range(len(self.Tasks))]
@@ -80,36 +65,62 @@ class MainFrame(LabelFrame):
         elif len(self.StateTasks) > len(self.TasksTS):  # tâches supprimées
             self.StateTasks = self.StateTasks[:len(self.TasksTS)]
 
+        # création et affichage des widgets
         self.ShownTasks = [TaskFrame(self, task) 
-                            for task in self.TasksTS[self.Ci:self.Ci+self.maxAff]]
+                            for task in self.TasksTS[self.ReaderIndex:self.ReaderIndex+self.maxAff]]
 
         for task in range(len(self.ShownTasks)):
             # assignation variable et set en fonction de status
-            self.StateTasks[self.Ci+task].set(0 
+            self.StateTasks[self.ReaderIndex+task].set(0 
                 if self.TasksTS[task][DefaultLabel.index("status")] == "enable" 
                     else 1)
-            self.ShownTasks[task].CheckB["variable"] = self.StateTasks[self.Ci+task]
-            self.ShownTasks[task].taskState = self.StateTasks[self.Ci+task]
+            self.ShownTasks[task].CheckB["variable"] = self.StateTasks[self.ReaderIndex+task]
+            self.ShownTasks[task].taskState = self.StateTasks[self.ReaderIndex+task]
             self.ShownTasks[task].pack(
                 anchor="w", padx=20, pady=5, ipadx=self.winfo_width()*.9)  # affichage tâche
+                
         # création bouton d'ajout de tâche
         self.AddTaskButton()
-        # Maj état des boutons de SubFrame
+        # Maj état des boutons de NavBar
+        self.UpdateNavBar()
+
+    def UpdateNavBar(self):
         if len(self.TasksTS) == 0 or len(self.TasksTS) <= self.maxAff:  # une seule page
-            self.master.SubFrame.BackButton["state"] = "disabled"
-            self.master.SubFrame.NextButton["state"] = "disabled"
-        elif self.Ci == 0:  # début de la liste des tâches
-            self.master.SubFrame.BackButton["state"] = "disabled"
-            self.master.SubFrame.NextButton["state"] = "normal"
+            self.master.NavBar.BackButton["state"] = "disabled"
+            self.master.NavBar.NextButton["state"] = "disabled"
+        elif self.ReaderIndex == 0:  # début de la liste des tâches
+            self.master.NavBar.BackButton["state"] = "disabled"
+            self.master.NavBar.NextButton["state"] = "normal"
         # fin de la liste des tâches
-        elif self.Ci+self.maxAff >= len(self.TasksTS):
-            self.master.SubFrame.BackButton["state"] = "normal"
-            self.master.SubFrame.NextButton["state"] = "disabled"
+        elif self.ReaderIndex+self.maxAff >= len(self.TasksTS):
+            self.master.NavBar.BackButton["state"] = "normal"
+            self.master.NavBar.NextButton["state"] = "disabled"
         else:  # autre intervalle
-            self.master.SubFrame.BackButton["state"] = "normal"
-            self.master.SubFrame.NextButton["state"] = "normal"
-        self.master.SubFrame.ReaderInfo[
-            'text'] = f"{self.Ci+1 if len(self.Tasks) > 0 else 0}-{self.Ci+len(self.ShownTasks)}/{len(self.TasksTS)} (/{len(self.Tasks)})"
+            self.master.NavBar.BackButton["state"] = "normal"
+            self.master.NavBar.NextButton["state"] = "normal"
+        self.master.NavBar.ReaderInfo[
+            'text'] = f"{self.ReaderIndex+1 if len(self.Tasks) > 0 else 0}-{self.ReaderIndex+len(self.ShownTasks)}/{len(self.TasksTS)} (/{len(self.Tasks)})"
+
+    def FilterTasks(self):
+        """
+        filtre et trie les tâches de l'attribut self.Tasks selon les choix de l'utilisateur et stocke le résultat dans self.TasksTS (TasksToShow)
+        """
+        # Filtrage des tâches selon les choix de l'utilisateur
+        self.TasksTS = list(filter(
+            lambda t: self.master.ShowVars[t[DefaultLabel.index("priority")]].get() == 1,
+                                    self.Tasks))
+        # Tri des tâches
+        # Tri par ordre d'ajout (New ou Old)
+        if self.master.SortingElement.get() in (0, 1):
+            self.TasksTS.sort(key=lambda x: int(x[0])
+                ,reverse=self.master.SortingElement.get())
+        # Tri par tag
+        elif self.master.SortingElement.get() == 2:
+            self.TasksTS.sort(key=lambda x: x[DefaultLabel.index("tag")])
+        # Tri par date dûe
+        elif self.master.SortingElement.get() == 3:
+            self.TasksTS.sort(key=lambda x: int(x[DefaultLabel.index("date")][-2:])+
+                int(x[DefaultLabel.index("date")][-5:-3])*jMois[int(x[DefaultLabel.index("date")][-5:-3])])
 
     def AddTaskButton(self):
         """
@@ -137,7 +148,7 @@ class MainFrame(LabelFrame):
             self.master.EntryFrame.destroy()
         for task in self.winfo_children():
             task.destroy()
-        for w in self.master.SubFrame.winfo_children():
+        for w in self.master.NavBar.winfo_children():
             w.destroy()
 
     def UpdateMaxAff(self):
@@ -151,7 +162,7 @@ class MainFrame(LabelFrame):
         #print(f"taille MainFrame : {CurrentHeight}")
         self.maxAff = CurrentHeight//50 - 2
         #print(f"nombre de tâches max : {self.maxAff}")
-        # on renvoie ensuite self.maxaff pour SubFrame
+        # on renvoie ensuite self.maxaff pour NavBar
         return self.maxAff
     
 class TaskFrame(Frame):
@@ -264,7 +275,7 @@ if __name__ == '__main__':  # test de la frame (affichage)
     root.geometry("{}x{}".format(x, y))
     root.MainFrame = MainFrame(root)
     # setup test
-    root.SubFrame = SubFrame(root)
+    root.NavBar = NavBar(root)
     root.EntryFrame = None
     root.MainFrame.ShowTasks()
 
