@@ -5,7 +5,7 @@ on peut afficher les tâches en se synchronisant au serveur
 """
 
 # variables globales
-from Global import __VERSION__, __AUTHOR__, X, Y, ShowVersion, platform, LABELS
+from Global import __VERSION__, __AUTHOR__, x, y, ShowVersion, platform, LABELS
 # importation des frames
 from NavBar import *
 from MainFrame import *
