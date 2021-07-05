@@ -249,7 +249,7 @@ class TaskFrame(Frame):
         # ajout widgets
         # widget tâche
         self.CheckB = ttk.Checkbutton(self,
-            text=f"{task[2][:60]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
+            text=f"{task[2][:30]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
             else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0,
             style=f"{task[0]}.TCheckbutton", command=partial(TaskSelected, task[0]))
         self.CheckB.grid(row=0, column=0, sticky="w")
