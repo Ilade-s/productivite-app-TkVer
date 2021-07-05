@@ -33,7 +33,7 @@ class MenuBar(Menu):
             label="Open...", command=self.OpenDatabase)
         FileMenu.add_separator()  # séparateur
         FileMenu.add_command(
-            label="Save as...", command=self.SaveDatabase)
+            label="Save a copy...", command=self.SaveDatabase)
         FileMenu.add_command(
             label="Close database", command=self.CloseDatabase)
 
@@ -93,7 +93,7 @@ class MenuBar(Menu):
             self.master.EntryFrame.destroy()
             self.master.EntryFrame = None
         if path == "":
-            path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data",
+            path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data", defaultextension=".csv",
                                             title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if path != None and path != "":
             try:
@@ -109,6 +109,7 @@ class MenuBar(Menu):
                 if msg:
                     msgbox.showerror("Ouverture database",
                                      f"Ouverture database échouée : {e}")
+                return e
         else:
             print("Ouverture DB annulée")
             if msg:
@@ -124,15 +125,11 @@ class MenuBar(Menu):
         if self.master.EntryFrame != None:
             self.master.EntryFrame.destroy()
             self.master.EntryFrame = None
-        if self.master.Server != None:
-            self.ServerDisconnect(False)
-        path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
+        path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data", defaultextension=".csv",
                                           title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
         if os.path.exists(path):  # file already exists
             return (0, path)
         if path != None and path != "":
-            if path[:-4] != ".csv" and (platform == "win32" or platform == "win64"):
-                path += ".csv"
             try:
                 # création d'un nouveau fichier CSV
                 self.master.File = DbM(path, "x+")
@@ -206,17 +203,21 @@ class MenuBar(Menu):
 
     def SaveDatabase(self):
         """
-        Sauvegarde base de donnée dans un nouveau fichier
+        Sauvegarde base de donnée dans un nouveau fichier (copie)
         """
         if self.master.File == None:
             msgbox.showinfo("Sauvegarde database",
-                            "Il n'y a pas de base de donnée ouverte")
+                            "Il n'y a pas de base de donnée ouverte")                   
         else:
             path = fldialog.asksaveasfilename(initialdir=f"{os.getcwd()}/Data",
                                               title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
-            if path[-4:] != ".csv":
+            if path[-4:] != ".csv" and (platform == "win32" or platform == "win64"):
                 path += ".csv"
-            if path != None:
+            if os.path.exists(path):  # file already exists
+                print("Sauvegarde DB impossible : fichier déjà existant")
+                msgbox.showerror("Sauvegarde database",
+                                 "Sauvegarde database impossible : fichier déjà existant")
+            elif path != None:
                 NewFile = DbM(path, "x+")
                 NewFile = DbM(path)
                 self.master.File.ReadAll()
@@ -342,7 +343,7 @@ class MenuBar(Menu):
         else:
             try:
                 TaskList = self.master.Server.GetData()
-                #print(f"Tasks : {TaskList}")
+                self.ServerDisconnect(False)
                 (exitcode, path) = self.CreateDatabase(False)
                 # création impossible (le fichier existe déjà)
                 if not exitcode:
@@ -363,6 +364,39 @@ class MenuBar(Menu):
         """
         Permet d'ajouter des tâches au serveur depuis un fichier CSV
         """
+        if self.master.Server == None:  # Pas de serveur ouvert
+            msgbox.showinfo("Import Database",
+                            "Vous n'êtes pas connectés à un serveur")
+        elif self.master.Server.Account == None:  # Pas de compte connecté
+            msgbox.showinfo("Import Database",
+                            "Vous n'êtes pas connectés à un compte")
+        else:
+            try:
+                # ouverture du fichier
+                path = fldialog.askopenfilename(initialdir=f"{os.getcwd()}/Data", defaultextension=".csv",
+                                              title="Base de donnée CSV", filetypes=(("CSV file", "*.csv"), ("all files", "*.*")))
+                file = DbM(path)
+                fileData = file.GetTasks()
+                # ajout de chaque tâche
+                for task in fileData: 
+                    newtask = { # création dict tâche à ajouter
+                        "goal": "addElement",
+                        "task": task[LABELS.index("name")],
+                        "date": task[LABELS.index("date")],
+                        "priority": task[LABELS.index("priority")],
+                        "tag": task[LABELS.index("tag")],
+                        "status": task[LABELS.index("status")]}
+                    self.master.Server.Add(newtask)
+                # mise à jour reader
+                self.master.MainFrame.Tasks = self.master.Server.GetData()
+                self.master.MainFrame.ShowTasks()
+                print(f"Importation réussie : {path}")
+                msgbox.showinfo("Import Database",
+                                f"Importation réussie depuis {path}")
+            except Exception as e:
+                print("Echec de l'importation")
+                msgbox.showerror(
+                    "Import Database", f"La base de donnée n'a pas pu être importée : {e}")
         
 
     # fonction du menu déroulant View
