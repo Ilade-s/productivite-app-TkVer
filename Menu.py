@@ -23,6 +23,14 @@ class MenuBar(Menu):
         self.CreateFileMenu() # Menu File
         self.CreateWebMenu() # Menu Web
         self.CreateViewMenu() # Menu View
+        self.CreateGraphsMenu() # Menu Graphs
+        # ajout about
+        self.add_command(
+            label="About", command=lambda: msgbox.showinfo("About",
+                    f"Productivity App v{__VERSION__}\nMade by Merlet Raphaël, 2021 \
+                    \nSource : https://github.com/Ilade-s/productivite-app-TkVer \
+                    \nServer side (optionnal) : https://github.com/Tifiloow/productivite-app \
+                    \nPlease report any error or bug you could enconter"))
 
     def CreateFileMenu(self):
         FileMenu = Menu(self, tearoff=False)
@@ -81,6 +89,10 @@ class MenuBar(Menu):
         ViewMenu.add_separator() # séparateur
         ViewMenu.add_command(
             label="Reset all", command=self.ResetView)
+
+    def CreateGraphsMenu(self):
+        GraphMenu = Menu(self, tearoff=False)
+        self.add_cascade(label="Graphs", menu=GraphMenu)
 
     # fonctions du menu déroulant File
     def OpenDatabase(self, msg=True, path=""):
@@ -398,7 +410,6 @@ class MenuBar(Menu):
                 msgbox.showerror(
                     "Import Database", f"La base de donnée n'a pas pu être importée : {e}")
         
-
     # fonction du menu déroulant View
     def ResetView(self):
         """
@@ -408,6 +419,9 @@ class MenuBar(Menu):
         for var in self.master.ShowVars.values():
             var.set(1)
         self.master.MainFrame.ShowTasks()
+    
+    # fonctions du menu déroulant Graphs
+
 
 
 
