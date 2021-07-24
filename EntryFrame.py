@@ -17,11 +17,11 @@ class EntryFrame(LabelFrame):
     située (packée) dans MainFrame
     """
 
-    def __init__(self, master, purpose="login"):
+    def __init__(self, master, goal="login"):
         """
         Création et affichage de la Frame souhaitée
         master : fenêtre maîtresse (sera MainFrame)
-        purpose : str : indique le but de la Frame à afficher (et donc les widgets à ajouter):
+        goal : str : indique le but de la Frame à afficher (et donc les widgets à ajouter):
             - "login" : fenêtre de connexion avec id et mdp
             - "signup" : fenêtre de création de compte avec id, nom et mdp
             - "adress": fenêtre de récupéation d'une adresse web
@@ -30,13 +30,13 @@ class EntryFrame(LabelFrame):
         super().__init__(master, background="#424864",
                          relief=SOLID, text="EntryFrame", foreground="white")
         self.master = master
-        if purpose == "login":
+        if goal == "login":
             self.LoginFrame()
-        elif purpose == "signup":
+        elif goal == "signup":
             self.SignupFrame()
-        elif purpose == "adress":
+        elif goal == "adress":
             self.AdressFrame()
-        elif purpose == "task":
+        elif goal == "task":
             self.TaskFrame()
         self.pack(anchor="nw", pady=5, padx=20, expand=True)
 
@@ -56,7 +56,7 @@ class EntryFrame(LabelFrame):
                     f"Productivity App v{__VERSION__} : {self.master.master.Server.adress} : {iD.get()}")
                 msgbox.showinfo("login Serveur",
                                 f"Connexion au compte {iD.get()} réussie")
-                self.ServerSync()
+                self.show_server_data()
                 self.destroy()
             except Exception as e:
                 self.master.master.Server.Account = None
@@ -96,7 +96,7 @@ class EntryFrame(LabelFrame):
                     f"Productivity App v{__VERSION__} : {self.master.master.Server.adress} : {iD.get()}")
                 msgbox.showinfo("sign_up Serveur",
                                 f"Création du compte {iD.get()} réussie")
-                self.ServerSync()
+                self.show_server_data()
                 self.destroy()
             except Exception as e:
                 self.master.master.Server.Account = None
@@ -124,7 +124,7 @@ class EntryFrame(LabelFrame):
         nameEntry.grid(row=1, column=1, padx=10, pady=10)
         passwdEntry.grid(row=2, column=1, padx=10, pady=10)
 
-    def ServerSync(self):
+    def show_server_data(self):
         """
         Permet de se synchroniser à la base de donnée (après être connecté à un compte)
         """
@@ -182,7 +182,7 @@ class EntryFrame(LabelFrame):
         priority.set("medium")
         tag = StringVar()
         # création dates sur le mois
-        self.dates = self.CreateDateList(CDATE)
+        self.dates = self.create_date_list(CDATE)
         taskdate.set(CDATE)  # assignation taskdate à la date d'aujourd'hui
 
         def GetTask(task, taskdate, priority, tag):
@@ -260,7 +260,7 @@ class EntryFrame(LabelFrame):
         priorityBox.grid(row=1, column=2, padx=10, pady=10)
         tagEntry.grid(row=1, column=3, padx=10, pady=10)
 
-    def CreateDateList(self, cdate):
+    def create_date_list(self, cdate):
         """
         retourne une liste des dates dans le format AAAA-MM-JJ sur 30 jours inclus avec cdate
         """
