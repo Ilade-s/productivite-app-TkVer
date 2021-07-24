@@ -5,7 +5,7 @@ on peut afficher les tâches en se synchronisant au serveur
 """
 
 # variables globales
-from Global import __VERSION__, __AUTHOR__, x, y, ShowVersion, platform
+from Global import __VERSION__, __AUTHOR__, x, y, show_version, platform
 # importation des frames
 from NavBar import *
 from MainFrame import *
@@ -34,9 +34,9 @@ class TopLevel(Tk):
         self.EntryFrame = None
         self.geometry("{}x{}".format(x, y))
         # Placement des Frames
-        self.SetupFrames()
+        self.setup_frames()
 
-    def SetupFrames(self):
+    def setup_frames(self):
         """
         Place les Frames dans la grille
         """
@@ -55,7 +55,7 @@ class TopLevel(Tk):
 
 
 def main():
-    ShowVersion() # affichage info prog
+    show_version() # affichage info prog
     # Création fenêtre
     app = TopLevel()
     app.mainloop()

@@ -50,11 +50,11 @@ class EntryFrame(LabelFrame):
 
         def LoginAttempt(iD, passwd):
             try:
-                self.master.master.Server.Login(
+                self.master.master.Server.login(
                     iD.get(), passwd.get(), self.master.master.Server.adress+"/login")
                 self.master.master.title(
                     f"Productivity App v{__VERSION__} : {self.master.master.Server.adress} : {iD.get()}")
-                msgbox.showinfo("Login Serveur",
+                msgbox.showinfo("login Serveur",
                                 f"Connexion au compte {iD.get()} réussie")
                 self.ServerSync()
                 self.destroy()
@@ -62,7 +62,7 @@ class EntryFrame(LabelFrame):
                 self.master.master.Server.Account = None
                 print(f"Echec login au compte {iD.get()}")
                 msgbox.showerror(
-                    "Login Serveur", f"Echec de la connexion, veuillez réessayer : {e}")
+                    "login Serveur", f"Echec de la connexion, veuillez réessayer : {e}")
 
         self["text"] = "Connexion à un compte"
         # Création widgets
@@ -70,7 +70,7 @@ class EntryFrame(LabelFrame):
               ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
         Label(self, text="password :", font=(17), background=self["background"], foreground="white"
               ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
-        ttk.Button(self, text="Login", command=partial(LoginAttempt, iD, passwd), width=20
+        ttk.Button(self, text="login", command=partial(LoginAttempt, iD, passwd), width=20
                    ).grid(row=2, column=1, padx=10, pady=10)
         idEntry = ttk.Entry(self, textvariable=iD, width=30,
                             background=self["background"])
@@ -90,11 +90,11 @@ class EntryFrame(LabelFrame):
 
         def LoginAttempt(iD, name, passwd):
             try:
-                self.master.master.Server.Signup(iD.get(), passwd.get(
+                self.master.master.Server.sign_up(iD.get(), passwd.get(
                 ), name.get(), self.master.master.Server.adress+"/signup")
                 self.master.master.title(
                     f"Productivity App v{__VERSION__} : {self.master.master.Server.adress} : {iD.get()}")
-                msgbox.showinfo("Signup Serveur",
+                msgbox.showinfo("sign_up Serveur",
                                 f"Création du compte {iD.get()} réussie")
                 self.ServerSync()
                 self.destroy()
@@ -102,7 +102,7 @@ class EntryFrame(LabelFrame):
                 self.master.master.Server.Account = None
                 print(f"Echec signup compte {iD.get()}")
                 msgbox.showerror(
-                    "Signup Serveur", f"Echec de la création du compte, veuillez réessayer : {e}")
+                    "sign_up Serveur", f"Echec de la création du compte, veuillez réessayer : {e}")
 
         self["text"] = "Création d'un compte"
         # Création widgets
@@ -112,7 +112,7 @@ class EntryFrame(LabelFrame):
               ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
         Label(self, text="password :", font=(17), background=self["background"], foreground="white"
               ).grid(row=2, column=0, padx=10, pady=10, sticky="w")
-        ttk.Button(self, text="Signup", command=partial(LoginAttempt, iD, name, passwd), width=20
+        ttk.Button(self, text="sign_up", command=partial(LoginAttempt, iD, name, passwd), width=20
                    ).grid(row=3, column=1, padx=10, pady=10)
         idEntry = ttk.Entry(self, textvariable=iD, width=30,
                             background=self["background"])
@@ -129,10 +129,10 @@ class EntryFrame(LabelFrame):
         Permet de se synchroniser à la base de donnée (après être connecté à un compte)
         """
         self.master.ReaderIndex = 0
-        self.master.Tasks = self.master.master.Server.GetData()
+        self.master.Tasks = self.master.master.Server.get_data()
         #print(f"Tasks : {self.master.MainFrame.Tasks}")
         if __name__ != '__main__':  # désactivé lors d'un test individuel
-            self.master.ShowTasks()
+            self.master.render_tasks()
         print("Synchronisation réussie")
 
     def AdressFrame(self):
@@ -197,14 +197,14 @@ class EntryFrame(LabelFrame):
                         "tag": tag.get(),
                         "status": "enable"}
                     print("Tâche :", newtask)
-                    self.master.master.Server.Add(newtask)
+                    self.master.master.Server.add(newtask)
                     print("Synchronisation des modifications...")
                     # mise à jour liste des tâches
-                    self.master.Tasks = self.master.master.Server.GetData()
+                    self.master.Tasks = self.master.master.Server.get_data()
                     # mise à jour index (pour montrer la nouvelle tâche)
-                    self.master.ReaderIndex = (len(self.master.Tasks)-self.master.UpdateMaxAff()
-                                      if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
-                    self.master.ShowTasks()  # mise à jour lecteur
+                    self.master.ReaderIndex = (len(self.master.Tasks)-self.master.update_max_aff()
+                                      if len(self.master.Tasks)-self.master.update_max_aff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
+                    self.master.render_tasks()  # mise à jour lecteur
 
                 elif self.master.master.File != None:  # base de donnée CSV ouverte
                     newtask = [(str(int(self.master.Tasks[-1][0])+1) if self.master.Tasks else "0"),
@@ -213,12 +213,12 @@ class EntryFrame(LabelFrame):
                                task.get(), taskdate.get(), priority.get(), "enable", tag.get()]
                     print("Tâche :", newtask)
                     print("Ajout de la tâche au fichier CSV...")
-                    self.master.master.File.Add(newtask)
+                    self.master.master.File.add(newtask)
                     print("Synchronisation des modifications...")
-                    self.master.Tasks = self.master.master.File.GetTasks()  # mise à jour liste des tâches
-                    self.master.ReaderIndex = (len(self.master.Tasks)-self.master.UpdateMaxAff()
-                                      if len(self.master.Tasks)-self.master.UpdateMaxAff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
-                    self.master.ShowTasks()  # mise à jour lecteur
+                    self.master.Tasks = self.master.master.File.get_tasks()  # mise à jour liste des tâches
+                    self.master.ReaderIndex = (len(self.master.Tasks)-self.master.update_max_aff()
+                                      if len(self.master.Tasks)-self.master.update_max_aff() >= 0 else 0)  # mise à jour index (pour montrer la nouvelle tâche)
+                    self.master.render_tasks()  # mise à jour lecteur
 
                 # Erreur : rien d'ouvert (normalement impossible en conditions normales)
                 else:
@@ -241,7 +241,7 @@ class EntryFrame(LabelFrame):
               ).grid(row=0, column=2, padx=10, pady=10, sticky="n")
         Label(self, text="Tag", font=(17), background=self["background"], foreground="white"
               ).grid(row=0, column=3, padx=10, pady=10, sticky="n")
-        ttk.Button(self, text="Cancel", command=self.master.ShowTasks, width=20
+        ttk.Button(self, text="Cancel", command=self.master.render_tasks, width=20
                    ).grid(row=0, column=4, padx=10, pady=10)
         ttk.Button(self, text="Confirm", command=partial(GetTask, task, taskdate, priority, tag), width=20
                    ).grid(row=1, column=4, padx=10, pady=10)

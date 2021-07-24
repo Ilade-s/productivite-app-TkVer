@@ -6,10 +6,11 @@ CsvHandler :
 -----------
     - permet de gérer et lire une base de donnée au format CSV
     - FONCTIONS :
-        - Search : chercher une ligne ou un élément d'une ligne à partir d'une clé
-        - Add : ajouter une donnée/ligne
-        - Remove : retirer une ligne
-        - Edit : éditer une ligne ou un élément de ligne
+        - update_reader : mise a jour de self.Data (liste des lignes)
+        - get_tasks : renvoie la liste des lignes de données (index 1 à n)
+        - add : ajouter une donnée/ligne
+        - remove : retirer une ligne
+        - edit : éditer une ligne ou un élément de ligne
 """
 
 import csv  # Module mère gestion CSV
@@ -20,9 +21,9 @@ class CsvHandler():
     Permet de gérer et lire une base de donnée au format CSV
     - FONCTIONS :
         - Search : chercher une ligne ou un élément d'une ligne à partir d'une clé
-        - Add : ajouter une donnée/ligne
-        - Remove : retirer une ligne
-        - Edit : éditer une ligne ou un élément de ligne
+        - add : ajouter une donnée/ligne
+        - remove : retirer une ligne
+        - edit : éditer une ligne ou un élément de ligne
     """
 
     def __init__(self, path, mode="r+", Delimiter=",") -> None:
@@ -58,7 +59,7 @@ class CsvHandler():
                 with open(path, "x+", encoding="utf-8", newline='\n') as file:
                     self.dbR = csv.reader(file, delimiter=Delimiter)
 
-    def ReadAll(self):
+    def update_reader(self):
         """
         Permet de mettre à jour la base de donnée
         """
@@ -69,18 +70,13 @@ class CsvHandler():
         self.dbW = csv.writer(self.file, delimiter=self.Delimiter)
         #print(self.Data)
     
-    def GetTasks(self):
-        """
-        Permet de récupérer la liste des tâches contenues dans le fichier
-        """
-        self.ReadAll() # mise à jour reader
+    def get_tasks(self):
+        self.update_reader()
         # récupération tâches
         tasks = [task for task in self.Data[1:]]
-        #print(tasks)
-
         return tasks
 
-    def Add(self, data):
+    def add(self, data):
         """
         Permet d'ajouter la ligne data
 
@@ -94,9 +90,9 @@ class CsvHandler():
             - Aucune
         """
         self.dbW.writerow(data)
-        self.ReadAll()
+        self.update_reader()
 
-    def Remove(self, key):
+    def remove(self, key):
         """    
         Retire toutes les lignes du fichier correspondantes à clé
        
@@ -113,7 +109,7 @@ class CsvHandler():
         
         self.__init__(self.path) # réouverture du fichier en mode r+ (lecture/écriture)
 
-    def Edit(self, key, status):
+    def edit(self, key, status):
         """    
         Edite l'êtat de la tâche (ligne) correspondante à la clé
        
@@ -138,9 +134,9 @@ class CsvHandler():
 def main():
     Db = CsvHandler("Data/test.csv")
     #print(Db.Data)
-    #Db.Add(LABELS)
-    #Db.ReadAll()
-    Db.Remove(["85"])
+    #Db.add(LABELS)
+    #Db.update_reader()
+    Db.remove(["85"])
     #print(Db.Data)
 
 if __name__=='__main__': # test

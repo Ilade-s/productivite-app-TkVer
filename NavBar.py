@@ -11,13 +11,10 @@ class NavBar(LabelFrame):
         self.master = master
         super().__init__(master, background="#A8B8FF",
                          relief=RAISED, text="NavBar", foreground="white")
-        self.CreateWidgets()
+        self.create_widgets()
         self.place(relx=0, rely=.75, relheight=.25, relwidth=1)
 
-    def CreateWidgets(self):
-        """
-        Placement des widgets
-        """
+    def create_widgets(self):
         self['text'] = "Menu de navigation"
         for w in self.winfo_children():
             w.destroy()
@@ -31,10 +28,10 @@ class NavBar(LabelFrame):
         # ajout des widgets
         self.BackButton = ttk.Button(
             self, text="Previous page", state="disabled", style="NavBar.TButton", 
-                command=self.PreviousPage, image=self.BackImg)
+                command=self.go_to_previous_page, image=self.BackImg)
         self.NextButton = ttk.Button(
             self, text="Next page", state="disabled", style="NavBar.TButton", 
-                command=self.NextPage, image=self.NextImg)
+                command=self.go_to_next_page, image=self.NextImg)
         self.ReaderInfo = Label(self, text="..-../.. (/..)", font=("Arial", 20))
         self.BackButton.grid(row=0, column=1)
         self.NextButton.grid(row=0, column=3)
@@ -43,30 +40,30 @@ class NavBar(LabelFrame):
         s = ttk.Style(self)
         s.configure("NavBar.TButton", font=("Arial", 10))
 
-    def PreviousPage(self):
+    def go_to_previous_page(self):
         """
         Commande appelée par le bouton self.BackButton permettant de revenir à la page précédente 
         (dans l'affichage des tâches)
         """
-        affmax = self.master.MainFrame.UpdateMaxAff()  # récupération affmax
+        affmax = self.master.MainFrame.update_max_aff()  # récupération affmax
         self.master.MainFrame.ReaderIndex -= affmax  # maj intervalle des tâches à afficher
         if self.master.MainFrame.ReaderIndex < 0:  # afin d'éviter les index négatifs
             self.master.MainFrame.ReaderIndex = 0
-        self.master.MainFrame.ShowTasks()  # maj affichage
+        self.master.MainFrame.render_tasks()  # maj affichage
 
-    def NextPage(self):
+    def go_to_next_page(self):
         """
         Commande appelée par le bouton self.NextButton permettant d'afficher la page suivante
         (dans l'affichage des tâches)
         """
         self.master.MainFrame.ReaderIndex += self.master.MainFrame.maxAff  # maj intervalle des tâches à afficher
-        self.master.MainFrame.UpdateMaxAff()  # maj affichage max
-        self.master.MainFrame.ShowTasks()  # maj affichage
+        self.master.MainFrame.update_max_aff()  # maj affichage max
+        self.master.MainFrame.render_tasks()  # maj affichage
 
 
 if __name__ == '__main__':  # test de la frame (affichage)
-    from Global import x, y, ShowVersion
-    ShowVersion()  # affichage info prog
+    from Global import x, y, show_version
+    show_version()  # affichage info prog
 
     root = Tk()
     root.title("Test NavBar")

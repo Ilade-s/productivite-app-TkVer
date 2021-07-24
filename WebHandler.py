@@ -31,7 +31,7 @@ class WebInterface():
         if r.status_code != requests.codes.ok:
             raise(Exception)
     
-    def Login(self, username, password, adress):
+    def login(self, username, password, adress):
         """
         Permet de s'identifier au serveur avec un compte (préexistant uniquement)
 
@@ -68,9 +68,9 @@ class WebInterface():
         if not "Welcome" in r.text:
             raise(Exception)
         
-        print(f"Login réussi : {self.Account}")
+        print(f"login réussi : {self.Account}")
 
-    def Signup(self, username, password, name, adress):
+    def sign_up(self, username, password, name, adress):
         """
         Permet de s'identifier au serveur avec un compte (préexistant uniquement)
 
@@ -103,9 +103,9 @@ class WebInterface():
 
         print(f"Création du compte réussie : {self.Account}")
 
-        self.Login(username, password, self.adress+"login")
+        self.login(username, password, self.adress+"login")
 
-    def GetData(self, subpage="/getdata"):
+    def get_data(self, subpage="/getdata"):
         """
         Permet de récupérer la base de données de toutes les tâches liées à l'utilisateur
         subpage : str (extension indiquant le sous page permettant des récupérer les données)
@@ -117,7 +117,7 @@ class WebInterface():
 
         return r.json()
 
-    def Add(self, task):
+    def add(self, task):
         """
         Ajoute un tâche
 
@@ -136,7 +136,7 @@ class WebInterface():
         #    print("échec ajout : ID déjà présent :", r.json())
         #    raise(Exception)
 
-    def Remove(self, taskID):
+    def remove(self, taskID):
         """
         Supprime une tâche
 
@@ -156,7 +156,7 @@ class WebInterface():
         except Exception as e:
             print(e)
     
-    def Edit(self, taskID, status):
+    def edit(self, taskID, status):
         """
         Edite l'êtat d'une tâche
 

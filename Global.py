@@ -15,7 +15,7 @@ y = 600
 # nombre de jour par mois (année non bissextile, dans l'ordre de janvier à décembre)
 JMOIS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-def ShowVersion():
+def show_version():
     """
     Affiche la version et les informations sur le programme dans la console
     """

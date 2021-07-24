@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from NavBar import NavBar
-from Global import LABELS, ShowVersion, JMOIS
+from Global import LABELS, show_version, JMOIS
 # permet d'exécuter des fonctions avec des paramètres avec un widget tk
 from functools import partial
 from EntryFrame import *
@@ -26,24 +26,21 @@ class MainFrame(LabelFrame):
                          relief=SOLID, text="MainFrame", foreground="white")
         self.place(relx=0, rely=0, relheight=.75, relwidth=1)
 
-    def ShowTasks(self):
-        """
-        Affiche les tâches
-        """
+    def render_tasks(self):
         if __name__!='__main__':
             # checks if a database is open, if not, exits the function
             if self.master.File == None and self.master.Server == None:
                 return 0
-            self.FilterTasks() # filter and sort the task list
+            self.filter_tasks()
             # maj index de lecture après filtrage (si la liste est raccourcie)
             if self.ReaderIndex > len(self.TasksTS):
-                self.ReaderIndex = (len(self.TasksTS)-self.UpdateMaxAff()
-                            if len(self.TasksTS)-self.UpdateMaxAff() >= 0 else 0)
+                self.ReaderIndex = (len(self.TasksTS)-self.update_max_aff()
+                            if len(self.TasksTS)-self.update_max_aff() >= 0 else 0)
         else: 
             self.TasksTS = self.Tasks
 
         self['text'] = "Liste des tâches"
-        # Remove and replace task Entryframe
+        # remove and replace task Entryframe
         if self.master.EntryFrame != None:
             self.master.EntryFrame.destroy()
         # Unpack tâches précedemment affichées
@@ -78,11 +75,11 @@ class MainFrame(LabelFrame):
                 anchor="w", padx=20, pady=5, ipadx=self.winfo_width()*.9)  # affichage tâche
 
         # création bouton d'ajout de tâche
-        self.AddTaskButton()
+        self.add_task_button()
         # Maj état des boutons de NavBar
-        self.UpdateNavBar()
+        self.update_navbar()
 
-    def UpdateNavBar(self):
+    def update_navbar(self):
         if len(self.TasksTS) == 0 or len(self.TasksTS) <= self.maxAff:  # une seule page
             self.master.NavBar.BackButton["state"] = "disabled"
             self.master.NavBar.NextButton["state"] = "disabled"
@@ -99,7 +96,7 @@ class MainFrame(LabelFrame):
         self.master.NavBar.ReaderInfo[
             'text'] = f"{self.ReaderIndex+1 if len(self.Tasks) > 0 else 0}-{self.ReaderIndex+len(self.ShownTasks)}/{len(self.TasksTS)} (/{len(self.Tasks)})"
 
-    def FilterTasks(self):
+    def filter_tasks(self):
         """
         filtre et trie les tâches de l'attribut self.Tasks selon les choix de l'utilisateur et stocke le résultat dans self.TasksTS (TasksToShow)
         """
@@ -120,15 +117,15 @@ class MainFrame(LabelFrame):
             self.TasksTS.sort(key=lambda x: int(x[LABELS.index("date")][-2:])+
                 int(x[LABELS.index("date")][-5:-3])*JMOIS[int(x[LABELS.index("date")][-5:-3])])
 
-    def AddTaskButton(self):
+    def add_task_button(self):
         """
         Ajoute le bouton "Ajout de tâche" à MainFrame
         """
         self.AddButton = ttk.Button(self, text="Ajouter une tâche",
-                                    image=self.addImg, command=self.AddTask)
+                                    image=self.addImg, command=self.add_task)
         self.AddButton.pack(pady=10, padx=20, anchor="w")
 
-    def AddTask(self):
+    def add_task(self):
         """
         Action déclenchée par le bouton "Ajouter une tâche"
         """
@@ -138,7 +135,7 @@ class MainFrame(LabelFrame):
             self.master.EntryFrame = None
         self.master.EntryFrame = EntryFrame(self, "task")
 
-    def UnpackTasks(self):
+    def unpack_tasks(self):
         """
         Retire toutes les tâches
         """
@@ -149,9 +146,9 @@ class MainFrame(LabelFrame):
         for w in self.master.NavBar.winfo_children():
             w.destroy()
 
-    def UpdateMaxAff(self):
+    def update_max_aff(self):
         """
-        Permet de mettre à jour le nombre de tâches affichables sans clippage 
+        Permet de mettre à jour le nombre de tâches affichables sans dépasser le cadre de la frame
         (et avec un espace pour la Frame d'ajout de tâches)
         """
         # on sait que taille de base = 600*.75 = 450 or on peut y afficher 9 tâches - 2 pour l'espace restant
@@ -190,15 +187,12 @@ class TaskFrame(Frame):
         self.SupprImg = PhotoImage(file="Assets/remove-icon.png") # icône du bouton de supression
         super().__init__(master, background=self.master['background'],
                         relief=SOLID)
-        self.CreateWidgets()
+        self.create_widgets()
     
-    def CreateWidgets(self):
-        """
-        Ajoute les widgets dans la frame
-        """
+    def create_widgets(self):
         task = self.task
 
-        def TaskSelected(taskID):
+        def task_selected(taskID):
             """
             Action d'un CheckButton de tâche lorsque que l'user interagit avec lui (pour la mettre comme faite ou non)
             param taskID : str : numéro sous forme de string qui peret de retrouver une tâche dans la liste
@@ -207,14 +201,14 @@ class TaskFrame(Frame):
             #print("Etat de la tâche :", ("faite" if self.taskState.get() else "à faire")) # debug
             try:
                 if self.master.master.File != None: # fichier CSV ouvert
-                    self.master.master.File.Edit(taskID,
+                    self.master.master.File.edit(taskID,
                         ("disable" if self.taskState.get() else "enable"))
-                    self.master.Tasks = self.master.master.File.GetTasks()
+                    self.master.Tasks = self.master.master.File.get_tasks()
 
                 elif self.master.master.Server != None: # connecté à un serveur
-                    self.master.master.Server.Edit(taskID,
+                    self.master.master.Server.edit(taskID,
                         ("disable" if self.taskState.get() else "enable"))
-                    self.master.Tasks = self.master.master.Server.GetData()
+                    self.master.Tasks = self.master.master.Server.get_data()
                 
                 print(f"Etat de la tâche {taskID} mis à jour")
 
@@ -223,8 +217,7 @@ class TaskFrame(Frame):
                 msgbox.showerror("Interaction avec une tâche",
                     f"Echec de l'interaction avec la tâche {taskID} : {e}") 
 
-
-        def RemoveTask(taskID):
+        def remove_task(taskID):
             """
             Action du bouton qui permet de retirer la tâche du fichier ou du serveur et de mettre à jour MainFrame
             param taskID : str : ID (task[0]) de la tâche à retirer
@@ -232,14 +225,14 @@ class TaskFrame(Frame):
             #print(taskID) # debug
             try:
                 if self.master.master.File != None: # fichier CSV ouvert
-                    self.master.master.File.Remove(taskID)
-                    self.master.Tasks = self.master.master.File.GetTasks()
+                    self.master.master.File.remove(taskID)
+                    self.master.Tasks = self.master.master.File.get_tasks()
 
                 elif self.master.master.Server != None: # connecté à un serveur
-                    self.master.master.Server.Remove(taskID)
-                    self.master.Tasks = self.master.master.Server.GetData()
+                    self.master.master.Server.remove(taskID)
+                    self.master.Tasks = self.master.master.Server.get_data()
 
-                self.master.ShowTasks()
+                self.master.render_tasks()
                 print(f"Tâche {taskID} retirée avec succés")
             except Exception as e:
                 print(f"Echec de la suppression de la tâche {taskID} {e}")
@@ -251,11 +244,11 @@ class TaskFrame(Frame):
         self.CheckB = ttk.Checkbutton(self,
             text=f"{task[2][:30]}... // {task[3]} // {task[4]} // {task[6]}" if len(task[2]) > 60
             else f"{task[2]} // {task[3]} // {task[4]} // {task[6]}", onvalue=1, offvalue=0,
-            style=f"{task[0]}.TCheckbutton", command=partial(TaskSelected, task[0]))
+            style=f"{task[0]}.TCheckbutton", command=partial(task_selected, task[0]))
         self.CheckB.grid(row=0, column=0, sticky="w")
         # bouton de suppression
         ttk.Button(self, text="Supprimer tâche",
-                    image=self.SupprImg, command=partial(RemoveTask, task[0])
+                    image=self.SupprImg, command=partial(remove_task, task[0])
                         ).place(rely=0, relx=.9)
         # config style
         s = ttk.Style(self)
@@ -265,7 +258,7 @@ class TaskFrame(Frame):
 
 
 if __name__ == '__main__':  # test de la frame (affichage)
-    ShowVersion()  # affichage info prog
+    show_version()  # affichage info prog
     from Global import x, y
 
     root = Tk()
@@ -275,6 +268,6 @@ if __name__ == '__main__':  # test de la frame (affichage)
     # setup test
     root.NavBar = NavBar(root)
     root.EntryFrame = None
-    root.MainFrame.ShowTasks()
+    root.MainFrame.render_tasks()
 
     root.mainloop()
