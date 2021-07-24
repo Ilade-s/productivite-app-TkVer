@@ -24,4 +24,5 @@ def show_version():
     print(f"Made by {__AUTHOR__} (with the advices of {__ADVISOR__})")
     print("Source : https://github.com/Ilade-s/productivite-app-TkVer")
     print("Server (optionnal) : https://github.com/Tifiloow/productivite-app")
+    print("Assets : https://feathericons.com/")
     print("===============================================================")

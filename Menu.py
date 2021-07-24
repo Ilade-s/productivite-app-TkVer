@@ -30,7 +30,7 @@ class MenuBar(Menu):
                     f"Productivity App v{__VERSION__}\nMade by Merlet Raphaël, 2021 \
                     \nSource : https://github.com/Ilade-s/productivite-app-TkVer \
                     \nServer side (optionnal) : https://github.com/Tifiloow/productivite-app \
-                    \nPlease report any error or bug you could enconter"))
+                    \nAssets : https://feathericons.com/"))
 
     def create_file_menu(self):
         FileMenu = Menu(self, tearoff=False)
@@ -195,7 +195,7 @@ class MenuBar(Menu):
                 self.master.File.file.close()
                 self.master.File = None
                 self.master.MainFrame.unpack_tasks()  # Supprime les tâches
-                self.master.NavBar.CreateWidgets()  # Réinitialise les widgets de NavBar
+                self.master.NavBar.create_widgets()  # Réinitialise les widgets de NavBar
                 # Réinitialise le titre de MainFrame
                 self.master.MainFrame['text'] = "MainFrame"
                 self.entryconfig("Web", state=NORMAL)
@@ -278,7 +278,7 @@ class MenuBar(Menu):
             if self.master.EntryFrame != None:
                 self.master.EntryFrame.destroy()
             self.master.MainFrame.unpack_tasks()  # Supprime les tâches
-            self.master.NavBar.CreateWidgets()  # Réinitialise les widgets de NavBar
+            self.master.NavBar.create_widgets()  # Réinitialise les widgets de NavBar
             self.entryconfig("File", state=NORMAL)
             # Réinitialise le titre de MainFrame
             self.master.MainFrame['text'] = "MainFrame"

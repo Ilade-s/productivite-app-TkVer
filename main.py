@@ -26,7 +26,7 @@ class TopLevel(Tk):
         self.style = ttk.Style()
         if platform=="linux":
             self.style.theme_use("clam")
-        self.iconphoto(True, PhotoImage(file="Assets/favicon.png"))
+        self.iconphoto(True, PhotoImage(file="Assets/calendar.png"))
         self.title(
             f"Productivity App v{__VERSION__} : Pas de base de donnée ouverte")
         self.File = None

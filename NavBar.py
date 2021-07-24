@@ -23,8 +23,8 @@ class NavBar(LabelFrame):
         for i in range(5):
             self.columnconfigure(i, weight=1)
         # importation images
-        self.BackImg = PhotoImage(file="Assets/back-arrow.png")
-        self.NextImg = PhotoImage(file="Assets/next-arrow.png")
+        self.BackImg = PhotoImage(file="Assets/chevron-left.png")
+        self.NextImg = PhotoImage(file="Assets/chevron-right.png")
         # ajout des widgets
         self.BackButton = ttk.Button(
             self, text="Previous page", state="disabled", style="NavBar.TButton", 

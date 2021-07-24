@@ -19,7 +19,7 @@ class MainFrame(LabelFrame):
         self.StateTasks = []
         self.ReaderIndex = 0
         self.AddButton = None
-        self.addImg = PhotoImage(file="Assets/add-icon.png")
+        self.addImg = PhotoImage(file="Assets/plus-square.png")
         # nombre de tâches affichables sans clippage (dynamique)
         self.maxAff = 7
         super().__init__(master, background="#292D3E",
@@ -184,7 +184,7 @@ class TaskFrame(Frame):
         }
         self.master = master
         self.task = task # liste de tâche
-        self.SupprImg = PhotoImage(file="Assets/remove-icon.png") # icône du bouton de supression
+        self.SupprImg = PhotoImage(file="Assets/trash.png") # icône du bouton de supression
         super().__init__(master, background=self.master['background'],
                         relief=SOLID)
         self.create_widgets()

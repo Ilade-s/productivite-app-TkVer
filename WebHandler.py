@@ -53,17 +53,13 @@ class WebInterface():
 
         self.session = requests.Session()
         p = self.session.post(adress, data=payload)
-        #print("login :",p.status_code)
 
-        if p.status_code != requests.codes.ok:
-            raise(Exception)
+        p.raise_for_status()
 
         r = self.session.get(self.adress+"profile" if self.adress[-1]=="/" 
                                 else self.adress+"/profile")
-        #print("profile :",r.status_code)
 
-        if r.status_code != requests.codes.ok:
-            raise(Exception)
+        r.raise_for_status()
         
         if not "Welcome" in r.text:
             raise(Exception)
@@ -95,9 +91,8 @@ class WebInterface():
 
         self.session = requests.Session()
         p = self.session.post(adress, data=payload, allow_redirects=True)
-        #print("login :",p.status_code)
-        if p.status_code != requests.codes.ok:
-            raise(Exception)
+        # checks to see if the signup succeded
+        p.raise_for_status()
         if not p.url == self.adress+"login":
             raise(Exception)
 
@@ -112,8 +107,7 @@ class WebInterface():
         """
         r = self.session.post(self.adress+subpage)
 
-        if r.status_code != requests.codes.ok:
-            raise(Exception)
+        r.raise_for_status()
 
         return r.json()
 
@@ -127,14 +121,7 @@ class WebInterface():
         """
         r = self.session.post(self.adress, data=json.dumps(task, separators=(',', ':')))
 
-        try:
-            r.raise_for_status()
-        except Exception as e:
-            print(e)
-        
-        #if r.json() != 'Success': # échec de l'ajout de la tâche
-        #    print("échec ajout : ID déjà présent :", r.json())
-        #    raise(Exception)
+        r.raise_for_status()
 
     def remove(self, taskID):
         """
@@ -151,10 +138,7 @@ class WebInterface():
 
         r = self.session.post(self.adress, data=json.dumps(payload, separators=(',', ':')))
 
-        try:
-            r.raise_for_status()
-        except Exception as e:
-            print(e)
+        r.raise_for_status()
     
     def edit(self, taskID, status):
         """
@@ -174,7 +158,4 @@ class WebInterface():
 
         r = self.session.post(self.adress, data=json.dumps(payload, separators=(',', ':')))
 
-        try:
-            r.raise_for_status()
-        except Exception as e:
-            print(e)
+        r.raise_for_status()
