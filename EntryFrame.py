@@ -35,20 +35,17 @@ class EntryFrame(LabelFrame):
         elif goal == "signup":
             self.SignupFrame()
         elif goal == "adress":
-            self.AdressFrame()
+            self.ConnexionFrame()
         elif goal == "task":
             self.TaskFrame()
         self.pack(anchor="nw", pady=5, padx=20, expand=True)
 
     def LoginFrame(self):
-        """
-        Widgets de frame permettant de se connecter à un compte existant
-        """
         # Création variables des entrées
         iD = StringVar()
         passwd = StringVar()
 
-        def LoginAttempt(iD, passwd):
+        def login_attempt(iD, passwd):
             try:
                 self.master.master.Server.login(
                     iD.get(), passwd.get(), self.master.master.Server.adress+"/login")
@@ -70,7 +67,7 @@ class EntryFrame(LabelFrame):
               ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
         Label(self, text="password :", font=(17), background=self["background"], foreground="white"
               ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
-        ttk.Button(self, text="login", command=partial(LoginAttempt, iD, passwd), width=20
+        ttk.Button(self, text="login", command=partial(login_attempt, iD, passwd), width=20
                    ).grid(row=2, column=1, padx=10, pady=10)
         idEntry = ttk.Entry(self, textvariable=iD, width=30,
                             background=self["background"])
@@ -88,7 +85,7 @@ class EntryFrame(LabelFrame):
         passwd = StringVar()
         name = StringVar()
 
-        def LoginAttempt(iD, name, passwd):
+        def signup_attempt(iD, name, passwd):
             try:
                 self.master.master.Server.sign_up(iD.get(), passwd.get(
                 ), name.get(), self.master.master.Server.adress+"/signup")
@@ -112,7 +109,7 @@ class EntryFrame(LabelFrame):
               ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
         Label(self, text="password :", font=(17), background=self["background"], foreground="white"
               ).grid(row=2, column=0, padx=10, pady=10, sticky="w")
-        ttk.Button(self, text="sign_up", command=partial(LoginAttempt, iD, name, passwd), width=20
+        ttk.Button(self, text="sign_up", command=partial(signup_attempt, iD, name, passwd), width=20
                    ).grid(row=3, column=1, padx=10, pady=10)
         idEntry = ttk.Entry(self, textvariable=iD, width=30,
                             background=self["background"])
@@ -125,24 +122,16 @@ class EntryFrame(LabelFrame):
         passwdEntry.grid(row=2, column=1, padx=10, pady=10)
 
     def show_server_data(self):
-        """
-        Permet de se synchroniser à la base de donnée (après être connecté à un compte)
-        """
         self.master.ReaderIndex = 0
         self.master.Tasks = self.master.master.Server.get_data()
-        #print(f"Tasks : {self.master.MainFrame.Tasks}")
-        if __name__ != '__main__':  # désactivé lors d'un test individuel
-            self.master.render_tasks()
+        self.master.render_tasks()
         print("Synchronisation réussie")
 
-    def AdressFrame(self):
-        """
-        Frame permettant de se connecter à un serveur à l'aide de son adresse web
-        """
+    def ConnexionFrame(self):
         # Création variables des entrées
         adress = StringVar()
 
-        def ConnexionAttempt(adress):
+        def connexion_attempt(adress):
             adresse = adress.get()
             try:
                 self.master.master.Server = WebInterface(adress=adresse)
@@ -162,7 +151,7 @@ class EntryFrame(LabelFrame):
         # Création widgets
         Label(self, text="Adresse web :", font=(17), background=self["background"], foreground="white"
               ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
-        ttk.Button(self, text="Connect to server", command=partial(ConnexionAttempt, adress), width=20
+        ttk.Button(self, text="Connect to server", command=partial(connexion_attempt, adress), width=20
                    ).grid(row=1, column=1, padx=10, pady=10)
         ttk.Button(self, text="Cancel", command=self.destroy, width=20
                    ).grid(row=1, column=0, padx=10, pady=10)

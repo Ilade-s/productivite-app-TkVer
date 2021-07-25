@@ -63,7 +63,7 @@ class MenuBar(Menu):
         self.WebMenu.add_command(
             label="Extract database to csv", command=self.server_extract_CSV)
         self.WebMenu.add_command(
-            label="add tasks from csv", command=self.server_import_CSV)
+            label="Add tasks from csv", command=self.server_import_CSV)
 
     def create_view_menu(self):
         ViewMenu = Menu(self, tearoff=False)
