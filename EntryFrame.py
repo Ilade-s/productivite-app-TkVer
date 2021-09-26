@@ -171,8 +171,8 @@ class EntryFrame(LabelFrame):
         priority.set("medium")
         tag = StringVar()
         # création dates sur le mois
-        self.dates = self.create_date_list(CDATE)
-        taskdate.set(CDATE)  # assignation taskdate à la date d'aujourd'hui
+        self.dates = self.create_date_list()
+        taskdate.set('{}-{}-{}'.format(CDATE.day, CDATE.month, CDATE.year))  # assignation taskdate à la date d'aujourd'hui
 
         def GetTask(task, taskdate, priority, tag):
             try:
@@ -249,17 +249,19 @@ class EntryFrame(LabelFrame):
         priorityBox.grid(row=1, column=2, padx=10, pady=10)
         tagEntry.grid(row=1, column=3, padx=10, pady=10)
 
-    def create_date_list(self, cdate):
+    def create_date_list(self):
         """
         retourne une liste des dates dans le format AAAA-MM-JJ sur 30 jours inclus avec cdate
         """
-        return [cdate[:-2]+(str(int(cdate[-2:])+i) if int(cdate[-2:])+i > 9 else cdate[-2]+str(int(cdate[-1])+i))  # création de la liste des dates sur un mois
-                 for i in range(JMOIS[int(cdate[5:7])-1]-int(cdate[-2:])+1)]+[
-            cdate[:6]+str(int(cdate[6])+1)+cdate[7:-2] + \
-            ("0"+str(i) if i < 10 else str(i))
-            if int(cdate[6])+1 <= 12
-            else cdate[:6]+"1"+cdate[7:-2]+("0"+str(i) if i < 10 else str(i))
-            for i in range(1, int(cdate[-2:])+1)]
+        return [
+            '{}-{}-{}'.format(
+                (CDATE.day + i) % 31 + 1,
+                (CDATE.month + 
+                    ((CDATE.day + i) // 31)) % 12,
+                CDATE.year + 
+                    ((CDATE.month + ((CDATE.day + i) // 31)) // 12))
+            for i in range(31)
+        ]
 
 
 if __name__ == '__main__':

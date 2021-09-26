@@ -3,7 +3,7 @@ Contient les variables et fonctions nécessaires dans plusieurs fichiers
 """
 from sys import platform # connaitre la plateforme/OS
 from datetime import date # récupération de la date (ajout de tâche)
-CDATE = str(date.today())  # date actuelle (format AAAA-MM-JJ)
+CDATE = date.today()  # date actuelle (format AAAA-MM-JJ)
 __VERSION__ = "1.2"
 __AUTHOR__ = "Raphaël"
 __ADVISOR__ = "Elisa"
