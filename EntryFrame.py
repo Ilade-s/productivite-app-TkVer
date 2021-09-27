@@ -172,7 +172,7 @@ class EntryFrame(LabelFrame):
         tag = StringVar()
         # création dates sur le mois
         self.dates = self.create_date_list()
-        taskdate.set('{}-{}-{}'.format(CDATE.day, CDATE.month, CDATE.year))  # assignation taskdate à la date d'aujourd'hui
+        taskdate.set('{2}-{1}-{0}'.format(CDATE.day, CDATE.month, CDATE.year))  # assignation taskdate à la date d'aujourd'hui
 
         def GetTask(task, taskdate, priority, tag):
             try:
@@ -254,7 +254,7 @@ class EntryFrame(LabelFrame):
         retourne une liste des dates dans le format AAAA-MM-JJ sur 30 jours inclus avec cdate
         """
         return [
-            '{}-{}-{}'.format(
+            '{2}-{1}-{0}'.format(
                 (CDATE.day + i) % 31 + 1,
                 (CDATE.month + 
                     ((CDATE.day + i) // 31)) % 12,
